@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run db:seed && next build",
     "start": "next start",
     "db:seed": "node --no-warnings scripts/seed.mjs"
   },
@@ -19,5 +19,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
