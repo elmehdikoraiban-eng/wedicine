@@ -1,0 +1,8 @@
+---
+// Toute adresse sans préfixe de langue (racine comprise) est redirigée vers la langue du visiteur.
+// Route explicite : sur Vercel, le middleware seul n'est pas appelé pour une adresse sans page.
+import { pickLang } from "@/lib/lang";
+const lang = pickLang(Astro.request, Astro.cookies.get("wd_lang")?.value);
+const path = Astro.params.path ? `/${Astro.params.path}` : "";
+return Astro.redirect(`/${lang}${path}${Astro.url.search}`, 302);
+---
