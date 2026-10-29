@@ -9,7 +9,7 @@ page publique du symptôme pour le référencement.
 
 - [Astro 5](https://astro.build) en rendu serveur, adaptateur Vercel, îlots React pour le
   formulaire, l'authentification et la publication.
-- Postgres (Neon) via `DATABASE_URL` ; sans cette variable, base locale PGlite dans `data/pglite`
+- Postgres (Supabase ou autre) via `DATABASE_URL` (ou `POSTGRES_URL` fourni par l'intégration Vercel) ; sans cette variable, base locale PGlite dans `data/pglite`
   (en mémoire sur Vercel, donc perdue à chaque déploiement).
 - Contenu médical dans `src/lib/content/fiches/*.ts`, structure du formulaire dans
   `src/lib/content/themes.ts` et `options.ts`.
@@ -27,7 +27,7 @@ npm run typecheck  # astro check
 
 | Variable            | Rôle                                                                  |
 | ------------------- | --------------------------------------------------------------------- |
-| `DATABASE_URL`      | Postgres (Neon). Obligatoire en production pour conserver les comptes. |
+| `DATABASE_URL`      | Postgres (Supabase, chaîne « Transaction pooler »). Obligatoire en production pour conserver les comptes. |
 | `PUBLIC_SITE_URL`   | Adresse publique (liens canoniques, sitemap).                         |
 | `CONTENT_REVIEWED`  | Mettre `1` après relecture médicale : les pages deviennent indexables. |
 

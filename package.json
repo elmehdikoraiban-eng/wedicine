@@ -13,18 +13,21 @@
     "@astrojs/react": "^4",
     "@astrojs/vercel": "^8",
     "@electric-sql/pglite": "^0.5.13",
-    "@neondatabase/serverless": "^1.2.0",
     "astro": "^5",
     "lucide-react": "^1.64.0",
+    "pg": "^8.23.1",
     "react": "^19",
     "react-dom": "^19"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9",
     "@types/node": "^22",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5"
   },
-  "engines": { "node": "22.x" }
+  "engines": {
+    "node": "22.x"
+  }
 }

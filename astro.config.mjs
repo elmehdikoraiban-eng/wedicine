@@ -12,5 +12,5 @@ export default defineConfig({
     includeFiles: ["node_modules/@electric-sql/pglite/dist/pglite.wasm", "node_modules/@electric-sql/pglite/dist/pglite.data"],
   }),
   integrations: [react()],
-  vite: { ssr: { external: ["@electric-sql/pglite", "@neondatabase/serverless"] } },
+  vite: { ssr: { external: ["@electric-sql/pglite", "pg"] } },
 });

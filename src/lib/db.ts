@@ -1,5 +1,5 @@
 
-// Postgres via DATABASE_URL (Neon) en production, PGlite (fichier local) sinon.
+// Postgres (Supabase, Neon ou autre) via DATABASE_URL en production, PGlite (fichier local) sinon.
 // Les deux exposent query(sql, params) avec le même format de résultat.
 
 type Row = Record<string, unknown>;
@@ -48,10 +48,16 @@ CREATE INDEX IF NOT EXISTS questions_page ON questions (theme, symptom, intent) 
 
 let ready: Promise<Q> | undefined;
 
+// Supabase : utiliser la chaîne « Transaction pooler » (port 6543), adaptée au serverless.
+// L'intégration Vercel de Supabase fournit POSTGRES_URL ; une variable DATABASE_URL marche aussi.
+// Le TLS suit les paramètres de la chaîne (sslmode=...), rien n'est désactivé ici.
+const connectionString = () => process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL;
+
 async function open(): Promise<Q> {
-  if (process.env.DATABASE_URL) {
-    const { Pool } = await import("@neondatabase/serverless");
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const url = connectionString();
+  if (url) {
+    const { default: pg } = await import("pg");
+    const pool = new pg.Pool({ connectionString: url, max: 3 });
     await pool.query(SCHEMA);
     return pool;
   }
