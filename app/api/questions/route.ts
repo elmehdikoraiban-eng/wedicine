@@ -3,7 +3,7 @@ import { isLang, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
 import { insertQuestion } from "@/lib/db";
 import { fiche } from "@/lib/content/fiches";
-import { pageTitle, symptom, theme } from "@/lib/content/themes";
+import { symptom, theme } from "@/lib/content/themes";
 import { isUrgent, validate } from "@/lib/triage";
 
 export async function POST(req: Request) {
@@ -28,8 +28,7 @@ export async function POST(req: Request) {
   return NextResponse.json({
     id,
     urgent,
-    title: pageTitle(lang, th, sy, a.intent),
-    summary: f.summary[lang],
+    theme: th.label[lang],
     next: user && !urgent ? `/${lang}/compte/q/${id}` : null,
   });
 }

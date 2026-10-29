@@ -10,7 +10,7 @@ import { Icon } from "./Icon";
 import { AuthForm } from "./AuthForm";
 
 type Step = "who" | "theme" | "symptom" | "zone" | "intensity" | "duration" | "signs" | "profile" | "intent";
-type Result = { id: number; urgent: boolean; title: string; summary: string; next: string | null };
+type Result = { id: number; urgent: boolean; theme: string; next: string | null };
 
 const EMPTY: Answers = {
   who: "", theme: "", symptom: "", zone: null, intensity: null, duration: null, signs: [],
@@ -257,34 +257,32 @@ function Preview({ lang, result }: { lang: Lang; result: Result }) {
   const sections: Array<"whatToKnow" | "meanwhile" | "whichDoctor" | "exams" | "askDoctor"> = ["whatToKnow", "meanwhile", "whichDoctor", "exams", "askDoctor"];
   return (
     <div className="answer with-aside">
-      <div>
-        <div className="card answer-head">
-          <span className="badge badge-ok"><Icon name="Check" size={14} /> {t(lang, "previewReady")}</span>
-          <h1 style={{ marginTop: 10 }}>{result.title}</h1>
-          <p className="summary">{result.summary}</p>
-          <p className="notice notice-info small"><Icon name="CircleAlert" size={18} />{t(lang, "answerInfo")}</p>
-        </div>
-        <div className="locked" style={{ marginTop: 16 }}>
-          <div className="blur" aria-hidden="true">
-            {sections.map((k) => (
-              <div key={k} className="card sec" style={{ marginBottom: 12 }}>
-                <h2>{t(lang, k)}</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-              </div>
-            ))}
+      <aside className="card" id="compte">
+        <span className="badge badge-ok"><Icon name="Check" size={14} /> {t(lang, "previewTitle")}</span>
+        <p className="muted" style={{ margin: "10px 0 16px" }}>{t(lang, "previewText")}</p>
+        <AuthForm lang={lang} questionId={result.id} />
+      </aside>
+      <div className="locked" aria-hidden="true">
+        <div className="blur">
+          <div className="card" style={{ marginBottom: 12 }}>
+            <p className="muted small" style={{ marginBottom: 6 }}>{result.theme}</p>
+            <h1 style={{ fontSize: "1.8rem" }}>Lorem ipsum dolor sit amet, consectetur ?</h1>
+            <p className="summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
           </div>
-          <div className="lock">
-            <div>
-              <Icon name="Lock" size={28} style={{ margin: "0 auto 8px", color: "var(--brand)" }} />
-              <p style={{ fontWeight: 700 }}>{t(lang, "previewLocked")}</p>
+          {sections.map((k) => (
+            <div key={k} className="card sec" style={{ marginBottom: 12 }}>
+              <h2>{t(lang, k)}</h2>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
             </div>
+          ))}
+        </div>
+        <div className="lock">
+          <div>
+            <Icon name="Lock" size={28} style={{ margin: "0 auto 8px", color: "var(--brand)" }} />
+            <p style={{ fontWeight: 500 }}>{t(lang, "previewLocked")}</p>
           </div>
         </div>
       </div>
-      <aside className="card" id="compte">
-        <AuthForm lang={lang} questionId={result.id} />
-      </aside>
     </div>
   );
 }
