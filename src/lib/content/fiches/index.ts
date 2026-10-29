@@ -1,4 +1,3 @@
-import "server-only";
 import type { Fiche, ThemeFiches } from "../types";
 import { fievre } from "./fievre";
 import { rhume } from "./rhume";

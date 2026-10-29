@@ -1,0 +1,134 @@
+---
+import Base from "@/layouts/Base.astro";
+import { t } from "@/lib/i18n";
+import { langParam } from "@/lib/lang";
+import { pageTitle, THEMES } from "@/lib/content/themes";
+import { qPath, SITE_URL } from "@/lib/site";
+import { Icon } from "@/components/Icon";
+import { Account, AnswerSheet, Choose, Community, PhoneForm, Urgent } from "@/components/Illustrations";
+
+const lang = langParam(Astro.params);
+if (!lang) return Astro.redirect("/fr", 302);
+
+// Quelques questions mises en avant sur l'accueil (thème, symptôme, intention).
+const POPULAR: [string, string, string][] = [
+  ["fievre", "seule", "grave"], ["tete", "migraine", "medecin"], ["digestion", "brulures", "attente"],
+  ["tension", "elevee", "grave"], ["dos", "lombaires", "attente"], ["sommeil", "endormissement", "medecin"],
+  ["allergie", "nez", "attente"], ["bilan", "checkup", "examens"], ["diabete", "soif", "examens"],
+];
+const page = ([thId, syId, intent]: [string, string, string]) => {
+  const th = THEMES.find((x) => x.id === thId)!;
+  const sy = th.symptoms.find((x) => x.id === syId)!;
+  return { th, sy, intent, href: qPath(lang, th, sy, intent), title: pageTitle(lang, th, sy, intent) };
+};
+const example = page(["fievre", "seule", "grave"]);
+const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
+const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
+const features = [
+  { icon: "CircleAlert", title: "seeQuickly", text: "receiveGrave" },
+  { icon: "UserRound", title: "yourCase", text: "receiveCase" },
+  { icon: "Stethoscope", title: "whichDoctor", text: "receiveDoctor" },
+  { icon: "MessageCircleQuestion", title: "askDoctor", text: "receiveQuestions" },
+] as const;
+---
+<Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false}>
+  <!-- Héros : titre à gauche, maquette téléphone à droite. -->
+  <section class="wrap hero">
+    <div>
+      <p class="eyebrow">{t(lang, "heroEyebrow")}</p>
+      <h1>{t(lang, "tagline")}</h1>
+      <p class="lead">{t(lang, "heroSub")}</p>
+      <div class="actions">
+        <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")}</a>
+        <a href={example.href} class="btn btn-ghost btn-lg">{t(lang, "seeExample")}</a>
+      </div>
+    </div>
+    <PhoneForm className="art" />
+  </section>
+
+  <!-- Comment ça marche : trois étapes illustrées. -->
+  <section class="band band-neutral" id="comment">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">{t(lang, "howEyebrow")}</p>
+        <h2>{t(lang, "howTitle")}</h2>
+      </div>
+      <div class="steps reveal-stagger">
+        <article class="step"><Choose /><h3>{t(lang, "step1Title")}</h3><p class="muted">{t(lang, "step1Text")}</p></article>
+        <article class="step"><Account /><h3>{t(lang, "step2Title")}</h3><p class="muted">{t(lang, "step2Text")}</p></article>
+        <article class="step"><AnswerSheet /><h3>{t(lang, "step3Title")}</h3><p class="muted">{t(lang, "step3Text")}</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bande bleue : contenu d'une réponse. -->
+  <section class="band band-blue">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">{t(lang, "receiveEyebrow")}</p>
+        <h2>{t(lang, "receiveTitle")}</h2>
+      </div>
+      <div class="features reveal-stagger">
+        {features.map((f) => (
+          <div class="feature"><span class="ico"><Icon name={f.icon} size={22} /></span><h4>{t(lang, f.title)}</h4><p>{t(lang, f.text)}</p></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sujets -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal"><h2>{t(lang, "themesTitle")}</h2></div>
+      <div class="grid reveal">
+        {THEMES.map((th) => (
+          <a href={`/${lang}/question?theme=${th.id}`} class="tile">
+            <span class="ico"><Icon name={th.icon} size={24} /></span>
+            {th.label[lang]}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Urgence et entraide -->
+  <section class="band band-neutral">
+    <div class="wrap" style="display:grid;gap:48px">
+      <div class="split reveal">
+        <div>
+          <p class="eyebrow">{t(lang, "urgentHomeEyebrow")}</p>
+          <h2>{t(lang, "urgentHomeTitle")}</h2>
+          <p class="lead">{t(lang, "urgentHomeText")}</p>
+        </div>
+        <Urgent />
+      </div>
+      <div class="split flip reveal">
+        <div>
+          <p class="eyebrow">{t(lang, "publicEyebrow")}</p>
+          <h2>{t(lang, "publicTitle")}</h2>
+          <p class="lead">{t(lang, "publicText")}</p>
+        </div>
+        <Community />
+      </div>
+    </div>
+  </section>
+
+  <!-- Questions fréquentes -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal"><h2>{t(lang, "popular")}</h2></div>
+      <div class="list-links reveal">
+        {POPULAR.map((p) => { const x = page(p); return <a href={x.href}><Icon name={x.th.icon} size={20} />{x.title}</a>; })}
+      </div>
+    </div>
+  </section>
+
+  <!-- Confiance -->
+  <section class="band band-neutral">
+    <div class="wrap reveal" style="text-align:center;max-width:760px">
+      <h2>{t(lang, "trustTitle")}</h2>
+      <p class="lead">{t(lang, "trustText")}</p>
+      <a href={`/${lang}/question`} class="btn btn-primary btn-lg" style="margin-top:8px">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
+    </div>
+  </section>
+</Base>

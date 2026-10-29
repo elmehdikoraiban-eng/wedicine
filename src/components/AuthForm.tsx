@@ -1,20 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
 import { t, type Lang } from "@/lib/i18n";
 import { Icon } from "./Icon";
 
 type Mode = "signup" | "login";
 
+// Formulaire de compte. Avec questionId, il débloque la réponse après inscription ou connexion.
 export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo }: { lang: Lang; questionId?: number; initialMode?: Mode; redirectTo?: string }) {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPw, setShowPw] = useState(false);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true); setError(null);
     const fd = new FormData(e.currentTarget);
@@ -28,26 +25,27 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
         }),
       });
       const data = await r.json().catch(() => ({}));
-      if (!r.ok) { setError(data.error === "taken" ? t(lang, "contactTaken") : data.error === "login" ? t(lang, "wrongLogin") : t(lang, "error")); return; }
-      router.push(data.url);
-      router.refresh();
+      if (!r.ok) { setError(data.error === "taken" ? t(lang, "contactTaken") : data.error === "login" ? t(lang, "wrongLogin") : t(lang, "error")); setBusy(false); return; }
+      window.location.assign(data.url);
     } catch {
       setError(t(lang, "error"));
-    } finally {
       setBusy(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} autoComplete="on">
-      <h2 style={{ fontSize: "1.2rem" }}>{mode === "signup" ? t(lang, "noAccount") : t(lang, "login")}</h2>
+    <form onSubmit={onSubmit} autoComplete="on" className="auth-form">
+      <div className="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={mode === "signup"} onClick={() => { setMode("signup"); setError(null); }}>{t(lang, "noAccount")}</button>
+        <button type="button" role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(null); }}>{t(lang, "login")}</button>
+      </div>
       {mode === "signup" && (
-        <div className="row" style={{ gap: 10 }}>
-          <div className="field" style={{ flex: 1, minWidth: 120 }}>
+        <div className="row" style={{ gap: 12 }}>
+          <div className="field" style={{ flex: 1, minWidth: 140 }}>
             <label htmlFor="firstName">{t(lang, "firstName")}</label>
             <input id="firstName" name="firstName" className="input" required maxLength={40} autoComplete="given-name" />
           </div>
-          <div className="field" style={{ flex: 1, minWidth: 120 }}>
+          <div className="field" style={{ flex: 1, minWidth: 140 }}>
             <label htmlFor="lastName">{t(lang, "lastName")}</label>
             <input id="lastName" name="lastName" className="input" required maxLength={40} autoComplete="family-name" />
           </div>
@@ -55,15 +53,14 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
       )}
       <div className="field">
         <label htmlFor="contact">{t(lang, "contact")}</label>
-        <input id="contact" name="contact" className="input" required maxLength={80} autoComplete="username" inputMode="email" dir="ltr" />
+        <input id="contact" name="contact" className="input" required maxLength={80} autoComplete="username" inputMode="email" dir="ltr" placeholder="nom@exemple.com" />
       </div>
       <div className="field">
         <label htmlFor="password">{t(lang, "password")}</label>
-        <div style={{ position: "relative" }}>
+        <div className="input-wrap">
           <input id="password" name="password" type={showPw ? "text" : "password"} className="input" required minLength={6} maxLength={100}
             autoComplete={mode === "signup" ? "new-password" : "current-password"} dir="ltr" />
-          <button type="button" className="btn btn-text" onClick={() => setShowPw((s) => !s)} aria-label="Afficher"
-            style={{ position: "absolute", insetInlineEnd: 4, top: 4, minHeight: 40 }}>
+          <button type="button" className="eye" onClick={() => setShowPw((s) => !s)} aria-label={showPw ? "Masquer" : "Afficher"}>
             <Icon name={showPw ? "EyeOff" : "Eye"} size={18} />
           </button>
         </div>
@@ -80,9 +77,6 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" className="btn btn-primary" disabled={busy} style={{ width: "100%", marginTop: 8 }}>
         {busy ? "…" : mode === "signup" ? (questionId != null ? t(lang, "createAccount") : t(lang, "noAccount")) : (questionId != null ? t(lang, "loginAndRead") : t(lang, "login"))}
-      </button>
-      <button type="button" className="btn btn-text" style={{ width: "100%", marginTop: 6 }} onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(null); }}>
-        {mode === "signup" ? t(lang, "haveAccount") : t(lang, "noAccount")}
       </button>
     </form>
   );

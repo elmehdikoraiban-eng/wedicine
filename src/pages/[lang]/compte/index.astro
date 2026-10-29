@@ -1,0 +1,49 @@
+---
+import Base from "@/layouts/Base.astro";
+import { t } from "@/lib/i18n";
+import { langParam } from "@/lib/lang";
+import { currentUser } from "@/lib/auth";
+import { questionsForUser } from "@/lib/db";
+import { pageTitle, symptom, theme } from "@/lib/content/themes";
+import { formatDate } from "@/lib/site";
+import { Icon } from "@/components/Icon";
+
+const lang = langParam(Astro.params);
+if (!lang) return Astro.redirect("/fr", 302);
+const user = await currentUser(Astro.cookies);
+if (!user) return Astro.redirect(`/${lang}/connexion`, 302);
+const qs = (await questionsForUser(user.id)).map((q) => {
+  const th = theme(q.theme); const sy = th && symptom(th, q.symptom);
+  return th && sy ? { q, th, sy } : null;
+}).filter((x) => x != null);
+---
+<Base lang={lang} title={t(lang, "myQuestions")} noindex>
+  <div class="narrow">
+    <div class="step-head">
+      <h1>{t(lang, "myQuestions")}</h1>
+      <form action="/api/logout" method="post">
+        <input type="hidden" name="lang" value={lang} />
+        <button type="submit" class="btn btn-text"><Icon name="LogOut" size={16} /> {t(lang, "logout")}</button>
+      </form>
+    </div>
+    <p class="muted">{user.first_name} {user.last_name}</p>
+    {qs.length === 0 && <p class="card">{t(lang, "noQuestions")}</p>}
+    <div class="qlist">
+      {qs.map(({ q, th, sy }) => (
+        <a href={`/${lang}/compte/q/${q.id}`}>
+          <span class="ico"><Icon name={th.icon} size={20} /></span>
+          <span>
+            <b>{pageTitle(lang, th, sy, q.intent)}</b>
+            <br /><span class="muted small">{formatDate(q.created_at, lang)}</span>
+          </span>
+          <span class="meta">
+            {q.urgent
+              ? <span class="badge badge-danger">!</span>
+              : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? t(lang, "published") : t(lang, "private")}</span>}
+          </span>
+        </a>
+      ))}
+    </div>
+    <p style="margin-top:24px"><a href={`/${lang}/question`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
+  </div>
+</Base>

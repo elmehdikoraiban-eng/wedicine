@@ -1,0 +1,13 @@
+---
+import Base from "@/layouts/Base.astro";
+import { t } from "@/lib/i18n";
+import { langParam } from "@/lib/lang";
+import { QuestionForm } from "@/components/QuestionForm";
+
+const lang = langParam(Astro.params);
+if (!lang) return Astro.redirect("/fr", 302);
+const theme = Astro.url.searchParams.get("theme") ?? undefined;
+---
+<Base lang={lang} title={t(lang, "start")} noindex>
+  <QuestionForm client:load lang={lang} initialTheme={theme} />
+</Base>

@@ -2,7 +2,7 @@ import type { Lang } from "./i18n";
 import { LANGS } from "./i18n";
 import { pageSlug, type Symptom, type Theme } from "./content/themes";
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://wedicine.vercel.app").replace(/\/$/, "");
+export const SITE_URL = ((import.meta.env.PUBLIC_SITE_URL as string | undefined) ?? "https://wedicine.vercel.app").replace(/\/$/, "");
 
 // Tant qu'un médecin n'a pas relu le contenu, les pages restent hors des moteurs.
 export const CONTENT_REVIEWED = process.env.CONTENT_REVIEWED === "1";

@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { t, type Lang } from "@/lib/i18n";
 import type { Fiche } from "@/lib/content/types";
 import type { Symptom, Theme } from "@/lib/content/themes";
 import { INTENTS } from "@/lib/content/options";
 import { pageTitle } from "@/lib/content/themes";
+import type { ReactNode } from "react";
 import { qPath } from "@/lib/site";
 import { Icon } from "./Icon";
 
@@ -18,7 +18,7 @@ const SECTIONS: Section[] = [
 
 // La fiche complète. L'intention choisie remonte sa section en premier.
 export function Answer({ lang, fiche, th, sy, intent, caseLines, children }: {
-  lang: Lang; fiche: Fiche; th: Theme; sy: Symptom; intent: string; caseLines?: string[]; children?: React.ReactNode;
+  lang: Lang; fiche: Fiche; th: Theme; sy: Symptom; intent: string; caseLines?: string[]; children?: ReactNode;
 }) {
   const ordered = [...SECTIONS].sort((a, b) => Number(b.intent === intent) - Number(a.intent === intent));
   return (
@@ -59,10 +59,10 @@ export function Answer({ lang, fiche, th, sy, intent, caseLines, children }: {
         <h3>{t(lang, "related")}</h3>
         <div className="list-links">
           {INTENTS.filter((i) => i.id !== intent).map((i) => (
-            <Link key={i.id} href={qPath(lang, th, sy, i.id)}><Icon name={i.icon ?? "ChevronRight"} size={18} />{pageTitle(lang, th, sy, i.id)}</Link>
+            <a key={i.id} href={qPath(lang, th, sy, i.id)}><Icon name={i.icon ?? "ChevronRight"} size={18} />{pageTitle(lang, th, sy, i.id)}</a>
           ))}
           {th.symptoms.filter((s) => s.id !== sy.id).slice(0, 4).map((s) => (
-            <Link key={s.id} href={qPath(lang, th, s, intent)}><Icon name={th.icon} size={18} />{pageTitle(lang, th, s, intent)}</Link>
+            <a key={s.id} href={qPath(lang, th, s, intent)}><Icon name={th.icon} size={18} />{pageTitle(lang, th, s, intent)}</a>
           ))}
         </div>
       </section>

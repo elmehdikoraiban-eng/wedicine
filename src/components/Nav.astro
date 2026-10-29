@@ -1,0 +1,30 @@
+---
+import { LANG_NAMES, LANGS, t, type Lang } from "@/lib/i18n";
+import { Icon } from "./Icon";
+
+interface Props { lang: Lang; user: { firstName: string } | null }
+const { lang, user } = Astro.props;
+// Le sélecteur de langue garde la page courante.
+const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
+---
+<header class="nav">
+  <div class="wrap">
+    <a href={`/${lang}`} class="logo" aria-label="Wedicine">
+      <span class="mark"><Icon name="HeartPulse" size={18} /></span>
+      <span class="word">Wedicine</span>
+    </a>
+    <nav class="nav-links" aria-label="Navigation">
+      <div class="lang" aria-label="Langue">
+        {LANGS.map((l) => (
+          <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>
+            <span class="full">{LANG_NAMES[l]}</span><span class="short">{l.toUpperCase()}</span>
+          </a>
+        ))}
+      </div>
+      {user
+        ? <a href={`/${lang}/compte`} class="plain"><span class="hide-sm">{user.firstName} · </span>{t(lang, "myQuestions")}</a>
+        : <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>}
+      <a href={`/${lang}/question`} class="btn btn-primary btn-sm">{t(lang, "start")}</a>
+    </nav>
+  </div>
+</header>

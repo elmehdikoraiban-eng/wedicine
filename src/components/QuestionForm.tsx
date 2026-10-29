@@ -1,24 +1,19 @@
-"use client";
-
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { t, type Lang } from "@/lib/i18n";
 import { ADULT_AGES, AGES, ALERTS, CHILD_AGES, CITIES, DURATIONS, INTENSITIES, INTENTS, WHO, ZONES, type Option } from "@/lib/content/options";
 import { THEMES, theme as getTheme } from "@/lib/content/themes";
 import { isUrgent, type Answers } from "@/lib/triage";
 import { Icon } from "./Icon";
-import { AuthForm } from "./AuthForm";
 
 type Step = "who" | "theme" | "symptom" | "zone" | "intensity" | "duration" | "signs" | "profile" | "intent";
-type Result = { id: number; urgent: boolean; theme: string; next: string | null };
+type Result = { id: number; urgent: boolean; next: string | null };
 
 const EMPTY: Answers = {
   who: "", theme: "", symptom: "", zone: null, intensity: null, duration: null, signs: [],
   age: null, sex: null, pregnant: null, city: null, intent: "",
 };
 
-export function QuestionForm({ lang, loggedIn, initialTheme }: { lang: Lang; loggedIn: boolean; initialTheme?: string }) {
-  const router = useRouter();
+export function QuestionForm({ lang, initialTheme }: { lang: Lang; initialTheme?: string }) {
   const [a, setA] = useState<Answers>({ ...EMPTY, theme: getTheme(initialTheme ?? "") ? initialTheme! : "" });
   const [i, setI] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -49,7 +44,7 @@ export function QuestionForm({ lang, loggedIn, initialTheme }: { lang: Lang; log
       });
       if (!r.ok) throw new Error(String(r.status));
       const data: Result = await r.json();
-      if (data.next && !data.urgent) { router.push(data.next); return; }
+      if (!data.urgent && data.next) { window.location.assign(data.next); return; }
       setResult(data);
       window.scrollTo({ top: 0 });
     } catch {
@@ -67,7 +62,6 @@ export function QuestionForm({ lang, loggedIn, initialTheme }: { lang: Lang; log
   }
 
   if (result?.urgent) return <Urgent lang={lang} onBack={() => { setResult(null); setI(steps.indexOf("signs") >= 0 ? steps.indexOf("signs") : 0); }} />;
-  if (result) return <Preview lang={lang} result={result} />;
 
   const label = (o: Option) => o.label[lang];
   const choose = (patch: Partial<Answers>, auto = true) => { set(patch); if (auto) setTimeout(next, 120); };
@@ -80,6 +74,7 @@ export function QuestionForm({ lang, loggedIn, initialTheme }: { lang: Lang; log
         <span className="muted small">{t(lang, "step")} {i + 1} {t(lang, "of")} {steps.length}</span>
       </div>
 
+      <div key={step} className="step-in">
       {step === "who" && (
         <div className="grid">
           {WHO.map((o) => <Tile key={o.id} icon={o.icon} label={label(o)} on={a.who === o.id} onClick={() => choose({ who: o.id, age: null, pregnant: null })} />)}
@@ -146,6 +141,8 @@ export function QuestionForm({ lang, loggedIn, initialTheme }: { lang: Lang; log
             onClick={() => { const merged = { ...a, intent: o.id }; setA(merged); void submit(merged); }} />)}
         </div>
       )}
+
+      </div>
 
       {error && <p className="error" role="alert" style={{ marginTop: 16 }}>{error}</p>}
 
@@ -249,40 +246,6 @@ function Urgent({ lang, onBack }: { lang: Lang; onBack: () => void }) {
         <a href="tel:141" className="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "call141")}</a>
       </div>
       <button type="button" className="btn btn-text" onClick={onBack}>{t(lang, "urgentBack")}</button>
-    </div>
-  );
-}
-
-function Preview({ lang, result }: { lang: Lang; result: Result }) {
-  const sections: Array<"whatToKnow" | "meanwhile" | "whichDoctor" | "exams" | "askDoctor"> = ["whatToKnow", "meanwhile", "whichDoctor", "exams", "askDoctor"];
-  return (
-    <div className="answer with-aside">
-      <aside className="card" id="compte">
-        <span className="badge badge-ok"><Icon name="Check" size={14} /> {t(lang, "previewTitle")}</span>
-        <p className="muted" style={{ margin: "10px 0 16px" }}>{t(lang, "previewText")}</p>
-        <AuthForm lang={lang} questionId={result.id} />
-      </aside>
-      <div className="locked" aria-hidden="true">
-        <div className="blur">
-          <div className="card" style={{ marginBottom: 12 }}>
-            <p className="muted small" style={{ marginBottom: 6 }}>{result.theme}</p>
-            <h1 style={{ fontSize: "1.8rem" }}>Lorem ipsum dolor sit amet, consectetur ?</h1>
-            <p className="summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          </div>
-          {sections.map((k) => (
-            <div key={k} className="card sec" style={{ marginBottom: 12 }}>
-              <h2>{t(lang, k)}</h2>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-            </div>
-          ))}
-        </div>
-        <div className="lock">
-          <div>
-            <Icon name="Lock" size={28} style={{ margin: "0 auto 8px", color: "var(--brand)" }} />
-            <p style={{ fontWeight: 500 }}>{t(lang, "previewLocked")}</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

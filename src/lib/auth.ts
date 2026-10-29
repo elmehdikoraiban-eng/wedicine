@@ -1,6 +1,5 @@
-import "server-only";
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { cookies } from "next/headers";
+import type { AstroCookies } from "astro";
 import { createSession, deleteSession, userBySession } from "./db";
 
 const COOKIE = "wd_session";
@@ -17,25 +16,25 @@ export function checkPassword(pw: string, stored: string) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export async function startSession(userId: number) {
+export async function startSession(cookies: AstroCookies, userId: number) {
   const token = randomBytes(32).toString("hex");
   await createSession(userId, token);
-  (await cookies()).set(COOKIE, token, {
-    httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/",
+  cookies.set(COOKIE, token, {
+    httpOnly: true, sameSite: "lax", secure: import.meta.env.PROD, path: "/",
     maxAge: 60 * 60 * 24 * 90,
   });
 }
 
-export async function endSession() {
-  const jar = await cookies();
-  const token = jar.get(COOKIE)?.value;
-  if (token) await deleteSession(token);
-  jar.delete(COOKIE);
+export async function endSession(cookies: AstroCookies) {
+  const token = cookies.get(COOKIE)?.value;
+  if (token) await deleteSession(token).catch(() => undefined);
+  cookies.delete(COOKIE, { path: "/" });
 }
 
-export async function currentUser() {
-  const token = (await cookies()).get(COOKIE)?.value;
-  return token ? userBySession(token) : undefined;
+export async function currentUser(cookies: AstroCookies) {
+  const token = cookies.get(COOKIE)?.value;
+  if (!token) return undefined;
+  return userBySession(token).catch(() => undefined);
 }
 
 // Nom affiché publiquement : prénom + initiale du nom.

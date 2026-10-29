@@ -1,4 +1,3 @@
-import "server-only";
 
 // Postgres via DATABASE_URL (Neon) en production, PGlite (fichier local) sinon.
 // Les deux exposent query(sql, params) avec le même format de résultat.

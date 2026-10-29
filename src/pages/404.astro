@@ -1,0 +1,13 @@
+---
+import Base from "@/layouts/Base.astro";
+import { isLang, type Lang } from "@/lib/i18n";
+const first = Astro.url.pathname.split("/")[1] ?? "";
+const lang: Lang = isLang(first) ? first : "fr";
+---
+<Base lang={lang} title="404" noindex>
+  <div class="card" style="max-width:520px;margin:40px auto;text-align:center">
+    <h1>404</h1>
+    <p class="muted">Page introuvable · الصفحة غير موجودة · Page not found</p>
+    <a href={`/${lang}`} class="btn btn-primary">Wedicine</a>
+  </div>
+</Base>
