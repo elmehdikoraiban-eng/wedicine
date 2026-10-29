@@ -5,8 +5,10 @@
 type Row = Record<string, unknown>;
 type Q = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Row[] }> };
 
+// Toutes les tables vivent dans le schéma « wedicine » : une base partagée avec un autre projet ne crée aucun conflit.
 const SCHEMA = `
-CREATE TABLE IF NOT EXISTS users (
+CREATE SCHEMA IF NOT EXISTS wedicine;
+CREATE TABLE IF NOT EXISTS wedicine.users (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   first_name TEXT NOT NULL,
@@ -17,15 +19,15 @@ CREATE TABLE IF NOT EXISTS users (
   consent_info_at TIMESTAMPTZ NOT NULL,
   consent_terms_at TIMESTAMPTZ NOT NULL
 );
-CREATE TABLE IF NOT EXISTS sessions (
+CREATE TABLE IF NOT EXISTS wedicine.sessions (
   token TEXT PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id INTEGER NOT NULL REFERENCES wedicine.users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE TABLE IF NOT EXISTS questions (
+CREATE TABLE IF NOT EXISTS wedicine.questions (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  user_id INTEGER REFERENCES users(id),
+  user_id INTEGER REFERENCES wedicine.users(id),
   lang TEXT NOT NULL,
   who TEXT NOT NULL,
   theme TEXT NOT NULL,
@@ -43,7 +45,7 @@ CREATE TABLE IF NOT EXISTS questions (
   is_public BOOLEAN NOT NULL DEFAULT false,
   consent_publish_at TIMESTAMPTZ
 );
-CREATE INDEX IF NOT EXISTS questions_page ON questions (theme, symptom, intent) WHERE is_public;
+CREATE INDEX IF NOT EXISTS questions_page ON wedicine.questions (theme, symptom, intent) WHERE is_public;
 `;
 
 let ready: Promise<Q> | undefined;
@@ -83,7 +85,7 @@ export type QuestionInput = {
 export async function insertQuestion(q: QuestionInput, userId: number | null, consentPublish: boolean) {
   const d = await db();
   const r = await d.query(
-    `INSERT INTO questions (user_id, lang, who, theme, symptom, zone, intensity, duration, signs, age, sex, pregnant, city, intent, urgent, is_public, consent_publish_at)
+    `INSERT INTO wedicine.questions (user_id, lang, who, theme, symptom, zone, intensity, duration, signs, age, sex, pregnant, city, intent, urgent, is_public, consent_publish_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id`,
     [userId, q.lang, q.who, q.theme, q.symptom, q.zone, q.intensity, q.duration, q.signs, q.age, q.sex, q.pregnant,
       q.city, q.intent, q.urgent, consentPublish && !q.urgent, consentPublish ? new Date() : null]
@@ -98,20 +100,20 @@ export type QuestionRow = QuestionInput & {
 
 export async function questionById(id: number): Promise<QuestionRow | undefined> {
   const d = await db();
-  const r = await d.query("SELECT * FROM questions WHERE id = $1", [id]);
+  const r = await d.query("SELECT * FROM wedicine.questions WHERE id = $1", [id]);
   return r.rows[0] as QuestionRow | undefined;
 }
 
 export async function questionsForUser(userId: number): Promise<QuestionRow[]> {
   const d = await db();
-  const r = await d.query("SELECT * FROM questions WHERE user_id = $1 ORDER BY id DESC", [userId]);
+  const r = await d.query("SELECT * FROM wedicine.questions WHERE user_id = $1 ORDER BY id DESC", [userId]);
   return r.rows as QuestionRow[];
 }
 
 export async function setPublic(id: number, userId: number, isPublic: boolean) {
   const d = await db();
   await d.query(
-    "UPDATE questions SET is_public = $3, consent_publish_at = CASE WHEN $3 THEN now() ELSE consent_publish_at END WHERE id = $1 AND user_id = $2 AND NOT urgent",
+    "UPDATE wedicine.questions SET is_public = $3, consent_publish_at = CASE WHEN $3 THEN now() ELSE consent_publish_at END WHERE id = $1 AND user_id = $2 AND NOT urgent",
     [id, userId, isPublic]
   );
 }
@@ -121,7 +123,7 @@ export async function publicAskers(theme: string, symptom: string, intent: strin
   const d = await db();
   const r = await d.query(
     `SELECT q.id, q.created_at, q.age, q.city, u.first_name, u.last_name
-     FROM questions q JOIN users u ON u.id = q.user_id
+     FROM wedicine.questions q JOIN wedicine.users u ON u.id = q.user_id
      WHERE q.theme = $1 AND q.symptom = $2 AND q.intent = $3 AND q.is_public
      ORDER BY q.id DESC LIMIT 20`,
     [theme, symptom, intent]
@@ -132,7 +134,7 @@ export async function publicAskers(theme: string, symptom: string, intent: strin
 export async function createUser(u: { firstName: string; lastName: string; contact: string; passwordHash: string; lang: string }) {
   const d = await db();
   const r = await d.query(
-    `INSERT INTO users (first_name, last_name, contact, password_hash, lang, consent_info_at, consent_terms_at)
+    `INSERT INTO wedicine.users (first_name, last_name, contact, password_hash, lang, consent_info_at, consent_terms_at)
      VALUES ($1,$2,$3,$4,$5,now(),now()) RETURNING id`,
     [u.firstName, u.lastName, u.contact, u.passwordHash, u.lang]
   );
@@ -141,19 +143,19 @@ export async function createUser(u: { firstName: string; lastName: string; conta
 
 export async function userByContact(contact: string) {
   const d = await db();
-  const r = await d.query("SELECT * FROM users WHERE contact = $1", [contact]);
+  const r = await d.query("SELECT * FROM wedicine.users WHERE contact = $1", [contact]);
   return r.rows[0] as (UserRow & { password_hash: string }) | undefined;
 }
 
 export async function createSession(userId: number, token: string) {
   const d = await db();
-  await d.query("INSERT INTO sessions (token, user_id) VALUES ($1, $2)", [token, userId]);
+  await d.query("INSERT INTO wedicine.sessions (token, user_id) VALUES ($1, $2)", [token, userId]);
 }
 
 export async function userBySession(token: string): Promise<UserRow | undefined> {
   const d = await db();
   const r = await d.query(
-    "SELECT u.id, u.first_name, u.last_name, u.contact, u.lang FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = $1",
+    "SELECT u.id, u.first_name, u.last_name, u.contact, u.lang FROM wedicine.sessions s JOIN wedicine.users u ON u.id = s.user_id WHERE s.token = $1",
     [token]
   );
   return r.rows[0] as UserRow | undefined;
@@ -161,13 +163,13 @@ export async function userBySession(token: string): Promise<UserRow | undefined>
 
 export async function deleteSession(token: string) {
   const d = await db();
-  await d.query("DELETE FROM sessions WHERE token = $1", [token]);
+  await d.query("DELETE FROM wedicine.sessions WHERE token = $1", [token]);
 }
 
 export async function claimQuestion(id: number, userId: number, consentPublish: boolean) {
   const d = await db();
   await d.query(
-    "UPDATE questions SET user_id = $2, is_public = ($3 AND NOT urgent), consent_publish_at = CASE WHEN $3 THEN now() ELSE NULL END WHERE id = $1 AND user_id IS NULL",
+    "UPDATE wedicine.questions SET user_id = $2, is_public = ($3 AND NOT urgent), consent_publish_at = CASE WHEN $3 THEN now() ELSE NULL END WHERE id = $1 AND user_id IS NULL",
     [id, userId, consentPublish]
   );
 }
