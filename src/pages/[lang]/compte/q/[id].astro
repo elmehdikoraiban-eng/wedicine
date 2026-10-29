@@ -6,7 +6,7 @@ import { currentUser } from "@/lib/auth";
 import { questionById } from "@/lib/db";
 import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
-import { caseLines } from "@/lib/case";
+import { personalize } from "@/lib/personalize";
 import { qPath } from "@/lib/site";
 import { Answer } from "@/components/Answer";
 import { PublishToggle } from "@/components/PublishToggle";
@@ -21,7 +21,8 @@ const q = Number.isInteger(id) ? await questionById(id) : undefined;
 if (!q || q.user_id !== user.id) return new Response(null, { status: 404 });
 const th = theme(q.theme); const sy = th && symptom(th, q.symptom); const f = th && sy && fiche(th.id, sy.id);
 if (!th || !sy || !f) return new Response(null, { status: 404 });
-const lines = q.urgent ? [] : caseLines({ ...q, intensity: q.intensity == null ? null : String(q.intensity) }, lang);
+const answers = { ...q, intensity: q.intensity == null ? null : String(q.intensity), signs: q.signs ?? [] };
+const personal = q.urgent ? undefined : personalize(answers, th, f, lang);
 ---
 <Base lang={lang} title={t(lang, "myQuestions")} noindex>
   {q.urgent ? (
@@ -37,7 +38,7 @@ const lines = q.urgent ? [] : caseLines({ ...q, intensity: q.intensity == null ?
   ) : (
     <div class="narrow">
       <p class="no-print"><a href={`/${lang}/compte`}>← {t(lang, "myQuestions")}</a></p>
-      <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} caseLines={lines}
+      <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} personal={personal}
         caseData={{ who: q.who, duration: q.duration, intensity: q.intensity == null ? null : String(q.intensity), age: q.age, sex: q.sex, city: q.city, signs: q.signs ?? [] }}>
         <section class="card no-print" style="margin-top:16px">
           <PublishToggle client:load lang={lang} id={q.id} isPublic={q.is_public} />

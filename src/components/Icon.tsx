@@ -1,5 +1,5 @@
 import {
-  Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, Check, ChevronRight, CircleAlert,
+  Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, CalendarCheck, Check, ChevronRight, CircleAlert, House,
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,
@@ -8,7 +8,7 @@ import {
 
 // Liste explicite pour ne pas embarquer toute la bibliothèque d'icônes.
 export const ICONS = {
-  Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, Check, ChevronRight, CircleAlert,
+  Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, CalendarCheck, Check, ChevronRight, CircleAlert, House,
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,

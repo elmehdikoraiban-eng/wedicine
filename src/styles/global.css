@@ -363,6 +363,25 @@ footer { border-top: 1px solid var(--line); padding: 32px 0; color: var(--muted)
 .checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .checklist li { display: flex; gap: 12px; align-items: flex-start; }
 .checklist .box { flex: none; width: 20px; height: 20px; border: 2px solid var(--line); border-radius: 5px; margin-top: 2px; }
+
+/* Réponse personnalisée */
+.verdict { display: grid; gap: 10px; background: var(--neutral); border-radius: var(--r-card); padding: 14px 16px; margin: 14px 0; border-inline-start: 4px solid var(--lv); }
+.verdict.lv0 { --lv: var(--green); } .verdict.lv1 { --lv: var(--brand); } .verdict.lv2 { --lv: #FF8B00; }
+.verdict .lvl { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--lv); font-size: .9375rem; }
+.verdict .lvl svg { color: var(--lv); }
+.verdict p { margin: 0; font-size: 1.0625rem; line-height: 1.5; }
+.reasons { display: flex; flex-wrap: wrap; gap: 6px; }
+.reason { background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px 10px; font-size: .8125rem; color: var(--ink-2); }
+.for-you { background: var(--tint); border-radius: var(--r-card); padding: 12px 14px; margin-bottom: 14px; }
+.for-you p { margin: 0 0 8px; } .for-you p:last-child { margin-bottom: 0; }
+.tag-you { display: inline-flex; align-items: center; gap: 4px; background: var(--brand); color: #fff; border-radius: var(--r-pill); padding: 2px 9px; font-size: .75rem; font-weight: 600; margin-bottom: 8px; }
+.steps-list li.personal { background: var(--tint); box-shadow: inset 0 0 0 1px #B3D4FF; }
+.steps-list li.personal .num { background: var(--brand); }
+.checklist li.personal { background: var(--tint); border-radius: var(--r-card); padding: 8px 10px; margin: 0 -10px; }
+.checklist li.personal .box { border-color: var(--brand); }
+.sub-tag { font-size: .8125rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
+.extra-warn { margin: 8px 0 0; padding-inline-start: 18px; } .extra-warn li { margin-bottom: 4px; }
+
 @media (max-width: 640px) {
   .answer-head { grid-template-columns: 1fr; }
   .answer-head .theme-art { width: 100px; height: 100px; order: -1; }

@@ -215,6 +215,14 @@ export const UI = {
   firstContact: { fr: "Premier contact", ar: "أول اتصال", en: "First contact" },
   generalDoctor: { fr: "Médecin généraliste", ar: "طبيب عام", en: "General practitioner" },
   profileTitle: { fr: "Profil", ar: "الملف", en: "Profile" },
+  // Réponse personnalisée
+  forYou: { fr: "Pour vous", ar: "لك", en: "For you" },
+  basedOn: { fr: "D'après vos réponses", ar: "حسب إجاباتك", en: "Based on your answers" },
+  level0: { fr: "Surveillez à la maison", ar: "راقب في المنزل", en: "Watch at home" },
+  level1: { fr: "Rendez-vous cette semaine", ar: "موعد هذا الأسبوع", en: "Appointment this week" },
+  level2: { fr: "Consultez sous 48 h", ar: "استشر خلال 48 ساعة", en: "See a doctor within 48 h" },
+  alsoForYou: { fr: "Et dans votre situation :", ar: "وفي حالتك أيضاً:", en: "And in your situation:" },
+  generalAdvice: { fr: "Conseils généraux", ar: "نصائح عامة", en: "General advice" },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
 } satisfies Record<string, T>;
 
