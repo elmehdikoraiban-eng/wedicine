@@ -5,7 +5,10 @@ import { langParam } from "@/lib/lang";
 import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath, SITE_URL } from "@/lib/site";
 import { Icon } from "@/components/Icon";
-import { Account, AnswerSheet, Choose, Community, PhoneForm, Urgent } from "@/components/Illustrations";
+import { Account, AnswerSheet, Choose, Community, DurationTimeline, PhoneForm, ThemeArt, Urgent } from "@/components/Illustrations";
+import { fiche } from "@/lib/content/fiches";
+import { DURATIONS } from "@/lib/content/options";
+import { countQuestions } from "@/lib/db";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
@@ -22,6 +25,10 @@ const page = ([thId, syId, intent]: [string, string, string]) => {
   return { th, sy, intent, href: qPath(lang, th, sy, intent), title: pageTitle(lang, th, sy, intent) };
 };
 const example = page(["fievre", "seule", "grave"]);
+const exampleFiche = fiche("fievre", "seule")!;
+const count = await countQuestions().catch(() => 0);
+const FAQ = [1, 2, 3, 4, 5, 6] as const;
+const EXAMPLE_SECTIONS = [["CircleAlert", "seeQuickly"], ["FileText", "whatToKnow"], ["Hourglass", "meanwhile"], ["Stethoscope", "whichDoctor"], ["Microscope", "exams"], ["MessageCircleQuestion", "askDoctor"]] as const;
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 const features = [
@@ -40,7 +47,12 @@ const features = [
       <p class="lead">{t(lang, "heroSub")}</p>
       <div class="actions">
         <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")}</a>
-        <a href={example.href} class="btn btn-ghost btn-lg">{t(lang, "seeExample")}</a>
+        <a href="#exemple" class="btn btn-ghost btn-lg">{t(lang, "seeExample")}</a>
+      </div>
+      <p class="trust">{t(lang, "trustLine")}</p>
+      <div class="quick">
+        <span class="muted small">{t(lang, "quickStart")}</span>
+        {THEMES.slice(0, 6).map((th) => <a href={`/${lang}/question?theme=${th.id}`} class="chip"><Icon name={th.icon} size={16} />{th.label[lang]}</a>)}
       </div>
     </div>
     <PhoneForm className="art" />
@@ -72,6 +84,39 @@ const features = [
         {features.map((f) => (
           <div class="feature"><span class="ico"><Icon name={f.icon} size={22} /></span><h4>{t(lang, f.title)}</h4><p>{t(lang, f.text)}</p></div>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Exemple de réponse : un vrai extrait de fiche, illustré. -->
+  <section class="band" id="exemple">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">{t(lang, "exampleEyebrow")}</p>
+        <h2>{t(lang, "exampleTitle")}</h2>
+        <p class="lead">{t(lang, "exampleText")}</p>
+      </div>
+      <div class="example reveal">
+        <div class="card example-card">
+          <div class="example-head">
+            <div>
+              <p class="muted small" style="margin-bottom:4px">{example.th.label[lang]}</p>
+              <h3>{example.title}</h3>
+              <p class="summary">{exampleFiche.summary[lang]}</p>
+            </div>
+            <ThemeArt icon={example.th.icon} className="small" />
+          </div>
+          <div class="example-timeline">
+            <p class="eyebrow" style="margin-bottom:4px">{t(lang, "timelineTitle")}</p>
+            <DurationTimeline labels={DURATIONS.map((d) => d.label[lang])} current={1} threshold={example.th.consultAfter}
+              youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} rtl={lang === "ar"} />
+          </div>
+          <ul class="example-sections">
+            {EXAMPLE_SECTIONS.map(([icon, key]) => <li><Icon name={icon} size={18} />{t(lang, key)}</li>)}
+          </ul>
+          <a href={example.href} class="btn btn-primary">{t(lang, "readExample")}</a>
+        </div>
+        {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
       </div>
     </div>
   </section>
@@ -119,6 +164,21 @@ const features = [
       <div class="section-head reveal"><h2>{t(lang, "popular")}</h2></div>
       <div class="list-links reveal">
         {POPULAR.map((p) => { const x = page(p); return <a href={x.href}><Icon name={x.th.icon} size={20} />{x.title}</a>; })}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="band">
+    <div class="wrap faq-wrap">
+      <div class="section-head reveal"><h2>{t(lang, "faqTitle")}</h2></div>
+      <div class="faq reveal">
+        {FAQ.map((n) => (
+          <details class="faq-item">
+            <summary>{t(lang, `faq${n}q` as "faq1q")}<Icon name="ChevronRight" size={18} /></summary>
+            <p>{t(lang, `faq${n}a` as "faq1a")}</p>
+          </details>
+        ))}
       </div>
     </div>
   </section>

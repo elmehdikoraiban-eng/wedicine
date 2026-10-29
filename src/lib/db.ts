@@ -131,6 +131,13 @@ export async function publicAskers(theme: string, symptom: string, intent: strin
   return r.rows as { id: number; created_at: string | Date; age: string | null; city: string | null; first_name: string; last_name: string }[];
 }
 
+// Nombre de questions posées (compteur de l'accueil).
+export async function countQuestions() {
+  const d = await db();
+  const r = await d.query("SELECT count(*)::int AS n FROM wedicine.questions WHERE NOT urgent");
+  return Number(r.rows[0].n);
+}
+
 export async function createUser(u: { firstName: string; lastName: string; contact: string; passwordHash: string; lang: string }) {
   const d = await db();
   const r = await d.query(

@@ -1,4 +1,6 @@
 // Illustrations vectorielles dans la palette Trello (bleu #0065FF, violet #8777D9, cyan #00C7E5, marine #091E42).
+import type { CSSProperties } from "react";
+import { Icon } from "./Icon";
 // Elles sont décoratives : le texte à côté porte le sens.
 
 const C = { blue: "#0065FF", deep: "#0747A6", purple: "#8777D9", teal: "#00C7E5", navy: "#091E42", tint: "#DEEBFF", grey: "#F4F5F7", line: "#DFE1E6", white: "#FFFFFF", red: "#DE354C", green: "#36B37E", yellow: "#FFAB00", skin: "#F3C9A6" };
@@ -170,6 +172,146 @@ export function Community({ className }: P) {
         <circle r="10" fill={C.navy} opacity=".2" />
         <path d="M-6 0l4 4 8-8" stroke={C.blue} strokeWidth="3" fill="none" strokeLinecap="round" />
       </g>
+    </svg>
+  );
+}
+
+/* ----- Illustrations de la réponse : elles expliquent le contenu à partir des choix du patient. ----- */
+
+// Frise « depuis quand » : les paliers de durée, la position du patient et le seuil à partir duquel on conseille de consulter.
+export function DurationTimeline({ labels, current, threshold, youAreHere, consultFrom, rtl }: {
+  labels: string[]; current: number; threshold: number; youAreHere: string; consultFrom: string; rtl?: boolean;
+}) {
+  const n = labels.length;
+  const W = 520, H = 150, x0 = 40, x1 = W - 40, y = 70;
+  const xs = labels.map((_, i) => x0 + ((x1 - x0) * i) / (n - 1));
+  const tx = threshold < n ? xs[threshold] : null;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={youAreHere} className="art-timeline" style={rtl ? { transform: "scaleX(-1)" } : undefined}>
+      <line x1={x0} y1={y} x2={x1} y2={y} stroke={C.line} strokeWidth="6" strokeLinecap="round" />
+      {tx != null && <line x1={tx} y1={y} x2={x1} y2={y} stroke={C.red} strokeWidth="6" strokeLinecap="round" opacity=".35" />}
+      {current >= 0 && <line x1={x0} y1={y} x2={xs[current]} y2={y} stroke={C.blue} strokeWidth="6" strokeLinecap="round" />}
+      {xs.map((x, i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r={i === current ? 11 : 7} fill={i === current ? C.blue : i >= threshold ? C.red : C.white} stroke={i === current ? C.blue : i >= threshold ? C.red : C.line} strokeWidth="3" />
+          {i === current && <circle cx={x} cy={y} r="4" fill={C.white} />}
+          <text x={x} y={y + 32} textAnchor="middle" fontSize="12" fill={C.navy} fontFamily="Inter, system-ui, sans-serif" style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${x}px ${y + 32}px` } : undefined}>{labels[i]}</text>
+        </g>
+      ))}
+      {current >= 0 && (
+        <g style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${xs[current]}px 30px` } : undefined}>
+          <rect x={xs[current] - 46} y="14" width="92" height="24" rx="12" fill={C.blue} />
+          <text x={xs[current]} y="30" textAnchor="middle" fontSize="12" fontWeight="500" fill={C.white} fontFamily="Inter, system-ui, sans-serif">{youAreHere}</text>
+        </g>
+      )}
+      {tx != null && (
+        <g style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${tx}px ${H - 14}px` } : undefined}>
+          <text x={tx} y={H - 10} textAnchor="middle" fontSize="12" fontWeight="500" fill={C.red} fontFamily="Inter, system-ui, sans-serif">▲ {consultFrom}</text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
+// Jauge d'intensité : cinq paliers, celui du patient en couleur.
+export function IntensityGauge({ labels, current, rtl }: { labels: string[]; current: number; rtl?: boolean }) {
+  const colors = [C.green, "#7AC1F0", C.yellow, "#FF7452", C.red];
+  return (
+    <div className="gauge" dir={rtl ? "rtl" : "ltr"}>
+      {labels.map((l, i) => (
+        <div key={i} className={`gauge-step${i === current ? " on" : ""}${i <= current ? " filled" : ""}`} style={{ "--c": colors[i] } as CSSProperties}>
+          <span className="bar" />
+          <span className="lbl">{l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Vignette de thème : fond coloré, grande icône, formes décoratives.
+export function ThemeArt({ icon, tone = "blue", className }: { icon: string; tone?: "blue" | "red" | "purple" | "teal"; className?: string }) {
+  const bg = { blue: C.tint, red: "#FFEBE6", purple: "#EAE6FF", teal: "#E6FCFF" }[tone];
+  const fg = { blue: C.blue, red: C.red, purple: C.purple, teal: "#00A3BF" }[tone];
+  return (
+    <div className={`theme-art ${className ?? ""}`} style={{ background: bg, color: fg }} aria-hidden="true">
+      <svg viewBox="0 0 120 120" className="deco"><circle cx="96" cy="26" r="16" fill={fg} opacity=".18" /><circle cx="22" cy="98" r="10" fill={fg} opacity=".18" /><circle cx="100" cy="100" r="6" fill={fg} opacity=".25" /></svg>
+      <Icon name={icon} size={56} strokeWidth={1.5} />
+    </div>
+  );
+}
+
+// Scènes de section : une par bloc de la réponse.
+export function ArtGrave() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill="#FFEBE6" />
+      <path d="M80 22l34 14v22c0 20-14 34-34 42-20-8-34-22-34-42V36z" fill={C.white} stroke={C.red} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M80 44v22" stroke={C.red} strokeWidth="5" strokeLinecap="round" /><circle cx="80" cy="78" r="3.5" fill={C.red} />
+      <circle cx="128" cy="30" r="6" fill={C.red} opacity=".3" /><circle cx="30" cy="92" r="4" fill={C.red} opacity=".3" />
+    </svg>
+  );
+}
+export function ArtMeanwhile() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill={C.tint} />
+      <circle cx="64" cy="58" r="26" fill={C.white} stroke={C.blue} strokeWidth="3" />
+      <path d="M64 42v16l10 7" stroke={C.blue} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path d="M100 68h26v16c0 8-6 14-13 14s-13-6-13-14z" fill={C.white} stroke={C.navy} strokeWidth="3" />
+      <path d="M126 72h6a6 6 0 0 1 0 12h-6" stroke={C.navy} strokeWidth="3" fill="none" />
+      <path d="M107 60c0-5 4-5 4-10M115 60c0-5 4-5 4-10" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity=".6" />
+    </svg>
+  );
+}
+export function ArtDoctor() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill="#EAE6FF" />
+      <circle cx="80" cy="44" r="16" fill={C.skin} stroke={C.navy} strokeWidth="2.5" />
+      <path d="M64 36c4-10 28-10 32 0" fill={C.navy} />
+      <path d="M48 108c2-22 16-34 32-34s30 12 32 34" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <path d="M70 76l10 12 10-12" fill={C.purple} />
+      <path d="M62 80c-8 6-10 14-6 24" stroke={C.navy} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <circle cx="56" cy="106" r="5" fill={C.purple} stroke={C.navy} strokeWidth="2" />
+    </svg>
+  );
+}
+export function ArtExams() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill="#E6FCFF" />
+      <g transform="translate(52 30)"><rect width="14" height="60" rx="7" fill={C.white} stroke={C.navy} strokeWidth="2.5" /><rect x="2.5" y="30" width="9" height="27" rx="4.5" fill={C.teal} /></g>
+      <g transform="translate(76 22)"><rect width="14" height="68" rx="7" fill={C.white} stroke={C.navy} strokeWidth="2.5" /><rect x="2.5" y="24" width="9" height="41" rx="4.5" fill={C.purple} /></g>
+      <g transform="translate(100 36)"><rect width="14" height="54" rx="7" fill={C.white} stroke={C.navy} strokeWidth="2.5" /><rect x="2.5" y="34" width="9" height="17" rx="4.5" fill={C.blue} /></g>
+      <rect x="44" y="92" width="76" height="6" rx="3" fill={C.navy} opacity=".5" />
+    </svg>
+  );
+}
+export function ArtQuestions() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill={C.grey} />
+      <rect x="46" y="24" width="68" height="76" rx="8" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      {[0, 1, 2].map((i) => (
+        <g key={i} transform={`translate(56 ${38 + i * 18})`}>
+          <rect width="12" height="12" rx="3" fill={i < 2 ? C.green : C.white} stroke={i < 2 ? C.green : C.line} strokeWidth="2" />
+          {i < 2 && <path d="M3 6l2.5 2.5L9 4" stroke={C.white} strokeWidth="2" fill="none" strokeLinecap="round" />}
+          <rect x="18" y="3" width={i === 1 ? 30 : 40} height="6" rx="3" fill={C.navy} opacity=".55" />
+        </g>
+      ))}
+      <path d="M118 44c8 0 12-6 12-12s-4-10-10-10-10 4-10 10" stroke={C.blue} strokeWidth="3" fill="none" strokeLinecap="round" /><circle cx="118" cy="52" r="2.5" fill={C.blue} />
+    </svg>
+  );
+}
+export function ArtKnow() {
+  return (
+    <svg viewBox="0 0 160 120" role="img" aria-hidden="true">
+      <circle cx="80" cy="60" r="50" fill={C.tint} />
+      <path d="M50 36c10-8 20-8 30 0 10-8 20-8 30 0v52c-10-8-20-8-30 0-10-8-20-8-30 0z" fill={C.white} stroke={C.navy} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M80 36v52" stroke={C.navy} strokeWidth="2.5" />
+      {[0, 1, 2].map((i) => <rect key={i} x="57" y={48 + i * 11} width="16" height="4" rx="2" fill={C.blue} opacity=".6" />)}
+      {[0, 1, 2].map((i) => <rect key={i} x="87" y={48 + i * 11} width="16" height="4" rx="2" fill={C.blue} opacity=".6" />)}
+      <circle cx="120" cy="30" r="12" fill={C.yellow} /><path d="M116 30l3 3 6-6" stroke={C.white} strokeWidth="2.5" fill="none" strokeLinecap="round" />
     </svg>
   );
 }

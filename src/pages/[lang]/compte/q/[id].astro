@@ -37,7 +37,8 @@ const lines = q.urgent ? [] : caseLines({ ...q, intensity: q.intensity == null ?
   ) : (
     <div class="narrow">
       <p class="no-print"><a href={`/${lang}/compte`}>← {t(lang, "myQuestions")}</a></p>
-      <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} caseLines={lines}>
+      <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} caseLines={lines}
+        caseData={{ who: q.who, duration: q.duration, intensity: q.intensity == null ? null : String(q.intensity), age: q.age, sex: q.sex, city: q.city, signs: q.signs ?? [] }}>
         <section class="card no-print" style="margin-top:16px">
           <PublishToggle client:load lang={lang} id={q.id} isPublic={q.is_public} />
           <p class="muted small" style="margin:10px 0 0">{t(lang, "consentPublish")}</p>

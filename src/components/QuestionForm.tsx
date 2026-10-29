@@ -71,8 +71,9 @@ export function QuestionForm({ lang, initialTheme }: { lang: Lang; initialTheme?
       <div className="progress" aria-hidden="true"><div style={{ width: `${((i + 1) / steps.length) * 100}%` }} /></div>
       <div className="step-head">
         <h1 style={{ fontSize: "1.6rem" }}>{title(lang, step, a)}</h1>
-        <span className="muted small">{t(lang, "step")} {i + 1} {t(lang, "of")} {steps.length}</span>
+        <span className="muted small">{t(lang, "step")} {i + 1} {t(lang, "of")} {steps.length} · {Math.round(((i + 1) / steps.length) * 100)} %</span>
       </div>
+      <p className="hint">{hint(lang, step)}</p>
 
       <div key={step} className="step-in">
       {step === "who" && (
@@ -182,6 +183,21 @@ function title(l: Lang, step: Step, a: Answers) {
     case "signs": return t(l, "qSigns");
     case "profile": return a.who === "moi" ? t(l, "qProfile") : t(l, "qProfileOther");
     case "intent": return t(l, "qIntent");
+  }
+}
+
+// Pourquoi on pose la question : une ligne sous chaque titre, comme un conseiller qui explique.
+function hint(l: Lang, step: Step) {
+  switch (step) {
+    case "who": return t(l, "hintWho");
+    case "theme": return t(l, "hintTheme");
+    case "symptom": return t(l, "hintSymptom");
+    case "zone": return t(l, "hintZone");
+    case "intensity": return t(l, "hintIntensity");
+    case "duration": return t(l, "hintDuration");
+    case "signs": return t(l, "hintSigns");
+    case "profile": return t(l, "hintProfile");
+    case "intent": return t(l, "hintIntent");
   }
 }
 
