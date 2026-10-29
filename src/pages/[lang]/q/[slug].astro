@@ -20,7 +20,7 @@ const f = fiche(th.id, sy.id);
 if (!f) return new Response(null, { status: 404 });
 
 // La liste des patients change : page rendue à la demande.
-const askers = await publicAskers(th.id, sy.id, intent).catch(() => []);
+const askers = await publicAskers(th.id, sy.id, intent).catch((e) => { console.error("publicAskers", e); return []; });
 const title = pageTitle(lang, th, sy, intent);
 const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
