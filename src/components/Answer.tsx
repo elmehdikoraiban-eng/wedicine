@@ -57,6 +57,24 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
         <ThemeArt icon={th.icon} />
       </header>
 
+      <section className="card sec sec-danger">
+        <div className="sec-art"><ArtGrave /></div>
+        <div>
+          <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
+          <p><b>{t(lang, "seeQuickly")}</b> {fiche.warning[lang]}</p>
+          {personal && personal.warning.length > 0 && (
+            <>
+              <p style={{ margin: "8px 0 0" }}><b>{t(lang, "alsoForYou")}</b></p>
+              <ul className="extra-warn">{personal.warning.map((w, i) => <li key={i}>{w}</li>)}</ul>
+            </>
+          )}
+          <div className="row">
+            <a href="tel:15" className="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call15")}</a>
+            <a href="tel:141" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call141")}</a>
+          </div>
+        </div>
+      </section>
+
       {caseData && (dur >= 0 || inten >= 0 || who) ? (
         <section className="card sec case-sec">
           <h2><Icon name="UserRound" size={22} />{t(lang, "yourCase")}</h2>
@@ -86,24 +104,6 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
           </div>
         </section>
       ) : null}
-
-      <section className="card sec sec-danger">
-        <div className="sec-art"><ArtGrave /></div>
-        <div>
-          <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
-          <p><b>{t(lang, "seeQuickly")}</b> {fiche.warning[lang]}</p>
-          {personal && personal.warning.length > 0 && (
-            <>
-              <p style={{ margin: "8px 0 0" }}><b>{t(lang, "alsoForYou")}</b></p>
-              <ul className="extra-warn">{personal.warning.map((w, i) => <li key={i}>{w}</li>)}</ul>
-            </>
-          )}
-          <div className="row">
-            <a href="tel:15" className="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call15")}</a>
-            <a href="tel:141" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call141")}</a>
-          </div>
-        </div>
-      </section>
 
       {ordered.map((s) => (
         <section key={s.key} className={`card sec sec-illustrated${s.intent === intent ? " focus" : ""}`} id={s.key}>

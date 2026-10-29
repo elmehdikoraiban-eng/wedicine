@@ -78,6 +78,10 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
       </div>
     </footer>
     <script>
+      // Ombre de la barre de navigation dès que la page défile.
+      const nav = document.querySelector(".nav");
+      const onScroll = () => nav?.classList.toggle("scrolled", window.scrollY > 8);
+      onScroll(); addEventListener("scroll", onScroll, { passive: true });
       // Apparition des sections au défilement (désactivée si l'utilisateur réduit les animations).
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const els = document.querySelectorAll(".reveal, .reveal-stagger");

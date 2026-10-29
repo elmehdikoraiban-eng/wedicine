@@ -55,7 +55,7 @@ const features = [
         {THEMES.slice(0, 6).map((th) => <a href={`/${lang}/question?theme=${th.id}`} class="chip"><Icon name={th.icon} size={16} />{th.label[lang]}</a>)}
       </div>
     </div>
-    <PhoneForm className="art" />
+    <div class="panel art-panel"><PhoneForm className="art" /></div>
   </section>
 
   <!-- Comment ça marche : trois étapes illustrées. -->
@@ -66,9 +66,9 @@ const features = [
         <h2>{t(lang, "howTitle")}</h2>
       </div>
       <div class="steps reveal-stagger">
-        <article class="step"><Choose /><h3>{t(lang, "step1Title")}</h3><p class="muted">{t(lang, "step1Text")}</p></article>
-        <article class="step"><Account /><h3>{t(lang, "step2Title")}</h3><p class="muted">{t(lang, "step2Text")}</p></article>
-        <article class="step"><AnswerSheet /><h3>{t(lang, "step3Title")}</h3><p class="muted">{t(lang, "step3Text")}</p></article>
+        <article class="step"><div class="step-art"><Choose /></div><div><span class="num">1</span></div><div><h3>{t(lang, "step1Title")}</h3><p class="muted">{t(lang, "step1Text")}</p></div></article>
+        <article class="step"><div class="step-art"><Account /></div><div><span class="num">2</span></div><div><h3>{t(lang, "step2Title")}</h3><p class="muted">{t(lang, "step2Text")}</p></div></article>
+        <article class="step"><div class="step-art"><AnswerSheet /></div><div><span class="num">3</span></div><div><h3>{t(lang, "step3Title")}</h3><p class="muted">{t(lang, "step3Text")}</p></div></article>
       </div>
     </div>
   </section>
@@ -89,14 +89,17 @@ const features = [
   </section>
 
   <!-- Exemple de réponse : un vrai extrait de fiche, illustré. -->
-  <section class="band" id="exemple">
+  <section class="band band-neutral" id="exemple">
     <div class="wrap">
-      <div class="section-head reveal">
-        <p class="eyebrow">{t(lang, "exampleEyebrow")}</p>
-        <h2>{t(lang, "exampleTitle")}</h2>
-        <p class="lead">{t(lang, "exampleText")}</p>
-      </div>
       <div class="example reveal">
+        <div>
+          <div class="section-head">
+            <p class="eyebrow">{t(lang, "exampleEyebrow")}</p>
+            <h2>{t(lang, "exampleTitle")}</h2>
+            <p class="lead">{t(lang, "exampleText")}</p>
+          </div>
+          {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
+        </div>
         <div class="card example-card">
           <div class="example-head">
             <div>
@@ -116,7 +119,6 @@ const features = [
           </ul>
           <a href={example.href} class="btn btn-primary">{t(lang, "readExample")}</a>
         </div>
-        {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
       </div>
     </div>
   </section>
@@ -137,15 +139,15 @@ const features = [
   </section>
 
   <!-- Urgence et entraide -->
-  <section class="band band-neutral">
-    <div class="wrap" style="display:grid;gap:48px">
+  <section class="band">
+    <div class="wrap" style="display:grid;gap:var(--sec)">
       <div class="split reveal">
         <div>
           <p class="eyebrow">{t(lang, "urgentHomeEyebrow")}</p>
           <h2>{t(lang, "urgentHomeTitle")}</h2>
           <p class="lead">{t(lang, "urgentHomeText")}</p>
         </div>
-        <Urgent />
+        <div class="panel panel-red"><Urgent /></div>
       </div>
       <div class="split flip reveal">
         <div>
@@ -153,13 +155,13 @@ const features = [
           <h2>{t(lang, "publicTitle")}</h2>
           <p class="lead">{t(lang, "publicText")}</p>
         </div>
-        <Community />
+        <div class="panel panel-purple"><Community /></div>
       </div>
     </div>
   </section>
 
   <!-- Questions fréquentes -->
-  <section class="band">
+  <section class="band band-neutral">
     <div class="wrap">
       <div class="section-head reveal"><h2>{t(lang, "popular")}</h2></div>
       <div class="list-links reveal">
@@ -184,8 +186,8 @@ const features = [
   </section>
 
   <!-- Confiance -->
-  <section class="band band-neutral">
-    <div class="wrap reveal" style="text-align:center;max-width:760px">
+  <section class="band band-tint">
+    <div class="wrap cta-final reveal">
       <h2>{t(lang, "trustTitle")}</h2>
       <p class="lead">{t(lang, "trustText")}</p>
       <a href={`/${lang}/question`} class="btn btn-primary btn-lg" style="margin-top:8px">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
