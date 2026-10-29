@@ -1,88 +1,168 @@
 import "server-only";
-import { DatabaseSync } from "node:sqlite";
-import { copyFileSync, existsSync } from "node:fs";
-import path from "node:path";
-import type { Answer } from "./answer";
-import { hasRedFlag } from "./answer";
-import type { Doctor } from "./doctors";
 
-const SOURCE = path.join(process.cwd(), "data", "wedicine.db");
+// Postgres via DATABASE_URL (Neon) en production, PGlite (fichier local) sinon.
+// Les deux exposent query(sql, params) avec le même format de résultat.
 
-// Sur Vercel le système de fichiers est en lecture seule, sauf /tmp (données éphémères).
-function open() {
-  if (!process.env.VERCEL) return new DatabaseSync(SOURCE);
-  const tmp = "/tmp/wedicine.db";
-  if (!existsSync(tmp)) copyFileSync(SOURCE, tmp);
-  return new DatabaseSync(tmp);
-}
+type Row = Record<string, unknown>;
+type Q = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Row[] }> };
 
-let db: DatabaseSync | undefined;
-const get = () => (db ??= open());
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  contact TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'fr',
+  consent_info_at TIMESTAMPTZ NOT NULL,
+  consent_terms_at TIMESTAMPTZ NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS questions (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  user_id INTEGER REFERENCES users(id),
+  lang TEXT NOT NULL,
+  who TEXT NOT NULL,
+  theme TEXT NOT NULL,
+  symptom TEXT NOT NULL,
+  zone TEXT,
+  intensity INTEGER,
+  duration TEXT,
+  signs TEXT[] NOT NULL DEFAULT '{}',
+  age TEXT,
+  sex TEXT,
+  pregnant BOOLEAN,
+  city TEXT,
+  intent TEXT NOT NULL,
+  urgent BOOLEAN NOT NULL DEFAULT false,
+  is_public BOOLEAN NOT NULL DEFAULT false,
+  consent_publish_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS questions_page ON questions (theme, symptom, intent) WHERE is_public;
+`;
 
-type AnswerRow = {
-  id: number; topic: string; specialty: string; keywords: string;
-  summary: string; explanation: string; questions: string; warning: string | null;
-};
+let ready: Promise<Q> | undefined;
 
-export function findAnswer(question: string): Answer {
-  const rows = get().prepare("SELECT * FROM answers ORDER BY id").all() as AnswerRow[];
-  const q = question.toLowerCase();
-  let best = rows[0]; // la première ligne est la réponse générale par défaut
-  let bestScore = 0;
-  for (const r of rows) {
-    const score = r.keywords.split(",").filter((k) => k && q.includes(k.trim())).length;
-    if (score > bestScore) [best, bestScore] = [r, score];
+async function open(): Promise<Q> {
+  if (process.env.DATABASE_URL) {
+    const { Pool } = await import("@neondatabase/serverless");
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    await pool.query(SCHEMA);
+    return pool;
   }
-  return {
-    id: best.id,
-    topic: best.topic,
-    urgent: hasRedFlag(question),
-    summary: best.summary,
-    explanation: JSON.parse(best.explanation),
-    questionsForDoctor: JSON.parse(best.questions),
-    warning: best.warning,
-    specialty: best.specialty,
-  };
+  const { PGlite } = await import("@electric-sql/pglite");
+  const path = await import("node:path");
+  const dataDir = process.env.VERCEL ? "memory://" : path.join(process.cwd(), "data", "pglite");
+  if (dataDir !== "memory://") (await import("node:fs")).mkdirSync(dataDir, { recursive: true });
+  const db = new PGlite(dataDir);
+  await db.exec(SCHEMA);
+  return db;
 }
 
-type DoctorRow = {
-  id: number; name: string; specialty: string; city: string; address: string;
-  distance_km: number; languages: string; price_mad: number; next_slot: string;
+export const db = () => (ready ??= open());
+
+export type UserRow = { id: number; first_name: string; last_name: string; contact: string; lang: string };
+
+export type QuestionInput = {
+  lang: string; who: string; theme: string; symptom: string; zone: string | null; intensity: number | null;
+  duration: string | null; signs: string[]; age: string | null; sex: string | null; pregnant: boolean | null;
+  city: string | null; intent: string; urgent: boolean;
 };
 
-export function findDoctor(city: string, specialty: string): Doctor {
-  const d = get();
-  const row = (d.prepare("SELECT * FROM doctors WHERE city = ? AND specialty = ? ORDER BY distance_km LIMIT 1").get(city, specialty) ??
-    d.prepare("SELECT * FROM doctors WHERE city = ? ORDER BY distance_km LIMIT 1").get(city) ??
-    d.prepare("SELECT * FROM doctors ORDER BY id LIMIT 1").get()) as DoctorRow;
-  const reviews = d
-    .prepare("SELECT author, rating, date, text FROM reviews WHERE doctor_id = ? ORDER BY id")
-    .all(row.id) as Doctor["reviews"];
-  const parts = row.name.replace(/^Dr /, "").split(" ");
-  return {
-    id: row.id,
-    name: row.name,
-    specialty: row.specialty,
-    city: row.city,
-    address: row.address,
-    distanceKm: row.distance_km,
-    languages: row.languages.split(",").map((s) => s.trim()),
-    priceMad: row.price_mad,
-    nextSlot: row.next_slot,
-    initials: `${parts[0][0]}${parts[parts.length - 1][0]}`,
-    reviews,
-  };
+export async function insertQuestion(q: QuestionInput, userId: number | null, consentPublish: boolean) {
+  const d = await db();
+  const r = await d.query(
+    `INSERT INTO questions (user_id, lang, who, theme, symptom, zone, intensity, duration, signs, age, sex, pregnant, city, intent, urgent, is_public, consent_publish_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING id`,
+    [userId, q.lang, q.who, q.theme, q.symptom, q.zone, q.intensity, q.duration, q.signs, q.age, q.sex, q.pregnant,
+      q.city, q.intent, q.urgent, consentPublish && !q.urgent, consentPublish ? new Date() : null]
+  );
+  return Number(r.rows[0].id);
 }
 
-export function saveRequest(r: {
-  question: string; age: string; sex: string; city: string;
-  answerId: number; doctorId: number; urgent: boolean;
-}) {
-  get()
-    .prepare(
-      `INSERT INTO consultation_requests
-       (question, age, sex, city, answer_id, doctor_id, consent_info, consent_share, consent_at, urgent)
-       VALUES (?, ?, ?, ?, ?, ?, 1, 1, ?, ?)`
-    )
-    .run(r.question, r.age || null, r.sex || null, r.city, r.answerId, r.doctorId, new Date().toISOString(), r.urgent ? 1 : 0);
+export type QuestionRow = QuestionInput & {
+  id: number; created_at: string | Date; user_id: number | null; is_public: boolean;
+  first_name?: string; last_name?: string;
+};
+
+export async function questionById(id: number): Promise<QuestionRow | undefined> {
+  const d = await db();
+  const r = await d.query("SELECT * FROM questions WHERE id = $1", [id]);
+  return r.rows[0] as QuestionRow | undefined;
+}
+
+export async function questionsForUser(userId: number): Promise<QuestionRow[]> {
+  const d = await db();
+  const r = await d.query("SELECT * FROM questions WHERE user_id = $1 ORDER BY id DESC", [userId]);
+  return r.rows as QuestionRow[];
+}
+
+export async function setPublic(id: number, userId: number, isPublic: boolean) {
+  const d = await db();
+  await d.query(
+    "UPDATE questions SET is_public = $3, consent_publish_at = CASE WHEN $3 THEN now() ELSE consent_publish_at END WHERE id = $1 AND user_id = $2 AND NOT urgent",
+    [id, userId, isPublic]
+  );
+}
+
+// Les patients qui ont posé cette question et accepté la publication (prénom + initiale seulement).
+export async function publicAskers(theme: string, symptom: string, intent: string) {
+  const d = await db();
+  const r = await d.query(
+    `SELECT q.id, q.created_at, q.age, q.city, u.first_name, u.last_name
+     FROM questions q JOIN users u ON u.id = q.user_id
+     WHERE q.theme = $1 AND q.symptom = $2 AND q.intent = $3 AND q.is_public
+     ORDER BY q.id DESC LIMIT 20`,
+    [theme, symptom, intent]
+  );
+  return r.rows as { id: number; created_at: string | Date; age: string | null; city: string | null; first_name: string; last_name: string }[];
+}
+
+export async function createUser(u: { firstName: string; lastName: string; contact: string; passwordHash: string; lang: string }) {
+  const d = await db();
+  const r = await d.query(
+    `INSERT INTO users (first_name, last_name, contact, password_hash, lang, consent_info_at, consent_terms_at)
+     VALUES ($1,$2,$3,$4,$5,now(),now()) RETURNING id`,
+    [u.firstName, u.lastName, u.contact, u.passwordHash, u.lang]
+  );
+  return Number(r.rows[0].id);
+}
+
+export async function userByContact(contact: string) {
+  const d = await db();
+  const r = await d.query("SELECT * FROM users WHERE contact = $1", [contact]);
+  return r.rows[0] as (UserRow & { password_hash: string }) | undefined;
+}
+
+export async function createSession(userId: number, token: string) {
+  const d = await db();
+  await d.query("INSERT INTO sessions (token, user_id) VALUES ($1, $2)", [token, userId]);
+}
+
+export async function userBySession(token: string): Promise<UserRow | undefined> {
+  const d = await db();
+  const r = await d.query(
+    "SELECT u.id, u.first_name, u.last_name, u.contact, u.lang FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = $1",
+    [token]
+  );
+  return r.rows[0] as UserRow | undefined;
+}
+
+export async function deleteSession(token: string) {
+  const d = await db();
+  await d.query("DELETE FROM sessions WHERE token = $1", [token]);
+}
+
+export async function claimQuestion(id: number, userId: number, consentPublish: boolean) {
+  const d = await db();
+  await d.query(
+    "UPDATE questions SET user_id = $2, is_public = ($3 AND NOT urgent), consent_publish_at = CASE WHEN $3 THEN now() ELSE NULL END WHERE id = $1 AND user_id IS NULL",
+    [id, userId, consentPublish]
+  );
 }
