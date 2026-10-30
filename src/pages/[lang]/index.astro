@@ -9,6 +9,7 @@ import { Account, AnswerSheet, ArtAppointment, Choose, DurationSteps, TopicScene
 import { fiche } from "@/lib/content/fiches";
 import { DURATIONS } from "@/lib/content/options";
 import { countQuestions } from "@/lib/db";
+import { visitorCity } from "@/lib/geo";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
@@ -32,16 +33,16 @@ const BADGES = [["Siren", "whenToSee"], ["UserRound", "yourCase"], ["Stethoscope
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
-// Le ruban est doublé pour boucler sans couture.
+// Tunnel : 24 cartes (chaque sujet deux fois) réparties sur 360°, les doublons sont masqués aux lecteurs d'écran.
 const ribbon = [...THEMES, ...THEMES];
+const city = visitorCity(Astro.request, Astro.url, lang);
 ---
 <Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false}>
   <!-- 1. Héros centré + ruban des 12 sujets illustrés -->
   <section class="hero-c">
     <div class="wrap hero-c-text">
-      <p class="kicker"><span class="dot"></span>{t(lang, "heroKicker")}</p>
-      <h1>{t(lang, "heroTitle1")} <span class="soft">{t(lang, "heroTitle2")}</span></h1>
-      <p class="lead">{t(lang, "heroLead")}</p>
+      <h1>{t(lang, "heroTitle1")} <span class="city">{city}</span></h1>
+      <p class="lead">{t(lang, "heroTitle2")}</p>
       <div class="actions">
         <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
         <a href="#exemple" class="link-ul">{t(lang, "seeExample")}</a>
@@ -51,7 +52,7 @@ const ribbon = [...THEMES, ...THEMES];
     <div class="ribbon" id="ribbon" aria-label={t(lang, "themesTitle")}>
       <div class="ribbon-track">
         {ribbon.map((th, i) => (
-          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
+          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" data-i={i} aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
             <TopicScene id={th.id} />
             <span class="topic-name"><Icon name={th.icon} size={18} />{th.label[lang]}</span>
           </a>
@@ -115,13 +116,23 @@ const ribbon = [...THEMES, ...THEMES];
   </section>
 
   <!-- 4. Urgence : une ligne -->
-  <section class="urgent-band">
-    <div class="wrap urgent-row reveal">
-      <span class="urgent-ico"><Icon name="Siren" size={24} /></span>
-      <p><b>{t(lang, "urgentHomeTitle")}</b> {t(lang, "urgentLine")}</p>
-      <div class="row">
-        <a href="tel:15" class="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call15")}</a>
-        <a href="tel:141" class="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call141")}</a>
+  <section class="urgent-plain">
+    <div class="wrap urgent-grid reveal">
+      <div class="urgent-head">
+        <span class="urgent-ico"><Icon name="Siren" size={26} /></span>
+        <div>
+          <h3>{t(lang, "urgentHomeTitle")}</h3>
+          <p class="muted">{t(lang, "urgentSub")}</p>
+        </div>
+      </div>
+      <ul class="urgent-signs">
+        <li><Icon name="HeartPulse" size={20} />{t(lang, "urgentSign1")}</li>
+        <li><Icon name="Wind" size={20} />{t(lang, "urgentSign2")}</li>
+        <li><Icon name="Frown" size={20} />{t(lang, "urgentSign3")}</li>
+      </ul>
+      <div class="urgent-calls">
+        <a href="tel:15" class="btn btn-danger"><Icon name="Phone" size={18} /> {t(lang, "call15")}</a>
+        <a href="tel:141" class="btn btn-ghost"><Icon name="Phone" size={18} /> {t(lang, "call141")}</a>
       </div>
     </div>
   </section>
@@ -160,14 +171,45 @@ const ribbon = [...THEMES, ...THEMES];
   </section>
 
   <script>
-    // Ruban des sujets : pause au survol, glisser à la souris ou au doigt, grille fixe si animations réduites.
+    // Tunnel des sujets : les cartes sont posées sur un anneau vu de l'intérieur (comme un tunnel) qui tourne lentement.
+    // On peut le faire tourner à la main ; grille fixe si animations réduites, liste tactile sur mobile (CSS).
     const r = document.getElementById("ribbon");
     const track = r?.querySelector<HTMLElement>(".ribbon-track");
-    if (r && track && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      let down = false, startX = 0, moved = 0, offset = 0;
-      const apply = () => { track.style.setProperty("--drag", `${offset}px`); };
-      r.addEventListener("pointerdown", (e) => { down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
-      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); offset += dx; startX = e.clientX; apply(); });
+    const cards = Array.from(r?.querySelectorAll<HTMLElement>(".topic-card") ?? []);
+    const wide = window.matchMedia("(min-width: 761px)");
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (r && track && cards.length) {
+      const n = cards.length, step = 360 / n, rtl = document.dir === "rtl";
+      let rot = 0, last = 0, down = false, startX = 0, moved = 0, raf = 0, on = false;
+      // Perspective, rayon de l'anneau et recul de la caméra par rapport à son centre (px).
+      const P = 340, R = 700, D = 40;
+      const place = () => {
+        for (let i = 0; i < n; i++) {
+          const a = ((i * step + rot) % 360 + 360) % 360;
+          const dist = D + R * Math.cos((a * Math.PI) / 180); // distance carte → caméra
+          const el = cards[i];
+          if (dist < 0.3 * P) { el.style.visibility = "hidden"; continue; }
+          el.style.visibility = "";
+          el.style.opacity = String(Math.min(1, (dist - 0.3 * P) / (0.3 * P)));
+          el.style.transform = `rotateY(${a}deg) translateZ(${-R}px)`;
+        }
+      };
+      const tick = (ts: number) => {
+        if (!down && !r.matches(":hover")) rot += ((ts - last) / 1000) * (rtl ? -4 : 4); // un tour en 90 s
+        last = ts; place(); raf = requestAnimationFrame(tick);
+      };
+      const start = () => {
+        if (on) return; on = true; r.classList.add("tunnel"); track.style.perspective = `${P}px`; track.style.transform = `translateZ(${P - D}px)`;
+        last = performance.now(); raf = requestAnimationFrame(tick);
+      };
+      const stop = () => {
+        if (!on) return; on = false; cancelAnimationFrame(raf); r.classList.remove("tunnel");
+        track.style.cssText = ""; cards.forEach((el) => { el.style.cssText = ""; });
+      };
+      const sync = () => (wide.matches && !calm.matches ? start() : stop());
+      sync(); wide.addEventListener("change", sync); calm.addEventListener("change", sync);
+      r.addEventListener("pointerdown", (e) => { if (!on) return; down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
+      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); rot -= (dx * 57.3) / P; startX = e.clientX; });
       const up = () => { down = false; r.classList.remove("dragging"); };
       r.addEventListener("pointerup", up); r.addEventListener("pointercancel", up);
       // Un glissement ne doit pas déclencher le lien.
