@@ -35,7 +35,7 @@ const city = visitorCity(Astro.request, Astro.url, lang);
   <!-- 1. Héros centré + ruban des 12 sujets illustrés -->
   <section class="hero-c">
     <div class="wrap hero-c-text">
-      <h1>{t(lang, "heroTitle1")} <span class="city">{city}</span></h1>
+      <h1>{t(lang, "heroTitle1").split(" ").map((w) => <><span class="word">{w}</span>{" "}</>)}<span class="city">{city}</span></h1>
       <p class="lead">{t(lang, "heroTitle2")}</p>
       <div class="actions">
         <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
