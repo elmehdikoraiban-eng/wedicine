@@ -2,7 +2,11 @@
    - Système visuel : asana.com (typographie large et serrée, sections très aérées, grands arrondis,
      ombres douces, panneaux pastel, boutons « pill », champs 1 px). Structure de parcours : himynona.
    - Couleurs : inchangées (bleu #0065FF, encre #091E42, bandes neutres Trello/Atlassian).
-   - Police : Inter (Atlassian Sans est un dérivé d'Inter). Noto Sans Arabic pour l'arabe. */
+   - Polices : Nunito Sans (FR/EN, variable, OFL) et Ramis Arabic (AR, licence Kutype, version d'essai
+     fournie par El Mehdi : licence commerciale à acquérir avant le lancement). Fichiers dans public/fonts. */
+@font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
+@font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
+@font-face { font-family: "Ramis Arabic"; src: url("/fonts/ramis-arabic.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
 :root {
   --brand: #0065ff;        /* bande bleue, accents, sélection */
   --brand-hover: #0747a6;
@@ -34,8 +38,8 @@
   --shadow-float: 0 24px 64px rgba(9, 30, 66, .12);
   --focus: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ring);
   --max: 1200px;
-  --font: "Inter", "Atlassian Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-ar: "Noto Sans Arabic", "Inter", system-ui, sans-serif;
+  --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ar: "Ramis Arabic", "Nunito Sans", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .7, .2, 1);
   --t: .18s;
   --sec: clamp(64px, 9vw, 120px);   /* hauteur des sections */
@@ -47,15 +51,14 @@ html { -webkit-text-size-adjust: 100%; scroll-padding-top: 84px; scroll-behavior
 body {
   margin: 0; background: var(--canvas); color: var(--ink);
   font-family: var(--font); font-size: 17px; line-height: 1.6;
-  font-feature-settings: "cv05", "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh; display: flex; flex-direction: column;
 }
-[dir="rtl"] body { font-family: var(--font-ar); font-size: 18px; font-feature-settings: normal; }
+[dir="rtl"] body { font-family: var(--font-ar); font-size: 18px; }
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 /* Titres asana : grands, serrés, poids moyen. */
-h1, h2, h3, h4 { margin: 0 0 .5em; font-weight: 500; letter-spacing: -.025em; color: var(--ink); text-wrap: balance; }
+h1, h2, h3, h4 { margin: 0 0 .5em; font-weight: 600; letter-spacing: -.02em; color: var(--ink); text-wrap: balance; }
 h1 { font-size: clamp(2.5rem, 5.5vw, 4rem); line-height: 1.08; }
 h2 { font-size: clamp(2rem, 3.8vw, 2.875rem); line-height: 1.12; }
 h3 { font-size: 1.5rem; line-height: 1.3; letter-spacing: -.015em; }
@@ -99,7 +102,7 @@ main > .page { padding-block: 48px 96px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 0 26px; min-height: 50px; border-radius: var(--r-pill); border: 1px solid transparent;
-  font-weight: 500; font-size: 1rem; line-height: 1.2; cursor: pointer; white-space: nowrap;
+  font-weight: 600; font-size: 1rem; line-height: 1.2; cursor: pointer; white-space: nowrap;
   transition: background var(--t) var(--ease), color var(--t), border-color var(--t), transform var(--t) var(--ease), box-shadow var(--t);
 }
 .btn:hover { text-decoration: none; }

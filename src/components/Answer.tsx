@@ -78,7 +78,6 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
           ) : (
             <p className="summary">{fiche.summary[lang]}</p>
           )}
-          <p className="notice notice-info small" style={{ marginBottom: 0 }}><Icon name="CircleAlert" size={18} />{t(lang, "answerInfo")}</p>
         </div>
         {VerdictArt ? <div className="verdict-scene"><VerdictArt /></div> : <ThemeArt icon={th.icon} />}
       </header>

@@ -146,7 +146,7 @@ export function Urgent({ className }: P) {
         <rect x="-26" y="20" width="52" height="8" rx="3" fill={C.navy} />
         <path d="M0 -24v-10M-18 -17l-7-7M18 -17l7-7" stroke={C.red} strokeWidth="4" strokeLinecap="round" />
       </g>
-      <text x="160" y="150" textAnchor="middle" fontFamily="Inter, system-ui, sans-serif" fontWeight="700" fontSize="28" fill={C.red}>15</text>
+      <text x="160" y="150" textAnchor="middle" fontFamily="inherit" fontWeight="700" fontSize="28" fill={C.red}>15</text>
       <rect x="130" y="166" width="60" height="14" rx="3" fill={C.red} />
       <circle cx="60" cy="60" r="10" fill={C.red} opacity=".3" /><circle cx="270" cy="150" r="14" fill={C.red} opacity=".2" />
     </svg>
@@ -195,18 +195,18 @@ export function DurationTimeline({ labels, current, threshold, youAreHere, consu
         <g key={i}>
           <circle cx={x} cy={y} r={i === current ? 11 : 7} fill={i === current ? C.blue : i >= threshold ? C.red : C.white} stroke={i === current ? C.blue : i >= threshold ? C.red : C.line} strokeWidth="3" />
           {i === current && <circle cx={x} cy={y} r="4" fill={C.white} />}
-          <text x={x} y={y + 32} textAnchor="middle" fontSize="12" fill={C.navy} fontFamily="Inter, system-ui, sans-serif" style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${x}px ${y + 32}px` } : undefined}>{labels[i]}</text>
+          <text x={x} y={y + 32} textAnchor="middle" fontSize="12" fill={C.navy} fontFamily="inherit" style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${x}px ${y + 32}px` } : undefined}>{labels[i]}</text>
         </g>
       ))}
       {current >= 0 && (
         <g style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${xs[current]}px 30px` } : undefined}>
           <rect x={xs[current] - 46} y="14" width="92" height="24" rx="12" fill={C.blue} />
-          <text x={xs[current]} y="30" textAnchor="middle" fontSize="12" fontWeight="500" fill={C.white} fontFamily="Inter, system-ui, sans-serif">{youAreHere}</text>
+          <text x={xs[current]} y="30" textAnchor="middle" fontSize="12" fontWeight="500" fill={C.white} fontFamily="inherit">{youAreHere}</text>
         </g>
       )}
       {tx != null && (
         <g style={rtl ? { transform: "scaleX(-1)", transformOrigin: `${tx}px ${H - 14}px` } : undefined}>
-          <text x={tx} y={H - 10} textAnchor="middle" fontSize="12" fontWeight="500" fill={C.red} fontFamily="Inter, system-ui, sans-serif">▲ {consultFrom}</text>
+          <text x={tx} y={H - 10} textAnchor="middle" fontSize="12" fontWeight="500" fill={C.red} fontFamily="inherit">▲ {consultFrom}</text>
         </g>
       )}
     </svg>
@@ -366,7 +366,7 @@ export function ArtSoon() {
       <path d="M110 60v32l20 12" stroke={C.navy} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       <circle cx="110" cy="92" r="4" fill={C.navy} />
       <rect x="150" y="104" width="60" height="30" rx="15" fill="#FF8B00" />
-      <text x="180" y="125" textAnchor="middle" fontFamily="Inter, sans-serif" fontWeight="700" fontSize="17" fill={C.white}>48 h</text>
+      <text x="180" y="125" textAnchor="middle" fontFamily="inherit" fontWeight="700" fontSize="17" fill={C.white}>48 h</text>
       <rect x="166" y="30" width="34" height="56" rx="8" fill={C.white} stroke={C.navy} strokeWidth="3" />
       <rect x="172" y="38" width="22" height="34" rx="3" fill="#DEEBFF" />
       <circle cx="183" cy="78" r="2.5" fill={C.navy} />
