@@ -57,7 +57,7 @@ const unlock = !!(q && th && sy);
       )}
     </aside>
     <div class="card auth-card">
-      <AuthForm client:load lang={lang} questionId={unlock ? qid : undefined} initialMode={unlock ? "signup" : "login"} redirectTo={safeNext} />
+      <AuthForm client:load lang={lang} questionId={unlock ? qid : undefined} initialMode={unlock || sp.get("mode") === "inscription" ? "signup" : "login"} redirectTo={safeNext} />
     </div>
   </div>
 </Base>

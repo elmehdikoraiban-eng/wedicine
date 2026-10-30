@@ -5,7 +5,7 @@ import { Icon } from "./Icon";
 
 interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number } | null }
 const { lang, user } = Astro.props;
-// Le sélecteur de langue garde la page courante.
+// Langue choisie automatiquement (navigateur) ; on peut la changer dans le menu du compte ou le pied de page, sur la même page.
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 ---
 <header class="nav">
@@ -15,15 +15,6 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
       <span class="word">Wedicine</span>
     </a>
     <nav class="nav-links" aria-label="Navigation">
-      {!user && (
-        <div class="lang" aria-label="Langue">
-          {LANGS.map((l) => (
-            <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>
-              <span class="full">{LANG_NAMES[l]}</span><span class="short">{l.toUpperCase()}</span>
-            </a>
-          ))}
-        </div>
-      )}
       {user
         ? (
           <details class="me-menu">
@@ -48,7 +39,10 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
             </div>
           </details>
         )
-        : <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>}
+        : <>
+          <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>
+          <a href={`/${lang}/connexion?mode=inscription`} class="btn btn-primary btn-sm">{t(lang, "signup")}</a>
+        </>}
     </nav>
   </div>
 </header>

@@ -24,11 +24,6 @@ export const UI = {
   noTyping: { fr: "Rien à écrire", ar: "بدون كتابة", en: "Nothing to type" },
   themesTitle: { fr: "Choisissez un sujet", ar: "اختر موضوعاً", en: "Pick a topic" },
   popular: { fr: "Questions fréquentes", ar: "أسئلة شائعة", en: "Popular questions" },
-  disclaimerShort: {
-    fr: "Information, pas diagnostic. Les réponses ne remplacent pas une consultation médicale.",
-    ar: "معلومة وليست تشخيصاً. الأجوبة لا تعوّض استشارة الطبيب.",
-    en: "Information, not diagnosis. Answers never replace a medical consultation.",
-  },
   footer: {
     fr: "Wedicine fournit une information générale et ne remplace pas un médecin. En cas d'urgence, appelez le 15 (SAMU) ou le 141.",
     ar: "يقدّم Wedicine معلومات عامة ولا يعوّض الطبيب. في حالة الطوارئ، اتصل بالرقم 15 (الإسعاف) أو 141.",
@@ -75,6 +70,7 @@ export const UI = {
   accConsentInfo: { fr: "Information, pas diagnostic : accepté le", ar: "معلومة وليست تشخيصاً: تمت الموافقة في", en: "Information, not diagnosis: accepted on" },
   accConsentTerms: { fr: "Conditions et données de santé (loi 09-08) : accepté le", ar: "الشروط والبيانات الصحية (القانون 09-08): تمت الموافقة في", en: "Terms and health data (law 09-08): accepted on" },
   accPrivacy: { fr: "Seuls votre prénom, l'initiale du nom, la tranche d'âge et la ville apparaissent sur une question publiée.", ar: "لا يظهر في السؤال المنشور إلا اسمك الشخصي والحرف الأول من اسمك العائلي والفئة العمرية والمدينة.", en: "Only your first name, last initial, age range and city appear on a published question." },
+  signup: { fr: "Inscription", ar: "إنشاء حساب", en: "Sign up" },
   login: { fr: "Connexion", ar: "تسجيل الدخول", en: "Log in" },
   logout: { fr: "Déconnexion", ar: "تسجيل الخروج", en: "Log out" },
   back: { fr: "Retour", ar: "رجوع", en: "Back" },
@@ -212,7 +208,7 @@ export const UI = {
   since: { fr: "depuis", ar: "منذ", en: "for" },
   // Accueil (sections explicatives)
   heroEyebrow: { fr: "Wedicine, l'information santé avant la consultation", ar: "Wedicine، المعلومة الصحية قبل الاستشارة", en: "Wedicine, health information before your appointment" },
-  startFree: { fr: "Poser ma question, c'est gratuit", ar: "اطرح سؤالي، مجاناً", en: "Ask my question, it's free" },
+  startFree: { fr: "Poser ma question", ar: "اطرح سؤالي", en: "Ask my question" },
   seeExample: { fr: "Voir un exemple de réponse", ar: "شاهد مثالاً لجواب", en: "See a sample answer" },
   howEyebrow: { fr: "Comment ça marche", ar: "كيف يعمل", en: "How it works" },
   howTitle: { fr: "Trois étapes, aucune ligne à écrire", ar: "ثلاث خطوات، بدون كتابة أي سطر", en: "Three steps, nothing to type" },
