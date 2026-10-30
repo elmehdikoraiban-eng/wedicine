@@ -43,9 +43,9 @@
   --ease: cubic-bezier(.2, .7, .2, 1);
   --t: .18s;
   --sec: clamp(64px, 9vw, 120px);   /* hauteur des sections */
-  /* Échelle de texte d'asana.com : Display Hero 102, Display 72, Section 54, Heading 36, Heading SM 24,
+  /* Échelle de texte d'asana.com : Display 72, Section 54, Heading 36, Heading SM 24,
      Body Lead 20, Body 16, Nav 14, Badge 12 (mobile : le hero descend à 52 px). */
-  --fs-hero: clamp(2.5rem, 7vw, 6.375rem);
+  --fs-hero: clamp(2.5rem, 5.5vw, 4rem);   /* titre de l’accueil : taille d’avant gardée (demande d’El Mehdi) */
   --fs-display: clamp(2.75rem, 5vw, 4.5rem);
   --fs-section: clamp(2.25rem, 3.8vw, 3.375rem);
   --fs-heading: clamp(1.75rem, 2.6vw, 2.25rem);
