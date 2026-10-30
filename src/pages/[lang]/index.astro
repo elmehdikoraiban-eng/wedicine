@@ -29,6 +29,8 @@ const exampleFiche = fiche("fievre", "seule")!;
 const count = await countQuestions().catch(() => 0);
 const FAQ = [1, 2, 3, 4, 5, 6] as const;
 const EXAMPLE_SECTIONS = [["CircleAlert", "seeQuickly"], ["FileText", "whatToKnow"], ["Hourglass", "meanwhile"], ["Stethoscope", "whichDoctor"], ["Microscope", "exams"], ["MessageCircleQuestion", "askDoctor"]] as const;
+// Première phrase seulement : l'accueil doit se lire en un coup d'œil.
+const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 const features = [
@@ -66,9 +68,9 @@ const features = [
         <h2>{t(lang, "howTitle")}</h2>
       </div>
       <div class="steps reveal-stagger">
-        <article class="step"><div class="step-art"><Choose /></div><div><span class="num">1</span></div><div><h3>{t(lang, "step1Title")}</h3><p class="muted">{t(lang, "step1Text")}</p></div></article>
-        <article class="step"><div class="step-art"><Account /></div><div><span class="num">2</span></div><div><h3>{t(lang, "step2Title")}</h3><p class="muted">{t(lang, "step2Text")}</p></div></article>
-        <article class="step"><div class="step-art"><AnswerSheet /></div><div><span class="num">3</span></div><div><h3>{t(lang, "step3Title")}</h3><p class="muted">{t(lang, "step3Text")}</p></div></article>
+        <article class="step"><div class="step-art"><Choose /></div><div><span class="num">1</span></div><div><h3>{t(lang, "step1Title")}</h3><p class="muted">{brief(t(lang, "step1Text"))}</p></div></article>
+        <article class="step"><div class="step-art"><Account /></div><div><span class="num">2</span></div><div><h3>{t(lang, "step2Title")}</h3><p class="muted">{brief(t(lang, "step2Text"))}</p></div></article>
+        <article class="step"><div class="step-art"><AnswerSheet /></div><div><span class="num">3</span></div><div><h3>{t(lang, "step3Title")}</h3><p class="muted">{brief(t(lang, "step3Text"))}</p></div></article>
       </div>
     </div>
   </section>
@@ -82,7 +84,7 @@ const features = [
       </div>
       <div class="features reveal-stagger">
         {features.map((f) => (
-          <div class="feature"><span class="ico"><Icon name={f.icon} size={22} /></span><h4>{t(lang, f.title)}</h4><p>{t(lang, f.text)}</p></div>
+          <div class="feature"><span class="ico"><Icon name={f.icon} size={24} /></span><h4>{t(lang, f.title)}</h4></div>
         ))}
       </div>
     </div>
@@ -96,7 +98,7 @@ const features = [
           <div class="section-head">
             <p class="eyebrow">{t(lang, "exampleEyebrow")}</p>
             <h2>{t(lang, "exampleTitle")}</h2>
-            <p class="lead">{t(lang, "exampleText")}</p>
+            <p class="lead">{brief(t(lang, "exampleText"))}</p>
           </div>
           {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
         </div>
@@ -145,7 +147,7 @@ const features = [
         <div>
           <p class="eyebrow">{t(lang, "urgentHomeEyebrow")}</p>
           <h2>{t(lang, "urgentHomeTitle")}</h2>
-          <p class="lead">{t(lang, "urgentHomeText")}</p>
+          <p class="lead">{brief(t(lang, "urgentHomeText"))}</p>
         </div>
         <div class="panel panel-red"><Urgent /></div>
       </div>
@@ -153,7 +155,7 @@ const features = [
         <div>
           <p class="eyebrow">{t(lang, "publicEyebrow")}</p>
           <h2>{t(lang, "publicTitle")}</h2>
-          <p class="lead">{t(lang, "publicText")}</p>
+          <p class="lead">{brief(t(lang, "publicText"))}</p>
         </div>
         <div class="panel panel-purple"><Community /></div>
       </div>
@@ -189,7 +191,6 @@ const features = [
   <section class="band band-tint">
     <div class="wrap cta-final reveal">
       <h2>{t(lang, "trustTitle")}</h2>
-      <p class="lead">{t(lang, "trustText")}</p>
       <a href={`/${lang}/question`} class="btn btn-primary btn-lg" style="margin-top:8px">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
     </div>
   </section>

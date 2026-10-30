@@ -223,6 +223,9 @@ export const UI = {
   level2: { fr: "Consultez sous 48 h", ar: "استشر خلال 48 ساعة", en: "See a doctor within 48 h" },
   alsoForYou: { fr: "Et dans votre situation :", ar: "وفي حالتك أيضاً:", en: "And in your situation:" },
   generalAdvice: { fr: "Conseils généraux", ar: "نصائح عامة", en: "General advice" },
+  readMore: { fr: "Lire la suite", ar: "اقرأ المزيد", en: "Read more" },
+  showLess: { fr: "Réduire", ar: "تصغير", en: "Show less" },
+  moreQuestions: { fr: "Autres questions utiles", ar: "أسئلة أخرى مفيدة", en: "Other useful questions" },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
 } satisfies Record<string, T>;
 

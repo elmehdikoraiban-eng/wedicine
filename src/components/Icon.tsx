@@ -3,6 +3,7 @@ import {
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,
+  Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
   type LucideProps,
 } from "lucide-react";
 
@@ -12,6 +13,7 @@ export const ICONS = {
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,
+  Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
 };
 export type IconName = keyof typeof ICONS;
 

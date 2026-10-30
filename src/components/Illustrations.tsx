@@ -315,3 +315,63 @@ export function ArtKnow() {
     </svg>
   );
 }
+
+// ----- Grandes scènes du verdict : ce que la personne doit faire, en un coup d'œil. -----
+// Niveau 0 : surveiller à la maison.
+export function ArtWatchHome() {
+  return (
+    <svg viewBox="0 0 240 180" role="img" aria-hidden="true" className="verdict-art">
+      <circle cx="120" cy="90" r="78" fill="#E3FCEF" />
+      <path d="M52 92l68-50 68 50v58a6 6 0 0 1-6 6H58a6 6 0 0 1-6-6z" fill={C.white} stroke={C.navy} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M40 96l80-60 80 60" fill="none" stroke={C.navy} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="104" y="116" width="32" height="40" rx="4" fill="#36B37E" />
+      <circle cx="130" cy="137" r="2.5" fill={C.white} />
+      <rect x="66" y="108" width="24" height="20" rx="3" fill="#DEEBFF" stroke={C.navy} strokeWidth="2" />
+      <rect x="150" y="108" width="24" height="20" rx="3" fill="#DEEBFF" stroke={C.navy} strokeWidth="2" />
+      <circle cx="190" cy="46" r="22" fill={C.white} stroke="#36B37E" strokeWidth="3" />
+      <path d="M190 32v14l9 6" stroke="#36B37E" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path d="M30 148c10-10 24-10 34 0" stroke="#36B37E" strokeWidth="3" strokeLinecap="round" fill="none" opacity=".6" />
+      <path d="M176 148c10-10 24-10 34 0" stroke="#36B37E" strokeWidth="3" strokeLinecap="round" fill="none" opacity=".6" />
+    </svg>
+  );
+}
+// Niveau 1 : rendez-vous cette semaine.
+export function ArtAppointment() {
+  return (
+    <svg viewBox="0 0 240 180" role="img" aria-hidden="true" className="verdict-art">
+      <circle cx="120" cy="90" r="78" fill="#DEEBFF" />
+      <rect x="56" y="40" width="128" height="110" rx="12" fill={C.white} stroke={C.navy} strokeWidth="3" />
+      <rect x="56" y="40" width="128" height="30" rx="12" fill="#0065FF" />
+      <rect x="56" y="58" width="128" height="12" fill="#0065FF" />
+      <rect x="80" y="28" width="8" height="24" rx="4" fill={C.navy} /><rect x="152" y="28" width="8" height="24" rx="4" fill={C.navy} />
+      {[0, 1, 2, 3].map((c) => [0, 1, 2].map((r) => (
+        <rect key={`${c}${r}`} x={72 + c * 26} y={82 + r * 22} width="18" height="14" rx="3" fill={c === 2 && r === 1 ? "#0065FF" : "#F4F5F7"} />
+      )))}
+      <circle cx="176" cy="126" r="26" fill="#36B37E" stroke={C.white} strokeWidth="4" />
+      <path d="M164 126l8 8 16-16" stroke={C.white} strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="40" cy="60" r="14" fill="#F3C9A6" stroke={C.navy} strokeWidth="2.5" />
+      <path d="M26 54c4-8 24-8 28 0" fill={C.navy} />
+      <path d="M22 100c2-16 10-26 18-26s16 10 18 26" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <path d="M34 78l6 8 6-8" fill="#8777D9" />
+    </svg>
+  );
+}
+// Niveau 2 : consulter sous 48 heures.
+export function ArtSoon() {
+  return (
+    <svg viewBox="0 0 240 180" role="img" aria-hidden="true" className="verdict-art">
+      <circle cx="120" cy="90" r="78" fill="#FFF0E0" />
+      <circle cx="110" cy="92" r="52" fill={C.white} stroke={C.navy} strokeWidth="3.5" />
+      <circle cx="110" cy="92" r="44" fill="none" stroke="#FF8B00" strokeWidth="8" strokeDasharray="140 200" strokeLinecap="round" transform="rotate(-90 110 92)" />
+      <path d="M110 60v32l20 12" stroke={C.navy} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <circle cx="110" cy="92" r="4" fill={C.navy} />
+      <rect x="150" y="104" width="60" height="30" rx="15" fill="#FF8B00" />
+      <text x="180" y="125" textAnchor="middle" fontFamily="Inter, sans-serif" fontWeight="700" fontSize="17" fill={C.white}>48 h</text>
+      <rect x="166" y="30" width="34" height="56" rx="8" fill={C.white} stroke={C.navy} strokeWidth="3" />
+      <rect x="172" y="38" width="22" height="34" rx="3" fill="#DEEBFF" />
+      <circle cx="183" cy="78" r="2.5" fill={C.navy} />
+      <path d="M46 118l4-10 4 10" stroke="#FF8B00" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M36 134l6-16 6 16" stroke="#FF8B00" strokeWidth="3" fill="none" strokeLinecap="round" opacity=".5" />
+    </svg>
+  );
+}

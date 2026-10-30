@@ -3,6 +3,7 @@ import { AGES, CITIES, DURATIONS } from "./content/options";
 import type { Theme } from "./content/themes";
 import type { Fiche } from "./content/types";
 import type { Answers } from "./triage";
+import { stepPicto, type Picto } from "./pictos";
 
 // Personnalisation de la réponse à partir des choix du patient.
 // Le contenu médical de la fiche reste la référence ; ces règles l'adaptent
@@ -11,7 +12,7 @@ import type { Answers } from "./triage";
 
 export type Level = 0 | 1 | 2; // 0 surveiller à la maison · 1 rendez-vous cette semaine · 2 consulter sous 48 h
 
-export type Step = { text: string; personal: boolean };
+export type Step = { text: string; personal: boolean; picto?: Picto };
 
 export type Personal = {
   level: Level;
@@ -150,33 +151,33 @@ export function personalize(a: Answers, th: Theme, fiche: Fiche, l: Lang): Perso
 
   // ---- Que faire en attendant --------------------------------------------
   const first: Step[] = [];
-  if (level >= 1 && th.id !== "bilan") first.push({ personal: true, text: pick(l, level === 2
+  if (level >= 1 && th.id !== "bilan") first.push({ personal: true, picto: { icon: "CalendarCheck", tone: "blue" }, text: pick(l, level === 2
     ? { fr: "Prenez rendez-vous aujourd'hui ou demain. Si vous ne trouvez pas de créneau, un centre de santé ou les urgences peuvent vous recevoir.", ar: "احجز موعداً اليوم أو غداً. إذا لم تجد موعداً، يمكن لمركز صحي أو قسم المستعجلات استقبالك.", en: "Book an appointment today or tomorrow. If you cannot find a slot, a health centre or the emergency department can see you." }
     : { fr: "Prenez rendez-vous chez le médecin dès cette semaine, sans attendre que ça passe.", ar: "احجز موعداً عند الطبيب هذا الأسبوع، دون انتظار أن يزول من تلقاء نفسه.", en: "Book a doctor's appointment this week, without waiting for it to pass." }) });
-  if (child) first.push({ personal: true, text: pick(l, {
+  if (child) first.push({ personal: true, picto: { icon: "Scale", tone: "purple" }, text: pick(l, {
     fr: "Pesez l'enfant : les doses de paracétamol se calculent au poids (et pas d'ibuprofène sans avis médical).",
     ar: "زِن الطفل: تُحسب جرعة الباراسيتامول حسب الوزن (ولا إيبوبروفين دون رأي طبي).",
     en: "Weigh the child: paracetamol doses are worked out by weight (and no ibuprofen without medical advice).",
   }) });
-  if (pregnant) first.push({ personal: true, text: pick(l, {
+  if (pregnant) first.push({ personal: true, picto: { icon: "Ban", tone: "red" }, text: pick(l, {
     fr: "Ni ibuprofène ni aspirine. Le paracétamol reste possible aux doses habituelles, en l'absence de contre-indication.",
     ar: "لا إيبوبروفين ولا أسبرين. يبقى الباراسيتامول ممكناً بالجرعات المعتادة إذا لم يكن هناك مانع.",
     en: "No ibuprofen or aspirin. Paracetamol remains possible at the usual doses if there is no contraindication.",
   }) });
-  if (senior) first.push({ personal: true, text: pick(l, {
+  if (senior) first.push({ personal: true, picto: { icon: "ClipboardList", tone: "blue" }, text: pick(l, {
     fr: "Préparez la liste de vos traitements habituels (ou les boîtes) : elle sera demandée dès la consultation.",
     ar: "جهّز قائمة أدويتك المعتادة (أو العلب): سيُطلب منك ذلك منذ بداية الاستشارة.",
     en: "Prepare the list of your usual medicines (or the boxes): it will be asked for at the start of the visit.",
   }) });
-  if (relative) first.push({ personal: true, text: pick(l, {
+  if (relative) first.push({ personal: true, picto: { icon: "Users", tone: "purple" }, text: pick(l, {
     fr: "Accompagnez votre proche à la consultation et notez pour lui ce qui a changé ces derniers jours.",
     ar: "رافق قريبك إلى الاستشارة وسجّل له ما تغيّر في الأيام الأخيرة.",
     en: "Go with your relative to the appointment and note down for them what has changed in the last few days.",
   }) });
-  if (th.duration && dur >= 0) first.push({ personal: true, text: pick(l, veryLong
+  if (th.duration && dur >= 0) first.push({ personal: true, picto: { icon: "NotebookPen", tone: "yellow" }, text: pick(l, veryLong
     ? { fr: "Notez sur une semaine : heures, intensité, ce qui soulage et ce qui aggrave. Un carnet simple vaut mieux qu'une mémoire floue.", ar: "سجّل خلال أسبوع: الأوقات، الشدة، ما يخفف وما يزيد. دفتر بسيط أفضل من ذاكرة مشوشة.", en: "Keep a one-week log: times, intensity, what helps and what worsens. A simple notebook beats a hazy memory." }
     : { fr: `Donnez-vous un repère : si c'est toujours là ${limit ? `après ${lower(l, limit)}` : "dans quelques jours"}, ou si ça empire, consultez.`, ar: `حدّد لنفسك معلماً: إذا استمر ${limit ? `بعد ${limit}` : "بعد بضعة أيام"} أو ساء، استشر الطبيب.`, en: `Set yourself a marker: if it is still there ${limit ? `after ${lower(l, limit)}` : "in a few days"}, or gets worse, see a doctor.` }) });
-  const meanwhile: Step[] = [...first, ...fiche.meanwhile.map((p) => ({ text: p[l], personal: false }))];
+  const meanwhile: Step[] = [...first, ...fiche.meanwhile.map((p) => ({ text: p[l], personal: false, picto: stepPicto(p.fr) }))];
 
   // ---- Quel médecin ------------------------------------------------------
   let doctor: Personal["doctor"] = null;

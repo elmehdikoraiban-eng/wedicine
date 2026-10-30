@@ -6,8 +6,9 @@ import { AGES, CITIES, DURATIONS, INTENSITIES, INTENTS, WHO } from "@/lib/conten
 import { pageTitle } from "@/lib/content/themes";
 import { qPath } from "@/lib/site";
 import { Icon } from "./Icon";
-import type { Personal } from "@/lib/personalize";
-import { ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, DurationTimeline, IntensityGauge, ThemeArt } from "./Illustrations";
+import type { Personal, Step } from "@/lib/personalize";
+import { examPicto, stepPicto, TONES, type Picto } from "@/lib/pictos";
+import { ArtAppointment, ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, ArtSoon, ArtWatchHome, DurationTimeline, IntensityGauge, ThemeArt } from "./Illustrations";
 
 type Key = "whatToKnow" | "meanwhile" | "whichDoctor" | "exams" | "askDoctor";
 const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }[] = [
@@ -17,13 +18,30 @@ const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }
   { key: "exams", icon: "Microscope", intent: "examens", art: ArtExams },
   { key: "askDoctor", icon: "MessageCircleQuestion", intent: "questions", art: ArtQuestions },
 ];
+const VERDICT_ART = [ArtWatchHome, ArtAppointment, ArtSoon] as const;
+const LEVEL_ICON = ["House", "CalendarCheck", "Clock"] as const;
+const VISIBLE_QUESTIONS = 3;
 
 // Choix du patient utilisés pour les illustrations « Dans votre cas ».
 export type CaseData = { who: string; duration: string | null; intensity: string | null; age: string | null; sex: string | null; city: string | null; signs: string[] };
 
-// La fiche complète, illustrée. L'intention choisie remonte sa section en premier.
-const LEVEL_ICON = ["House", "CalendarCheck", "Clock"] as const;
+// Pastille illustrée : un pictogramme coloré, lisible sans le texte.
+function Pic({ p, size = 26 }: { p: Picto; size?: number }) {
+  const c = TONES[p.tone];
+  return <span className="pic" style={{ background: c.bg, color: c.fg }} aria-hidden="true"><Icon name={p.icon} size={size} /></span>;
+}
 
+// Bloc repliable « Lire la suite » pour le texte générique.
+function More({ lang, children }: { lang: Lang; children: ReactNode }) {
+  return (
+    <details className="more">
+      <summary><span className="when-closed"><Icon name="ChevronRight" size={16} />{t(lang, "readMore")}</span><span className="when-open"><Icon name="ChevronRight" size={16} />{t(lang, "showLess")}</span></summary>
+      <div className="more-body">{children}</div>
+    </details>
+  );
+}
+
+// La fiche complète, illustrée. L'intention choisie remonte sa section en premier.
 export function Answer({ lang, fiche, th, sy, intent, personal, caseData, children }: {
   lang: Lang; fiche: Fiche; th: Theme; sy: Symptom; intent: string; personal?: Personal; caseData?: CaseData; children?: ReactNode;
 }) {
@@ -35,28 +53,37 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
   const age = caseData?.age && AGES.find((a) => a.id === caseData.age);
   const city = caseData?.city && caseData.city !== "autre" && CITIES.find((c) => c.id === caseData.city);
   const signs = caseData ? th.signs.filter((s) => caseData.signs.includes(s.id)) : [];
+  const steps: Step[] = personal ? personal.meanwhile : fiche.meanwhile.map((p) => ({ text: p[lang], personal: false, picto: stepPicto(p.fr) }));
+  const questions: Step[] = personal ? personal.questions : fiche.questions.map((p) => ({ text: p[lang], personal: false }));
+  const visibleQ = questions.filter((q, i) => q.personal || i < VISIBLE_QUESTIONS);
+  const hiddenQ = questions.filter((q, i) => !q.personal && i >= VISIBLE_QUESTIONS);
+  const [firstPara, ...restParas] = fiche.explanation;
+  const VerdictArt = personal ? VERDICT_ART[personal.level] : null;
 
   return (
     <article className="answer-page">
-      <header className="card answer-head">
+      {/* En-tête : titre, verdict et grande scène qui dit quoi faire. */}
+      <header className={`card answer-head${personal ? " has-verdict" : ""}`}>
         <div>
           <p className="muted small" style={{ marginBottom: 6 }}>{th.label[lang]}</p>
           <h1>{pageTitle(lang, th, sy, intent)}</h1>
-          <p className="summary">{fiche.summary[lang]}</p>
-          {personal && (
+          {personal ? (
             <div className={`verdict lv${personal.level}`} data-level={personal.level}>
-              <span className="lvl"><Icon name={LEVEL_ICON[personal.level]} size={18} />{t(lang, `level${personal.level}` as "level0")}</span>
+              <span className="lvl"><Icon name={LEVEL_ICON[personal.level]} size={20} />{t(lang, `level${personal.level}` as "level0")}</span>
               <p>{personal.verdict}</p>
               {personal.reasons.length > 0 && (
                 <div className="reasons"><span className="reason muted">{t(lang, "basedOn")}</span>{personal.reasons.map((r, i) => <span key={i} className="reason">{r}</span>)}</div>
               )}
             </div>
+          ) : (
+            <p className="summary">{fiche.summary[lang]}</p>
           )}
           <p className="notice notice-info small" style={{ marginBottom: 0 }}><Icon name="CircleAlert" size={18} />{t(lang, "answerInfo")}</p>
         </div>
-        <ThemeArt icon={th.icon} />
+        {VerdictArt ? <div className="verdict-scene"><VerdictArt /></div> : <ThemeArt icon={th.icon} />}
       </header>
 
+      {/* Quand consulter : toujours deuxième, visible sans défiler. */}
       <section className="card sec sec-danger">
         <div className="sec-art"><ArtGrave /></div>
         <div>
@@ -110,44 +137,63 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
           <div className="sec-art">{s.art()}</div>
           <div className="sec-body">
             <h2><Icon name={s.icon} size={22} />{t(lang, s.key)}</h2>
+
             {s.key === "whatToKnow" && (
               <>
                 {personal && personal.know.length > 0 && (
                   <div className="for-you"><span className="tag-you"><Icon name="UserRound" size={12} />{t(lang, "forYou")}</span>{personal.know.map((p, i) => <p key={i}>{p}</p>)}</div>
                 )}
-                {fiche.explanation.map((p, i) => <p key={i}>{p[lang]}</p>)}
+                {personal ? (
+                  <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{p[lang]}</p>)}</More>
+                ) : (
+                  <>
+                    <p>{firstPara[lang]}</p>
+                    {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{p[lang]}</p>)}</More>}
+                  </>
+                )}
               </>
             )}
+
             {s.key === "meanwhile" && (
-              <ol className="steps-list">
-                {(personal ? personal.meanwhile : fiche.meanwhile.map((p) => ({ text: p[lang], personal: false }))).map((p, i) => (
-                  <li key={i} className={p.personal ? "personal" : undefined}><span className="num">{i + 1}</span><span>{p.text}</span></li>
+              <ol className="steps-grid">
+                {steps.map((p, i) => (
+                  <li key={i} className={p.personal ? "personal" : undefined}>
+                    <Pic p={p.picto ?? stepPicto("")} />
+                    <span className="num" aria-hidden="true">{i + 1}</span>
+                    <span className="txt">{p.text}</span>
+                  </li>
                 ))}
               </ol>
             )}
+
             {s.key === "whichDoctor" && (
               <div className="doctor-card">
-                <span className="ico"><Icon name="Stethoscope" size={26} /></span>
+                <span className="ico"><Icon name="Stethoscope" size={30} /></span>
                 <div>
                   <p className="eyebrow" style={{ marginBottom: 2 }}>{personal?.doctor ? t(lang, "forYou") : t(lang, "firstContact")}</p>
                   <p style={{ margin: 0 }}>{personal?.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : fiche.whichDoctor[lang]}</p>
                 </div>
               </div>
             )}
+
             {s.key === "exams" && personal?.exams && <p className="for-you" style={{ margin: "0 0 12px" }}>{personal.exams}</p>}
             {s.key === "exams" && (
-              <ul className="exam-list">
-                {fiche.exams.map((p, i) => <li key={i}><Icon name={i % 2 ? "Microscope" : "TestTube"} size={20} />{p[lang]}</li>)}
+              <ul className="exam-grid">
+                {fiche.exams.map((p, i) => <li key={i}><Pic p={examPicto(p.fr)} /><span className="txt">{p[lang]}</span></li>)}
               </ul>
             )}
+
             {s.key === "askDoctor" && (
               <>
                 <p className="muted small">{t(lang, "checklistHint")}</p>
                 <ul className="checklist">
-                  {(personal ? personal.questions : fiche.questions.map((p) => ({ text: p[lang], personal: false }))).map((p, i) => (
-                    <li key={i} className={p.personal ? "personal" : undefined}><span className="box" aria-hidden="true" />{p.text}</li>
-                  ))}
+                  {visibleQ.map((p, i) => <li key={i} className={p.personal ? "personal" : undefined}><span className="box" aria-hidden="true" />{p.text}</li>)}
                 </ul>
+                {hiddenQ.length > 0 && (
+                  <More lang={lang}>
+                    <ul className="checklist">{hiddenQ.map((p, i) => <li key={i}><span className="box" aria-hidden="true" />{p.text}</li>)}</ul>
+                  </More>
+                )}
               </>
             )}
           </div>
