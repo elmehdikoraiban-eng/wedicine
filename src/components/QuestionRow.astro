@@ -1,0 +1,22 @@
+---
+// Une ligne de la liste « Mes questions ».
+import { t, type Lang } from "@/lib/i18n";
+import { pageTitle, type Theme, type Symptom } from "@/lib/content/themes";
+import { formatDate } from "@/lib/site";
+import type { QuestionRow as Q } from "@/lib/db";
+import { Icon } from "@/components/Icon";
+interface Props { lang: Lang; q: Q; th: Theme; sy: Symptom }
+const { lang, q, th, sy } = Astro.props;
+---
+<a href={`/${lang}/compte/q/${q.id}`}>
+  <span class="ico"><Icon name={th.icon} size={20} /></span>
+  <span>
+    <b>{pageTitle(lang, th, sy, q.intent)}</b>
+    <br /><span class="muted small">{formatDate(q.created_at, lang)}</span>
+  </span>
+  <span class="meta">
+    {q.urgent
+      ? <span class="badge badge-danger">!</span>
+      : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? t(lang, "published") : t(lang, "private")}</span>}
+  </span>
+</a>

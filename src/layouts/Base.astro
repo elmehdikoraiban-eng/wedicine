@@ -44,7 +44,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <slot name="head" />
   </head>
   <body>
-    <Nav lang={lang} user={user ? { firstName: user.first_name, avatar: avatarOf(user) } : null} />
+    <Nav lang={lang} user={user ? { firstName: user.first_name, lastName: user.last_name, avatar: avatarOf(user) } : null} />
     <main>
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>

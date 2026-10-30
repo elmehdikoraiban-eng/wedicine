@@ -1,8 +1,9 @@
 ---
-import { LANG_NAMES, LANGS, t, type Lang } from "@/lib/i18n";
+import { LANG_NAMES, LANGS, t, type Lang, type UIKey } from "@/lib/i18n";
+import { ACCOUNT_PAGES } from "@/lib/account";
 import { Icon } from "./Icon";
 
-interface Props { lang: Lang; user: { firstName: string; avatar: number } | null }
+interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number } | null }
 const { lang, user } = Astro.props;
 // Le sélecteur de langue garde la page courante.
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
@@ -14,7 +15,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
       <span class="word">Wedicine</span>
     </a>
     <nav class="nav-links" aria-label="Navigation">
-      <div class="lang" aria-label="Langue">
+      <div class={`lang${user ? " lang-in" : ""}`} aria-label="Langue">
         {LANGS.map((l) => (
           <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>
             <span class="full">{LANG_NAMES[l]}</span><span class="short">{l.toUpperCase()}</span>
@@ -22,9 +23,43 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
         ))}
       </div>
       {user
-        ? <a href={`/${lang}/compte`} class="plain nav-me"><img src={`/avatars/${String(user.avatar).padStart(2, "0")}.svg`} alt="" width="32" height="32" /><span class="hide-sm">{t(lang, "myAccount")}</span></a>
+        ? (
+          <details class="me-menu">
+            <summary aria-label={t(lang, "myAccount")}>
+              <img src={`/avatars/${String(user.avatar).padStart(2, "0")}.svg`} alt="" width="36" height="36" />
+              <span class="hide-sm">{user.firstName}</span>
+              <Icon name="ChevronDown" size={16} />
+            </summary>
+            <div class="me-pop">
+              <div class="me-head">
+                <img src={`/avatars/${String(user.avatar).padStart(2, "0")}.svg`} alt="" width="44" height="44" />
+                <span><b>{user.firstName} {user.lastName}</b><a href={`/${lang}/compte`}>{t(lang, "myAccount")}</a></span>
+              </div>
+              {ACCOUNT_PAGES.filter((p) => p.id).map((p) => (
+                <a href={`/${lang}/compte/${p.id}`}><Icon name={p.icon} size={18} />{t(lang, p.key as UIKey)}</a>
+              ))}
+              <div class="me-lang">
+                <span class="muted small"><Icon name="Globe" size={16} /> {t(lang, "accLanguage")}</span>
+                <div>{LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}</div>
+              </div>
+              <form action="/api/logout" method="post">
+                <input type="hidden" name="lang" value={lang} />
+                <button type="submit"><Icon name="LogOut" size={18} />{t(lang, "logout")}</button>
+              </form>
+            </div>
+          </details>
+        )
         : <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>}
       <a href={`/${lang}/question`} class="btn btn-primary btn-sm">{t(lang, "start")}</a>
     </nav>
   </div>
 </header>
+
+<script>
+  // Menu avatar : se ferme au clic à l'extérieur ou avec Échap.
+  const m = document.querySelector<HTMLDetailsElement>(".me-menu");
+  if (m) {
+    document.addEventListener("click", (e) => { if (m.open && !m.contains(e.target as Node)) m.open = false; });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && m.open) { m.open = false; m.querySelector("summary")?.focus(); } });
+  }
+</script>

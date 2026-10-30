@@ -1,0 +1,28 @@
+---
+import Account from "@/layouts/Account.astro";
+import { t, LANG_NAMES } from "@/lib/i18n";
+import { langParam } from "@/lib/lang";
+import { loadAccount } from "@/lib/account";
+import { formatDate } from "@/lib/site";
+
+const lang = langParam(Astro.params);
+if (!lang) return Astro.redirect("/fr", 302);
+const a = await loadAccount(Astro, lang);
+if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
+const { acc } = a;
+---
+<Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={`${acc.first_name} ${acc.last_name}`} avatar={a.avatar}>
+  <section class="acc-card">
+    <div class="acc-avatar-row">
+      <img src={`/avatars/${a.avatar}.svg`} alt="" width="88" height="88" class="acc-avatar" />
+      <p class="muted small">{t(lang, "accAvatarNote")}</p>
+    </div>
+    <dl class="acc-list">
+      <div><dt>{t(lang, "firstName")}</dt><dd>{acc.first_name}</dd></div>
+      <div><dt>{t(lang, "lastName")}</dt><dd>{acc.last_name}</dd></div>
+      <div><dt>{t(lang, "contact")}</dt><dd dir="ltr">{acc.contact}</dd></div>
+      <div><dt>{t(lang, "accLanguage")}</dt><dd>{LANG_NAMES[acc.lang as keyof typeof LANG_NAMES] ?? acc.lang}</dd></div>
+      <div><dt>{t(lang, "memberSince")}</dt><dd>{formatDate(acc.created_at, lang)}</dd></div>
+    </dl>
+  </section>
+</Account>
