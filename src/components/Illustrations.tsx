@@ -415,3 +415,123 @@ export function IntensityFaces({ labels, current }: { labels: string[]; current:
     </div>
   );
 }
+
+// ----- Scènes des 12 sujets (ruban de l'accueil). Même style : traits bleu marine, aplats pastel. -----
+const S = { bg: "#EEF4FF", bg2: "#EAE6FF", bg3: "#E6FCFF", bg4: "#FFF4F2", bg5: "#E3FCEF", bg6: "#FFFAE6" };
+const head = (cx: number, cy: number, r = 22) => (
+  <>
+    <circle cx={cx} cy={cy} r={r} fill={C.skin} stroke={C.navy} strokeWidth="2.5" />
+    <path d={`M${cx - r + 2} ${cy - r * 0.4}c${r * 0.3}-${r * 0.9} ${r * 1.5}-${r * 0.9} ${r * 1.8} 0`} fill={C.navy} />
+  </>
+);
+const body = (cx: number, top: number, w: number, h: number, fill: string) => (
+  <path d={`M${cx - w / 2} ${top + h}c2-${h * 0.75} ${w * 0.4}-${h} ${w / 2}-${h}s${w / 2 - 2} ${h * 0.25} ${w / 2} ${h}`} fill={fill} stroke={C.navy} strokeWidth="2.5" />
+);
+export function TopicScene({ id }: { id: string }) {
+  const W = 200, H = 150;
+  const wrap = (bg: string, children: React.ReactNode) => (
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-hidden="true" className="topic-scene">
+      <rect width={W} height={H} rx="18" fill={bg} />
+      {children}
+    </svg>
+  );
+  switch (id) {
+    case "fievre": return wrap(S.bg4, <>
+      <rect x="30" y="86" width="140" height="40" rx="10" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <rect x="40" y="76" width="44" height="18" rx="9" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      {head(62, 66, 18)}
+      <path d="M92 90h66v18H92z" fill={C.tint} />
+      <rect x="128" y="28" width="12" height="52" rx="6" fill={C.white} stroke={C.red} strokeWidth="2.5" />
+      <rect x="131.5" y="48" width="5" height="30" rx="2.5" fill={C.red} /><circle cx="134" cy="82" r="7" fill={C.red} />
+      <path d="M100 40c0-6 6-6 6-12M112 40c0-6 6-6 6-12" stroke={C.red} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity=".6" />
+    </>);
+    case "rhume": return wrap(S.bg3, <>
+      {head(80, 70, 30)}
+      <path d="M72 78c4 4 12 4 16 0" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <circle cx="80" cy="74" r="4" fill={C.red} opacity=".8" />
+      <path d="M118 60c10-4 16 2 22 0M118 72c10-4 16 2 22 0M118 84c10-4 16 2 22 0" stroke={C.teal} strokeWidth="3" strokeLinecap="round" fill="none" />
+      <rect x="40" y="108" width="120" height="22" rx="11" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <path d="M52 119h30M92 119h56" stroke={C.line} strokeWidth="4" strokeLinecap="round" />
+    </>);
+    case "gorge": return wrap(S.bg2, <>
+      {head(80, 62, 30)}
+      <path d="M60 100c6 12 34 12 40 0" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <ellipse cx="80" cy="108" rx="14" ry="8" fill="#FFBDAD" />
+      <path d="M120 52l14-8M122 66h16M120 80l14 8" stroke={C.red} strokeWidth="3" strokeLinecap="round" />
+      <rect x="36" y="118" width="128" height="16" rx="8" fill={C.white} stroke={C.navy} strokeWidth="2" />
+    </>);
+    case "tete": return wrap(S.bg, <>
+      {head(90, 74, 34)}
+      <path d="M46 74c-8-8-8-20 0-28M134 74c8-8 8-20 0-28" stroke={C.red} strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <path d="M38 60l-8-4M38 72h-10M142 60l8-4M142 72h10" stroke={C.red} strokeWidth="3" strokeLinecap="round" />
+      <path d="M74 86c6 4 26 4 32 0" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M80 56l6 6 6-6" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </>);
+    case "tension": return wrap(S.bg4, <>
+      <circle cx="100" cy="70" r="44" fill={C.white} stroke={C.navy} strokeWidth="3" />
+      <path d="M66 86a38 38 0 0 1 68 0" stroke={C.line} strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M66 86a38 38 0 0 1 44-36" stroke={C.green} strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M110 50a38 38 0 0 1 24 36" stroke={C.red} strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d="M100 84l18-24" stroke={C.navy} strokeWidth="4" strokeLinecap="round" /><circle cx="100" cy="84" r="5" fill={C.navy} />
+      <rect x="60" y="120" width="80" height="14" rx="7" fill={C.red} opacity=".25" />
+    </>);
+    case "diabete": return wrap(S.bg3, <>
+      <path d="M100 26c22 30 34 46 34 64a34 34 0 0 1-68 0c0-18 12-34 34-64z" fill={C.white} stroke={C.navy} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M84 96a18 18 0 0 0 14 16" stroke={C.teal} strokeWidth="4" strokeLinecap="round" fill="none" />
+      <rect x="34" y="40" width="30" height="22" rx="5" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <path d="M40 51h18" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="152" cy="48" r="10" fill={C.yellow} /><circle cx="166" cy="64" r="6" fill={C.yellow} opacity=".6" />
+    </>);
+    case "digestion": return wrap(S.bg6, <>
+      {body(90, 56, 90, 80, C.white)}
+      <path d="M68 92c6-12 38-12 44 0c-6 12-38 12-44 0z" fill={C.yellow} opacity=".55" />
+      <path d="M78 92c4-4 20-4 24 0" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M130 70c0-6 6-6 6-12M142 76c0-6 6-6 6-12" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity=".5" />
+      <path d="M40 120h100" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+    </>);
+    case "fatigue": return wrap(S.bg2, <>
+      <rect x="40" y="96" width="120" height="30" rx="8" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      {head(72, 80, 20)}
+      <path d="M64 84c3 2 13 2 16 0" stroke={C.navy} strokeWidth="2" strokeLinecap="round" fill="none" />
+      <path d="M62 78h8M74 78h8" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M96 100h50v12H96z" fill={C.tint} />
+      <path d="M120 44h18l-18 18h18M144 30h12l-12 12h12" stroke={C.purple} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </>);
+    case "dos": return wrap(S.bg, <>
+      {head(84, 44, 18)}
+      <path d="M84 62c-14 10-18 30-14 54" stroke={C.navy} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <path d="M84 62c-14 10-18 30-14 54" stroke={C.white} strokeWidth="8" strokeLinecap="round" fill="none" />
+      <circle cx="74" cy="100" r="12" fill={C.red} opacity=".25" /><circle cx="74" cy="100" r="5" fill={C.red} />
+      <path d="M104 82l10-6M106 96h12M104 110l10 6" stroke={C.red} strokeWidth="3" strokeLinecap="round" />
+      <path d="M40 126h120" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+    </>);
+    case "sommeil": return wrap("#1F2A52", <>
+      <path d="M118 36a34 34 0 1 0 30 48a28 28 0 0 1-30-48z" fill="#FFE380" />
+      <circle cx="54" cy="40" r="3" fill={C.white} /><circle cx="160" cy="112" r="2.5" fill={C.white} /><circle cx="40" cy="96" r="2" fill={C.white} />
+      <rect x="34" y="100" width="100" height="28" rx="8" fill={C.white} />
+      {head(60, 92, 16)}
+      <path d="M54 92h4M62 92h4" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M80 104h46v10H80z" fill={C.tint} />
+      <path d="M150 54h10l-10 12h10" stroke={C.white} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </>);
+    case "allergie": return wrap(S.bg5, <>
+      {head(70, 78, 26)}
+      <path d="M62 86c3 3 13 3 16 0" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <circle cx="70" cy="80" r="4" fill={C.red} opacity=".8" />
+      <g transform="translate(132 54)"><circle r="16" fill="#FFE380" /><circle r="7" fill={C.yellow} />
+        {[0, 60, 120, 180, 240, 300].map((a) => <ellipse key={a} cx="0" cy="-22" rx="5" ry="9" fill="#FFBDAD" transform={`rotate(${a})`} />)}</g>
+      <path d="M110 92c6 4 6 12 0 16M120 84c8 6 8 18 0 24" stroke={C.green} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity=".7" />
+      <path d="M40 128h120" stroke={C.navy} strokeWidth="2.5" strokeLinecap="round" />
+    </>);
+    default: return wrap(S.bg3, <>
+      <rect x="54" y="28" width="92" height="104" rx="10" fill={C.white} stroke={C.navy} strokeWidth="2.5" />
+      <rect x="82" y="20" width="36" height="16" rx="6" fill={C.navy} />
+      {[0, 1, 2].map((i) => <g key={i} transform={`translate(68 ${52 + i * 24})`}>
+        <rect width="14" height="14" rx="4" fill={i < 2 ? C.green : C.white} stroke={i < 2 ? C.green : C.line} strokeWidth="2" />
+        {i < 2 && <path d="M3 7l3 3 6-6" stroke={C.white} strokeWidth="2.5" fill="none" strokeLinecap="round" />}
+        <rect x="22" y="4" width={i === 1 ? 30 : 44} height="6" rx="3" fill={C.navy} opacity=".4" />
+      </g>)}
+      <g transform="translate(140 100)"><rect x="-8" y="-28" width="16" height="48" rx="8" fill={C.white} stroke={C.navy} strokeWidth="2.5" /><rect x="-4" y="-6" width="8" height="22" rx="4" fill={C.teal} /></g>
+    </>);
+  }
+}

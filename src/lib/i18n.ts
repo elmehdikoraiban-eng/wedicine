@@ -229,6 +229,19 @@ export const UI = {
   forWhom: { fr: "Pour qui", ar: "لمن", en: "For whom" },
   signsChecked: { fr: "Signes cochés", ar: "العلامات المختارة", en: "Signs ticked" },
   noSigns: { fr: "Aucun autre signe", ar: "لا علامات أخرى", en: "No other sign" },
+  // Accueil v5
+  heroKicker: { fr: "Pré-consultation en ligne · Maroc", ar: "استشارة أولية عبر الإنترنت · المغرب", en: "Online pre-consultation · Morocco" },
+  heroTitle1: { fr: "Une question santé\u00a0?", ar: "عندك سؤال صحي؟", en: "A health question?" },
+  heroTitle2: { fr: "Une réponse claire, avant le médecin.", ar: "جواب واضح، قبل الطبيب.", en: "A clear answer, before the doctor." },
+  heroLead: { fr: "Quelques choix illustrés, zéro ligne à écrire. Vous savez si c'est grave, quoi faire en attendant et quel médecin voir.", ar: "بضع اختيارات مصوّرة، بدون كتابة. تعرف إن كان الأمر خطيراً، وماذا تفعل في الانتظار، وأي طبيب تستشير.", en: "A few illustrated choices, nothing to type. You learn if it's serious, what to do meanwhile and which doctor to see." },
+  ribbonHint: { fr: "Touchez un sujet pour commencer", ar: "المس موضوعاً للبدء", en: "Tap a topic to start" },
+  receiveLead: { fr: "Voici la réponse reçue par Mehdi K., 31 à 45 ans, Rabat, pour une fièvre depuis 1 à 3 jours.", ar: "هذا هو الجواب الذي حصل عليه مهدي ك.، 31 إلى 45 سنة، الرباط، لحمى منذ يوم إلى 3 أيام.", en: "Here is the answer Mehdi K., 31 to 45, Rabat, received for a fever lasting 1 to 3 days." },
+  urgentLine: { fr: "Douleur dans la poitrine, difficulté à respirer, malaise : n'attendez pas.", ar: "ألم في الصدر، صعوبة في التنفس، إغماء: لا تنتظر.", en: "Chest pain, trouble breathing, fainting: do not wait." },
+  faqTitleShort: { fr: "Vos questions", ar: "أسئلتكم", en: "Your questions" },
+  faq7q: { fr: "Ma question est-elle visible par d'autres ?", ar: "هل يرى الآخرون سؤالي؟", en: "Can others see my question?" },
+  faq7a: { fr: "Seulement si vous l'acceptez. Elle apparaît alors sur la page du symptôme, signée de votre prénom, de votre tranche d'âge et de votre ville, jamais de votre nom. Vous pouvez la retirer à tout moment.", ar: "فقط إذا وافقت. يظهر حينها على صفحة العرض موقّعاً باسمك الأول وفئتك العمرية ومدينتك، دون اسم العائلة أبداً. يمكنك سحبه في أي وقت.", en: "Only if you agree. It then appears on the symptom page, signed with your first name, age range and city, never your surname. You can remove it anytime." },
+  ctaTitle: { fr: "Prêt à poser votre question ?", ar: "مستعد لطرح سؤالك؟", en: "Ready to ask your question?" },
+  ctaText: { fr: "Une minute, rien à écrire, et une réponse à garder pour la consultation.", ar: "دقيقة واحدة، بدون كتابة، وجواب تحتفظ به للاستشارة.", en: "One minute, nothing to type, and an answer to keep for the visit." },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
 } satisfies Record<string, T>;
 

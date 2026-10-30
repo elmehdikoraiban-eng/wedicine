@@ -5,7 +5,7 @@ import { langParam } from "@/lib/lang";
 import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath, SITE_URL } from "@/lib/site";
 import { Icon } from "@/components/Icon";
-import { Account, AnswerSheet, Choose, Community, DurationSteps, PhoneForm, ThemeArt, Urgent } from "@/components/Illustrations";
+import { Account, AnswerSheet, ArtAppointment, Choose, DurationSteps, TopicScene } from "@/components/Illustrations";
 import { fiche } from "@/lib/content/fiches";
 import { DURATIONS } from "@/lib/content/options";
 import { countQuestions } from "@/lib/db";
@@ -13,7 +13,7 @@ import { countQuestions } from "@/lib/db";
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 
-// Quelques questions mises en avant sur l'accueil (thème, symptôme, intention).
+// Questions mises en avant (thème, symptôme, intention) : une par sujet, pour le SEO.
 const POPULAR: [string, string, string][] = [
   ["fievre", "seule", "grave"], ["tete", "migraine", "medecin"], ["digestion", "brulures", "attente"],
   ["tension", "elevee", "grave"], ["dos", "lombaires", "attente"], ["sommeil", "endormissement", "medecin"],
@@ -27,171 +27,151 @@ const page = ([thId, syId, intent]: [string, string, string]) => {
 const example = page(["fievre", "seule", "grave"]);
 const exampleFiche = fiche("fievre", "seule")!;
 const count = await countQuestions().catch(() => 0);
-const FAQ = [1, 2, 3, 4, 5, 6] as const;
-const EXAMPLE_SECTIONS = [["CircleAlert", "seeQuickly"], ["FileText", "whatToKnow"], ["Hourglass", "meanwhile"], ["Stethoscope", "whichDoctor"], ["Microscope", "exams"], ["MessageCircleQuestion", "askDoctor"]] as const;
-// Première phrase seulement : l'accueil doit se lire en un coup d'œil.
-const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
+const FAQ = [1, 2, 3, 4, 5, 6, 7] as const;
+const BADGES = [["Siren", "whenToSee"], ["UserRound", "yourCase"], ["Stethoscope", "whichDoctor"], ["MessageCircleQuestion", "askDoctor"]] as const;
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
-const features = [
-  { icon: "CircleAlert", title: "seeQuickly", text: "receiveGrave" },
-  { icon: "UserRound", title: "yourCase", text: "receiveCase" },
-  { icon: "Stethoscope", title: "whichDoctor", text: "receiveDoctor" },
-  { icon: "MessageCircleQuestion", title: "askDoctor", text: "receiveQuestions" },
-] as const;
+const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
+// Le ruban est doublé pour boucler sans couture.
+const ribbon = [...THEMES, ...THEMES];
 ---
 <Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false}>
-  <!-- Héros : titre à gauche, maquette téléphone à droite. -->
-  <section class="wrap hero">
-    <div>
-      <p class="eyebrow">{t(lang, "heroEyebrow")}</p>
-      <h1>{t(lang, "tagline")}</h1>
-      <p class="lead">{t(lang, "heroSub")}</p>
+  <!-- 1. Héros centré + ruban des 12 sujets illustrés -->
+  <section class="hero-c">
+    <div class="wrap hero-c-text">
+      <p class="kicker"><span class="dot"></span>{t(lang, "heroKicker")}</p>
+      <h1>{t(lang, "heroTitle1")} <span class="soft">{t(lang, "heroTitle2")}</span></h1>
+      <p class="lead">{t(lang, "heroLead")}</p>
       <div class="actions">
-        <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")}</a>
-        <a href="#exemple" class="btn btn-ghost btn-lg">{t(lang, "seeExample")}</a>
+        <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
+        <a href="#exemple" class="link-ul">{t(lang, "seeExample")}</a>
       </div>
       <p class="trust">{t(lang, "trustLine")}</p>
-      <div class="quick">
-        <span class="muted small">{t(lang, "quickStart")}</span>
-        {THEMES.slice(0, 6).map((th) => <a href={`/${lang}/question?theme=${th.id}`} class="chip"><Icon name={th.icon} size={16} />{th.label[lang]}</a>)}
-      </div>
     </div>
-    <div class="panel art-panel"><PhoneForm className="art" /></div>
-  </section>
-
-  <!-- Comment ça marche : trois étapes illustrées. -->
-  <section class="band band-neutral" id="comment">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <p class="eyebrow">{t(lang, "howEyebrow")}</p>
-        <h2>{t(lang, "howTitle")}</h2>
-      </div>
-      <div class="steps reveal-stagger">
-        <article class="step"><div class="step-art"><Choose /></div><div><span class="num">1</span></div><div><h3>{t(lang, "step1Title")}</h3><p class="muted">{brief(t(lang, "step1Text"))}</p></div></article>
-        <article class="step"><div class="step-art"><Account /></div><div><span class="num">2</span></div><div><h3>{t(lang, "step2Title")}</h3><p class="muted">{brief(t(lang, "step2Text"))}</p></div></article>
-        <article class="step"><div class="step-art"><AnswerSheet /></div><div><span class="num">3</span></div><div><h3>{t(lang, "step3Title")}</h3><p class="muted">{brief(t(lang, "step3Text"))}</p></div></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Bande bleue : contenu d'une réponse. -->
-  <section class="band band-blue">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <p class="eyebrow">{t(lang, "receiveEyebrow")}</p>
-        <h2>{t(lang, "receiveTitle")}</h2>
-      </div>
-      <div class="features reveal-stagger">
-        {features.map((f) => (
-          <div class="feature"><span class="ico"><Icon name={f.icon} size={24} /></span><h4>{t(lang, f.title)}</h4></div>
+    <div class="ribbon" id="ribbon" aria-label={t(lang, "themesTitle")}>
+      <div class="ribbon-track">
+        {ribbon.map((th, i) => (
+          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
+            <TopicScene id={th.id} />
+            <span class="topic-name"><Icon name={th.icon} size={18} />{th.label[lang]}</span>
+          </a>
         ))}
       </div>
     </div>
+    <p class="ribbon-hint muted small"><Icon name="Hand" size={16} />{t(lang, "ribbonHint")}</p>
   </section>
 
-  <!-- Exemple de réponse : un vrai extrait de fiche, illustré. -->
+  <!-- 2. Ce que vous recevez : un vrai exemple -->
   <section class="band band-neutral" id="exemple">
     <div class="wrap">
-      <div class="example reveal">
-        <div>
-          <div class="section-head">
-            <p class="eyebrow">{t(lang, "exampleEyebrow")}</p>
-            <h2>{t(lang, "exampleTitle")}</h2>
-            <p class="lead">{brief(t(lang, "exampleText"))}</p>
-          </div>
-          {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
-        </div>
+      <div class="section-head center reveal">
+        <p class="eyebrow">{t(lang, "receiveEyebrow")}</p>
+        <h2>{t(lang, "receiveTitle")}</h2>
+        <p class="lead">{t(lang, "receiveLead")}</p>
+      </div>
+      <div class="showcase reveal">
         <div class="card example-card">
           <div class="example-head">
             <div>
               <p class="muted small" style="margin-bottom:4px">{example.th.label[lang]}</p>
               <h3>{example.title}</h3>
-              <p class="summary">{exampleFiche.summary[lang]}</p>
+              <div class="verdict lv1" style="margin:12px 0 0">
+                <span class="lvl"><Icon name="CalendarCheck" size={18} />{t(lang, "level1")}</span>
+                <p>{brief(exampleFiche.summary[lang])}</p>
+              </div>
             </div>
-            <ThemeArt icon={example.th.icon} className="small" />
+            <div class="example-art"><ArtAppointment /></div>
           </div>
           <div class="example-timeline">
-            <p class="eyebrow" style="margin-bottom:4px">{t(lang, "timelineTitle")}</p>
+            <p class="ctile-lbl"><Icon name="Clock" size={16} />{t(lang, "timelineTitle")}</p>
             <DurationSteps labels={DURATIONS.map((d) => d.label[lang])} current={1} threshold={example.th.consultAfter}
               youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} />
           </div>
-          <ul class="example-sections">
-            {EXAMPLE_SECTIONS.map(([icon, key]) => <li><Icon name={icon} size={18} />{t(lang, key)}</li>)}
+          <ul class="badges">
+            {BADGES.map(([icon, key]) => <li><Icon name={icon} size={18} />{t(lang, key)}</li>)}
           </ul>
-          <a href={example.href} class="btn btn-primary">{t(lang, "readExample")}</a>
+          <div class="row">
+            <a href={example.href} class="btn btn-primary">{t(lang, "readExample")}</a>
+            {count > 0 && <p class="counter"><b>{count.toLocaleString(lang === "ar" ? "ar-MA" : "fr-MA")}</b> {t(lang, "counter")}</p>}
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Sujets -->
-  <section class="band">
+  <!-- 3. Comment ça marche : trois étapes reliées -->
+  <section class="band" id="comment">
     <div class="wrap">
-      <div class="section-head reveal"><h2>{t(lang, "themesTitle")}</h2></div>
-      <div class="grid reveal">
-        {THEMES.map((th) => (
-          <a href={`/${lang}/question?theme=${th.id}`} class="tile">
-            <span class="ico"><Icon name={th.icon} size={24} /></span>
-            {th.label[lang]}
-          </a>
-        ))}
+      <div class="section-head center reveal">
+        <p class="eyebrow">{t(lang, "howEyebrow")}</p>
+        <h2>{t(lang, "howTitle")}</h2>
+      </div>
+      <div class="stepper reveal-stagger">
+        <article class="step"><div class="step-art"><Choose /></div><span class="num">1</span><h3>{t(lang, "step1Title")}</h3><p class="muted">{brief(t(lang, "step1Text"))}</p></article>
+        <article class="step"><div class="step-art"><Account /></div><span class="num">2</span><h3>{t(lang, "step2Title")}</h3><p class="muted">{brief(t(lang, "step2Text"))}</p></article>
+        <article class="step"><div class="step-art"><AnswerSheet /></div><span class="num">3</span><h3>{t(lang, "step3Title")}</h3><p class="muted">{brief(t(lang, "step3Text"))}</p></article>
       </div>
     </div>
   </section>
 
-  <!-- Urgence et entraide -->
-  <section class="band">
-    <div class="wrap" style="display:grid;gap:var(--sec)">
-      <div class="split reveal">
-        <div>
-          <p class="eyebrow">{t(lang, "urgentHomeEyebrow")}</p>
-          <h2>{t(lang, "urgentHomeTitle")}</h2>
-          <p class="lead">{brief(t(lang, "urgentHomeText"))}</p>
-        </div>
-        <div class="panel panel-red"><Urgent /></div>
-      </div>
-      <div class="split flip reveal">
-        <div>
-          <p class="eyebrow">{t(lang, "publicEyebrow")}</p>
-          <h2>{t(lang, "publicTitle")}</h2>
-          <p class="lead">{brief(t(lang, "publicText"))}</p>
-        </div>
-        <div class="panel panel-purple"><Community /></div>
+  <!-- 4. Urgence : une ligne -->
+  <section class="urgent-band">
+    <div class="wrap urgent-row reveal">
+      <span class="urgent-ico"><Icon name="Siren" size={24} /></span>
+      <p><b>{t(lang, "urgentHomeTitle")}</b> {t(lang, "urgentLine")}</p>
+      <div class="row">
+        <a href="tel:15" class="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call15")}</a>
+        <a href="tel:141" class="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call141")}</a>
       </div>
     </div>
   </section>
 
-  <!-- Questions fréquentes -->
+  <!-- 5. Questions fréquentes + FAQ -->
   <section class="band band-neutral">
-    <div class="wrap">
-      <div class="section-head reveal"><h2>{t(lang, "popular")}</h2></div>
-      <div class="list-links reveal">
-        {POPULAR.map((p) => { const x = page(p); return <a href={x.href}><Icon name={x.th.icon} size={20} />{x.title}</a>; })}
+    <div class="wrap two-col">
+      <div class="reveal">
+        <h2>{t(lang, "popular")}</h2>
+        <div class="list-links" style="grid-template-columns:1fr">
+          {POPULAR.map((p) => { const x = page(p); return <a href={x.href}><Icon name={x.th.icon} size={20} />{x.title}</a>; })}
+        </div>
+      </div>
+      <div class="reveal">
+        <h2>{t(lang, "faqTitleShort")}</h2>
+        <div class="faq">
+          {FAQ.map((n) => (
+            <details class="faq-item">
+              <summary>{t(lang, `faq${n}q` as "faq1q")}<Icon name="ChevronRight" size={18} /></summary>
+              <p>{t(lang, `faq${n}a` as "faq1a")}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section class="band">
-    <div class="wrap faq-wrap">
-      <div class="section-head reveal"><h2>{t(lang, "faqTitle")}</h2></div>
-      <div class="faq reveal">
-        {FAQ.map((n) => (
-          <details class="faq-item">
-            <summary>{t(lang, `faq${n}q` as "faq1q")}<Icon name="ChevronRight" size={18} /></summary>
-            <p>{t(lang, `faq${n}a` as "faq1a")}</p>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Confiance -->
+  <!-- 6. Appel final -->
   <section class="band band-tint">
     <div class="wrap cta-final reveal">
-      <h2>{t(lang, "trustTitle")}</h2>
-      <a href={`/${lang}/question`} class="btn btn-primary btn-lg" style="margin-top:8px">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
+      <h2>{t(lang, "ctaTitle")}</h2>
+      <p class="lead">{t(lang, "ctaText")}</p>
+      <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
+      <p class="muted small" style="margin-top:16px">{t(lang, "disclaimerShort")}</p>
     </div>
   </section>
+
+  <script>
+    // Ruban des sujets : pause au survol, glisser à la souris ou au doigt, grille fixe si animations réduites.
+    const r = document.getElementById("ribbon");
+    const track = r?.querySelector<HTMLElement>(".ribbon-track");
+    if (r && track && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      let down = false, startX = 0, moved = 0, offset = 0;
+      const apply = () => { track.style.setProperty("--drag", `${offset}px`); };
+      r.addEventListener("pointerdown", (e) => { down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
+      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); offset += dx; startX = e.clientX; apply(); });
+      const up = () => { down = false; r.classList.remove("dragging"); };
+      r.addEventListener("pointerup", up); r.addEventListener("pointercancel", up);
+      // Un glissement ne doit pas déclencher le lien.
+      r.addEventListener("click", (e) => { if (moved > 8) { e.preventDefault(); e.stopPropagation(); } }, true);
+    }
+  </script>
 </Base>
