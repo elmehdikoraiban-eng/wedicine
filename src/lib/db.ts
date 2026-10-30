@@ -54,6 +54,11 @@ CREATE TABLE IF NOT EXISTS wedicine.page_views (
   views INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (theme, symptom, intent)
 );
+CREATE TABLE IF NOT EXISTS wedicine.page_feedback (
+  theme TEXT NOT NULL, symptom TEXT NOT NULL, intent TEXT NOT NULL,
+  yes INTEGER NOT NULL DEFAULT 0, no INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (theme, symptom, intent)
+);
 -- Rattrapage : un avatar qui ne correspond pas au sexe déclaré (dernière question « pour moi ») est remplacé.
 -- Impairs = femmes, pairs = hommes. Ne touche jamais un avatar choisi par le patient.
 UPDATE wedicine.users u SET sex = s.sex
@@ -299,6 +304,17 @@ export async function pageStats(theme: string, symptom: string): Promise<PageSta
 }
 
 // Vues d'une page publique (sert à « votre question a aidé N personnes »).
+// « Cette page vous a aidé ? » : simple compteur oui / non par page, sans donnée personnelle.
+export async function addFeedback(theme: string, symptom: string, intent: string, helpful: boolean) {
+  const d = await db();
+  const col = helpful ? "yes" : "no";
+  await d.query(
+    `INSERT INTO wedicine.page_feedback (theme, symptom, intent, ${col}) VALUES ($1,$2,$3,1)
+     ON CONFLICT (theme, symptom, intent) DO UPDATE SET ${col} = wedicine.page_feedback.${col} + 1`,
+    [theme, symptom, intent]
+  );
+}
+
 export async function countView(theme: string, symptom: string, intent: string) {
   const d = await db();
   await d.query(

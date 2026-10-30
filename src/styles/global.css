@@ -789,3 +789,22 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .topic-chip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 8px; border-radius: var(--r-pill); background: var(--tint-2); color: var(--ink); font-weight: 600; transition: background var(--t); }
 .topic-chip:hover { background: var(--tint); text-decoration: none; }
 .chip-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--canvas); color: var(--brand); }
+
+/* Illustration du sujet en tête de page, glossaire, avis */
+.topic-art { flex: none; display: grid; place-items: center; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #eaf5ff 0%, #dbeeff 70%); }
+.topic-art .topic-icon { width: 112px; height: 112px; }
+@media (max-width: 760px) { .topic-art { width: 104px; height: 104px; order: -1; } .topic-art .topic-icon { width: 72px; height: 72px; } }
+.gloss { position: relative; text-decoration: underline dotted var(--brand); text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: help; outline: none; }
+.gloss-def { position: absolute; inset-inline-start: 50%; bottom: calc(100% + 10px); translate: -50% 4px; z-index: 20; width: max-content; max-width: min(300px, 80vw); padding: 10px 14px; border-radius: var(--r-sm); background: var(--ink); color: #fff; font-size: var(--fs-small); font-weight: 500; line-height: 1.45; text-align: start; box-shadow: var(--shadow-float); display: none; pointer-events: none; }
+[dir="rtl"] .gloss-def { translate: 50% 4px; }
+.gloss:hover .gloss-def, .gloss:focus .gloss-def { display: block; translate: -50% 0; animation: rise .18s var(--ease); }
+[dir="rtl"] .gloss:hover .gloss-def, [dir="rtl"] .gloss:focus .gloss-def { translate: 50% 0; }
+.gloss:focus-visible { box-shadow: var(--focus); border-radius: 3px; }
+/* Sur mobile, la définition s'ouvre en bas de l'écran, toujours lisible en entier. */
+@media (max-width: 760px) { .gloss-def, [dir="rtl"] .gloss-def { position: fixed; inset: auto 16px 16px; bottom: 16px; translate: none !important; width: auto; max-width: none; font-size: var(--fs-body); padding: 16px 18px; } }
+.faq-sec .faq-item p { margin: 0; padding: 0 24px 20px; color: var(--ink-2); }
+.faq-sec .faq-item summary { font-size: var(--fs-body); font-weight: 600; }
+.helpful { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 20px; margin-top: 32px; padding: 20px 24px; border-radius: var(--r-card); background: var(--tint-2); }
+.helpful-q { margin: 0; font-weight: 700; }
+.helpful-btns { display: flex; gap: 10px; }
+.helpful-thanks { margin: 0; display: inline-flex; align-items: center; gap: 8px; color: #1f845a; font-weight: 600; }

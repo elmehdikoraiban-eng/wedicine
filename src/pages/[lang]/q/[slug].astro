@@ -8,7 +8,7 @@ import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
 import { countView, pageStats, publicAskers, type PageStats } from "@/lib/db";
 import { publicName } from "@/lib/auth";
 import { alternates, formatDate, qPath, SITE_URL, timeAgo } from "@/lib/site";
-import { Answer, answerOutline } from "@/components/Answer";
+import { Answer, answerFaq, answerOutline } from "@/components/Answer";
 import type { UIKey } from "@/lib/i18n";
 import { Icon } from "@/components/Icon";
 
@@ -47,9 +47,16 @@ const jsonLd = {
   mainEntity: { "@type": "Question", name: title, acceptedAnswer: { "@type": "Answer", text: f.summary[lang] } },
   publisher: { "@type": "Organization", name: "Wedicine", url: SITE_URL },
 };
+// Données FAQ pour Google : exactement les questions affichées dans la page.
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: answerFaq(lang, f, th, sy).map((x) => ({ "@type": "Question", name: x.q, acceptedAnswer: { "@type": "Answer", text: x.a } })),
+};
 ---
 <Base lang={lang} title={title} description={f.summary[lang].slice(0, 160)} canonical={path} alternates={alternates(th, sy, intent)}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqLd)} />
   <div class="read-layout">
     <nav class="toc" aria-label={t(lang, "tocTitle")}>
       <p class="toc-title">{t(lang, "tocTitle")}</p>
@@ -93,11 +100,33 @@ const jsonLd = {
         </p>
       </section>
     </Answer>
+    <section class="helpful" id="avis" data-page={`${th.id}/${sy.id}/${intent}`}>
+      <p class="helpful-q">{t(lang, "helpfulQ")}</p>
+      <div class="helpful-btns">
+        <button type="button" class="btn btn-ghost btn-sm" data-helpful="1"><Icon name="ThumbsUp" size={18} />{t(lang, "yes")}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-helpful="0"><Icon name="ThumbsDown" size={18} />{t(lang, "no")}</button>
+      </div>
+      <p class="helpful-thanks" role="status" hidden><Icon name="Check" size={18} /> {t(lang, "helpfulThanks")}</p>
+    </section>
     </div>
   </div>
 </Base>
 
 <script>
+  // « Cette page vous a aidé ? » : un vote par page et par navigateur.
+  const box = document.querySelector<HTMLElement>(".helpful");
+  if (box) {
+    const key = `wd_help_${box.dataset.page}`;
+    const done = () => { box.querySelector(".helpful-btns")?.setAttribute("hidden", ""); box.querySelector(".helpful-thanks")?.removeAttribute("hidden"); };
+    try { if (localStorage.getItem(key)) done(); } catch {}
+    box.querySelectorAll<HTMLButtonElement>("[data-helpful]").forEach((b) => b.addEventListener("click", () => {
+      const [theme, symptom, intent] = (box.dataset.page ?? "").split("/");
+      fetch("/api/feedback", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ theme, symptom, intent, helpful: b.dataset.helpful === "1" }) }).catch(() => {});
+      try { localStorage.setItem(key, "1"); } catch {}
+      done();
+    }));
+  }
+
   // Sommaire : surligne la rubrique en cours de lecture.
   const links = new Map([...document.querySelectorAll<HTMLAnchorElement>(".toc a")].map((a) => [a.hash.slice(1), a]));
   const seen = new Set<string>();

@@ -6,9 +6,11 @@ import { AGES, CITIES, DURATIONS, INTENSITIES, INTENTS, WHO } from "@/lib/conten
 import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath } from "@/lib/site";
 import { Icon } from "./Icon";
+import { TopicScene } from "./TopicScenes";
+import { glossaryFor } from "@/lib/glossary";
 import type { Personal, Step } from "@/lib/personalize";
 import { examPicto, stepPicto, TONES, type Picto } from "@/lib/pictos";
-import { ArtAppointment, ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, ArtSoon, ArtWatchHome, DurationSteps, IntensityFaces, ThemeArt } from "./Illustrations";
+import { ArtAppointment, ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, ArtSoon, ArtWatchHome, DurationSteps, IntensityFaces } from "./Illustrations";
 
 type Key = "whatToKnow" | "meanwhile" | "whichDoctor" | "exams" | "askDoctor";
 const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }[] = [
@@ -22,10 +24,41 @@ const VERDICT_ART = [ArtWatchHome, ArtAppointment, ArtSoon] as const;
 const LEVEL_ICON = ["House", "CalendarCheck", "Clock"] as const;
 const VISIBLE_QUESTIONS = 3;
 
+// Glossaire : chaque mot médical connu est expliqué au survol ou au toucher, à sa première apparition dans la page.
+function glossify(text: string, lang: Lang, used: Set<number>): ReactNode {
+  const { re, defs } = glossaryFor(lang);
+  const out: ReactNode[] = [];
+  let last = 0;
+  for (const m of text.matchAll(re)) {
+    const d = defs.get(m[0].toLowerCase());
+    if (!d || used.has(d.key)) continue;
+    used.add(d.key);
+    out.push(text.slice(last, m.index), <span key={m.index} className="gloss" tabIndex={0}>{m[0]}<span className="gloss-def" role="tooltip">{d.def}</span></span>);
+    last = m.index! + m[0].length;
+  }
+  if (!out.length) return text;
+  out.push(text.slice(last));
+  return out;
+}
+
+// FAQ par sujet, construite à partir de la fiche (mêmes textes, réutilisés en données FAQPage pour Google).
+export function answerFaq(lang: Lang, fiche: Fiche, th: Theme, sy: Symptom): { q: string; a: string }[] {
+  const name = sy.label[lang];
+  const q = (k: string) => t(lang, k as "faqWhen").replace("{s}", lang === "fr" ? name.toLowerCase() : name);
+  const out = [
+    { q: q("faqWhen"), a: fiche.warning[lang] },
+    { q: q("faqHome"), a: fiche.meanwhile.slice(0, 3).map((p) => p[lang]).join(" ") },
+    { q: q("faqDoctor"), a: fiche.whichDoctor[lang] },
+  ];
+  if (th.duration) out.push({ q: q("faqHowLong"), a: t(lang, "faqHowLongA").replace("{d}", DURATIONS[th.consultAfter]?.label[lang].toLowerCase() ?? "") });
+  if (fiche.exams.length) out.push({ q: q("faqExams"), a: fiche.exams.slice(0, 3).map((p) => p[lang]).join(" ") });
+  return out.map((x) => ({ q: x.q, a: x.a.charAt(0).toLocaleUpperCase(lang) + x.a.slice(1) }));
+}
+
 // Plan de la page (sommaire latéral) : mêmes ancres et même ordre que les sections rendues.
 export function answerOutline(intent: string): { id: string; key: string }[] {
   const ordered = [...SECTIONS].sort((a, b) => Number(b.intent === intent) - Number(a.intent === intent));
-  return [{ id: "en-bref", key: "briefTitle" }, { id: "quand-consulter", key: "whenToSee" }, ...ordered.map((s) => ({ id: s.key, key: s.key }))];
+  return [{ id: "en-bref", key: "briefTitle" }, { id: "quand-consulter", key: "whenToSee" }, ...ordered.map((s) => ({ id: s.key, key: s.key })), { id: "faq", key: "topicFaqTitle" }];
 }
 
 // Choix du patient utilisés pour les illustrations « Dans votre cas ».
@@ -65,6 +98,9 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
   const hiddenQ = questions.filter((q, i) => !q.personal && i >= VISIBLE_QUESTIONS);
   const [firstPara, ...restParas] = fiche.explanation;
   const VerdictArt = personal ? VERDICT_ART[personal.level] : null;
+  const used = new Set<number>();
+  const G = (text: string) => glossify(text, lang, used);
+  const faq = personal ? [] : answerFaq(lang, fiche, th, sy);
 
   return (
     <article className="answer-page">
@@ -82,10 +118,10 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
               )}
             </div>
           ) : (
-            <p className="summary">{fiche.summary[lang]}</p>
+            <p className="summary">{G(fiche.summary[lang])}</p>
           )}
         </div>
-        {VerdictArt ? <div className="verdict-scene"><VerdictArt /></div> : <ThemeArt icon={th.icon} />}
+        {VerdictArt ? <div className="verdict-scene"><VerdictArt /></div> : <div className="topic-art"><TopicScene id={th.id} /></div>}
       </header>
 
       {/* En bref (pages publiques) : trois niveaux colorés, lisibles sans défiler, comme le NHS. */}
@@ -105,7 +141,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
         <div className="sec-art"><ArtGrave /></div>
         <div>
           <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
-          <p><b>{t(lang, "seeQuickly")}</b> {fiche.warning[lang]}</p>
+          <p><b>{t(lang, "seeQuickly")}</b> {G(fiche.warning[lang])}</p>
           {personal && personal.warning.length > 0 && (
             <>
               <p style={{ margin: "8px 0 0" }}><b>{t(lang, "alsoForYou")}</b></p>
@@ -182,11 +218,11 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
                   <div className="for-you"><span className="tag-you"><Icon name="UserRound" size={12} />{t(lang, "forYou")}</span>{personal.know.map((p, i) => <p key={i}>{p}</p>)}</div>
                 )}
                 {personal ? (
-                  <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{p[lang]}</p>)}</More>
+                  <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>
                 ) : (
                   <>
-                    <p>{firstPara[lang]}</p>
-                    {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{p[lang]}</p>)}</More>}
+                    <p>{G(firstPara[lang])}</p>
+                    {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>}
                   </>
                 )}
               </>
@@ -198,7 +234,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
                   <li key={i} className={p.personal ? "personal" : undefined}>
                     <Pic p={p.picto ?? stepPicto("")} />
                     <span className="num" aria-hidden="true">{i + 1}</span>
-                    <span className="txt">{p.text}</span>
+                    <span className="txt">{G(p.text)}</span>
                   </li>
                 ))}
               </ol>
@@ -209,7 +245,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
                 <span className="ico"><Icon name="Stethoscope" size={30} /></span>
                 <div>
                   <p className="eyebrow" style={{ marginBottom: 2 }}>{personal?.doctor ? t(lang, "forYou") : t(lang, "firstContact")}</p>
-                  <p style={{ margin: 0 }}>{personal?.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : fiche.whichDoctor[lang]}</p>
+                  <p style={{ margin: 0 }}>{personal?.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : G(fiche.whichDoctor[lang])}</p>
                 </div>
               </div>
             )}
@@ -217,7 +253,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
             {s.key === "exams" && personal?.exams && <p className="for-you" style={{ margin: "0 0 12px" }}>{personal.exams}</p>}
             {s.key === "exams" && (
               <ul className="exam-grid">
-                {fiche.exams.map((p, i) => <li key={i}><Pic p={examPicto(p.fr)} /><span className="txt">{p[lang]}</span></li>)}
+                {fiche.exams.map((p, i) => <li key={i}><Pic p={examPicto(p.fr)} /><span className="txt">{G(p[lang])}</span></li>)}
               </ul>
             )}
 
@@ -239,6 +275,20 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       ))}
 
       {children}
+
+      {faq.length > 0 && (
+        <section className="card sec faq-sec" id="faq">
+          <h2><Icon name="MessageCircleQuestion" size={22} />{t(lang, "topicFaqTitle")}</h2>
+          <div className="faq">
+            {faq.map((f, i) => (
+              <details key={i} className="faq-item">
+                <summary>{f.q}<Icon name="ChevronRight" size={18} /></summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Sujets proches : d'autres questions du même sujet, puis d'autres sujets (comme Doctissimo / Mayo Clinic). */}
       <section className="sec related" id="sujets-proches">
