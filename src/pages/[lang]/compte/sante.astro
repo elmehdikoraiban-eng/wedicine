@@ -26,7 +26,7 @@ if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
     <section class="acc-section">
       <h2>{t(lang, "accTopics")}</h2>
       <div class="acc-topics">
-        {a.topics.map((th) => <a href={`/${lang}/question?theme=${th.id}`} class="topic-card"><TopicScene id={th.id} /><span class="topic-name">{th.label[lang]}</span></a>)}
+        {a.topics.map((th) => <a href={`/${lang}?theme=${th.id}`} class="topic-card"><TopicScene id={th.id} /><span class="topic-name">{th.label[lang]}</span></a>)}
       </div>
     </section>
   )}

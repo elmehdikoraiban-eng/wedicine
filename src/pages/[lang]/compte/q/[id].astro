@@ -54,7 +54,7 @@ const mode = !q.is_public ? "private" : q.anonymous ? "anonymous" : "named";
           <PublishToggle client:load lang={lang} id={q.id} mode={mode} previewNamed={previewNamed} previewAnon={previewAnon} />
           <div class="row" style="margin-top:16px">
             <a href={qPath(lang, th, sy, q.intent)} class="btn btn-ghost btn-sm"><Icon name="Globe" size={16} /> {t(lang, "publicPage")}</a>
-            <a href={`/${lang}/question`} class="btn btn-ghost btn-sm">{t(lang, "newQuestion")}</a>
+            <a href={`/${lang}`} class="btn btn-ghost btn-sm">{t(lang, "newQuestion")}</a>
           </div>
         </section>
         <section class="no-print del-zone">

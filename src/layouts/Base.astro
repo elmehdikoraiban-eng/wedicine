@@ -61,11 +61,11 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
           </div>
           <div>
             <h4>{t(lang, "footerTopics")}</h4>
-            {THEMES.slice(0, 6).map((th) => <a href={`/${lang}/question?theme=${th.id}`}>{th.label[lang]}</a>)}
+            {THEMES.slice(0, 6).map((th) => <a href={`/${lang}?theme=${th.id}`}>{th.label[lang]}</a>)}
           </div>
           <div>
             <h4>{t(lang, "footerAbout")}</h4>
-            <a href={`/${lang}/question`}>{t(lang, "start")}</a>
+            <a href={`/${lang}`}>{t(lang, "start")}</a>
             <a href={`/${lang}/connexion`}>{t(lang, "login")}</a>
             <a href={`/${lang}/compte`}>{t(lang, "myAccount")}</a>
           </div>

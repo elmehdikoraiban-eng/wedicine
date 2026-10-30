@@ -44,5 +44,5 @@ const DESC = { questions: "accQuestionsDesc", infos: "accIdentityDesc", sante: "
       <div class="qlist">{a.qs.slice(0, 3).map((x) => <QuestionRow lang={lang} {...x} />)}</div>
     </section>
   )}
-  <p><a href={`/${lang}/question`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
+  <p><a href={`/${lang}`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
 </Account>

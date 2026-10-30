@@ -29,7 +29,7 @@ const list = by(tab);
         <Icon name={x.icon} size={18} />{t(lang, x.key)}<span class="tab-count">{by(x.id).length}</span>
       </a>
     ))}
-    <a href={`/${lang}/question`} class="tab tab-new"><Icon name="Plus" size={18} />{t(lang, "newQuestionTab")}</a>
+    <a href={`/${lang}`} class="tab tab-new"><Icon name="Plus" size={18} />{t(lang, "newQuestionTab")}</a>
   </nav>
   <div role="tabpanel">
     {list.length === 0

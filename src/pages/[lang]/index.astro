@@ -1,113 +1,18 @@
 ---
 import Base from "@/layouts/Base.astro";
-import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
-import { pageTitle, THEMES } from "@/lib/content/themes";
-import { qPath, SITE_URL } from "@/lib/site";
-import { Icon } from "@/components/Icon";
-import { Account, AnswerSheet, Choose } from "@/components/Illustrations";
-import { visitorCity } from "@/lib/geo";
+import { theme } from "@/lib/content/themes";
+import { SITE_URL } from "@/lib/site";
+import { Chat } from "@/components/Chat";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
-
-// Questions mises en avant (thème, symptôme, intention) : une par sujet, pour le SEO.
-const POPULAR: [string, string, string][] = [
-  ["fievre", "seule", "grave"], ["tete", "migraine", "medecin"], ["digestion", "brulures", "attente"],
-  ["tension", "elevee", "grave"], ["dos", "lombaires", "attente"], ["sommeil", "endormissement", "medecin"],
-  ["allergie", "nez", "attente"], ["bilan", "checkup", "examens"], ["diabete", "soif", "examens"],
-];
-const page = ([thId, syId, intent]: [string, string, string]) => {
-  const th = THEMES.find((x) => x.id === thId)!;
-  const sy = th.symptoms.find((x) => x.id === syId)!;
-  return { th, sy, intent, href: qPath(lang, th, sy, intent), title: pageTitle(lang, th, sy, intent) };
-};
-const FAQ = [1, 2, 3, 4, 5, 6, 7] as const;
-const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
+// L'accueil est la conversation elle-même : la première question est posée tout de suite, sans compte.
+// ?theme=fievre (liens des pages publiques et du pied de page) répond d'avance à « De quoi s'agit-il ? ».
+const th = Astro.url.searchParams.get("theme") ?? "";
+const initialTheme = theme(th) ? th : undefined;
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
-const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
-const city = visitorCity(Astro.request, Astro.url, lang);
 ---
-<Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false}>
-  <!-- 1. Héros centré sur fond bleu ciel léger -->
-  <section class="hero-c">
-    <div class="wrap hero-c-text">
-      <h1>{(([w0, ...rest]) => <><span class="word">{w0}</span> <span class="word">{rest.join(" ")}</span> </>)(t(lang, "heroTitle1").split(" "))}<span class="city">{city}</span></h1>
-      <p class="lead">{t(lang, "heroTitle2")}</p>
-      <div class="actions">
-        <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
-      </div>
-      <p class="trust">{t(lang, "trustLine")}</p>
-    </div>
-  </section>
-
-  <!-- 3. Comment ça marche : trois étapes reliées -->
-  <section class="band" id="comment">
-    <div class="wrap">
-      <div class="section-head center reveal">
-        <p class="eyebrow">{t(lang, "howEyebrow")}</p>
-        <h2>{t(lang, "howTitle")}</h2>
-      </div>
-      <div class="stepper reveal-stagger">
-        <article class="step"><div class="step-art"><Choose /></div><span class="num">1</span><h3>{t(lang, "step1Title")}</h3><p class="muted">{brief(t(lang, "step1Text"))}</p></article>
-        <article class="step"><div class="step-art"><Account /></div><span class="num">2</span><h3>{t(lang, "step2Title")}</h3><p class="muted">{brief(t(lang, "step2Text"))}</p></article>
-        <article class="step"><div class="step-art"><AnswerSheet /></div><span class="num">3</span><h3>{t(lang, "step3Title")}</h3><p class="muted">{brief(t(lang, "step3Text"))}</p></article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. Urgence : une ligne -->
-  <section class="urgent-plain">
-    <div class="wrap urgent-grid reveal">
-      <div class="urgent-head">
-        <span class="urgent-ico"><Icon name="Siren" size={26} /></span>
-        <div>
-          <h3>{t(lang, "urgentHomeTitle")}</h3>
-          <p class="muted">{t(lang, "urgentSub")}</p>
-        </div>
-      </div>
-      <ul class="urgent-signs">
-        <li><Icon name="HeartPulse" size={20} />{t(lang, "urgentSign1")}</li>
-        <li><Icon name="Wind" size={20} />{t(lang, "urgentSign2")}</li>
-        <li><Icon name="Frown" size={20} />{t(lang, "urgentSign3")}</li>
-      </ul>
-      <div class="urgent-calls">
-        <a href="tel:141" class="btn btn-danger"><Icon name="Phone" size={18} /> {t(lang, "callSamu")}</a>
-        <a href="tel:15" class="btn btn-ghost"><Icon name="Phone" size={18} /> {t(lang, "callCivil")}</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. Questions fréquentes + FAQ -->
-  <section class="band band-neutral">
-    <div class="wrap two-col">
-      <div class="reveal">
-        <h2>{t(lang, "popular")}</h2>
-        <div class="list-links" style="grid-template-columns:1fr">
-          {POPULAR.map((p) => { const x = page(p); return <a href={x.href}><Icon name={x.th.icon} size={20} />{x.title}</a>; })}
-        </div>
-      </div>
-      <div class="reveal">
-        <h2>{t(lang, "faqTitleShort")}</h2>
-        <div class="faq">
-          {FAQ.map((n) => (
-            <details class="faq-item">
-              <summary>{t(lang, `faq${n}q` as "faq1q")}<Icon name="ChevronRight" size={18} /></summary>
-              <p>{t(lang, `faq${n}a` as "faq1a")}</p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. Appel final -->
-  <section class="band band-tint">
-    <div class="wrap cta-final reveal">
-      <h2>{t(lang, "ctaTitle")}</h2>
-      <p class="lead">{t(lang, "ctaText")}</p>
-      <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "start")} <Icon name={arrow} size={20} /></a>
-    </div>
-  </section>
-
+<Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false} footer={false}>
+  <Chat client:load lang={lang} initialTheme={initialTheme} />
 </Base>

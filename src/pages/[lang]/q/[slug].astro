@@ -63,7 +63,7 @@ const faqLd = {
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
       <section class="cta-own">
         <p>{t(lang, "ctaOwnCase")}</p>
-        <a href={`/${lang}/question?theme=${th.id}`} class="btn btn-primary"><Icon name={it.icon ?? "ArrowRight"} size={18} /> {t(lang, "startFree")}</a>
+        <a href={`/${lang}?theme=${th.id}`} class="btn btn-primary"><Icon name={it.icon ?? "ArrowRight"} size={18} /> {t(lang, "startFree")}</a>
       </section>
       {showCommunity && <>
       <section class="card sec stats-sec" id={anchor(lang, "stats")} style="margin-top:16px">
