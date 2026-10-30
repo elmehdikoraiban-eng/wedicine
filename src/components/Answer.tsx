@@ -55,10 +55,18 @@ export function answerFaq(lang: Lang, fiche: Fiche, th: Theme, sy: Symptom): { q
   return out.map((x) => ({ q: x.q, a: x.a.charAt(0).toLocaleUpperCase(lang) + x.a.slice(1) }));
 }
 
+// Ancres lisibles dans l'adresse (#quel-medecin), dans la langue de la page ; l'arabe garde les ancres françaises (latines).
+const ANCHORS = {
+  fr: { briefTitle: "en-bref", whenToSee: "quand-consulter", whatToKnow: "a-savoir", meanwhile: "en-attendant", whichDoctor: "quel-medecin", exams: "examens", askDoctor: "questions-medecin", faq: "faq", stats: "statistiques", othersAsked: "ils-ont-demande", related: "sujets-proches", feedback: "avis" },
+  en: { briefTitle: "in-short", whenToSee: "when-to-see", whatToKnow: "what-to-know", meanwhile: "meanwhile", whichDoctor: "which-doctor", exams: "tests", askDoctor: "questions-for-doctor", faq: "faq", stats: "statistics", othersAsked: "who-asked", related: "related", feedback: "feedback" },
+} as const;
+export type AnchorKey = keyof typeof ANCHORS.fr;
+export const anchor = (lang: Lang, key: AnchorKey) => ANCHORS[lang === "en" ? "en" : "fr"][key];
+
 // Plan de la page (sommaire latéral) : mêmes ancres et même ordre que les sections rendues.
-export function answerOutline(intent: string): { id: string; key: string }[] {
+export function answerOutline(lang: Lang, intent: string): { id: string; key: string }[] {
   const ordered = [...SECTIONS].sort((a, b) => Number(b.intent === intent) - Number(a.intent === intent));
-  return [{ id: "en-bref", key: "briefTitle" }, { id: "quand-consulter", key: "whenToSee" }, ...ordered.map((s) => ({ id: s.key, key: s.key })), { id: "faq", key: "topicFaqTitle" }];
+  return [{ id: anchor(lang, "briefTitle"), key: "briefTitle" }, { id: anchor(lang, "whenToSee"), key: "whenToSee" }, ...ordered.map((s) => ({ id: anchor(lang, s.key), key: s.key })), { id: anchor(lang, "faq"), key: "topicFaqTitle" }];
 }
 
 // Choix du patient utilisés pour les illustrations « Dans votre cas ».
@@ -126,7 +134,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
 
       {/* En bref (pages publiques) : trois niveaux colorés, lisibles sans défiler, comme le NHS. */}
       {!personal && (
-        <section className="brief" aria-label={t(lang, "briefTitle")} id="en-bref">
+        <section className="brief" aria-label={t(lang, "briefTitle")} id={anchor(lang, "briefTitle")}>
           <h2 className="brief-title">{t(lang, "briefTitle")}</h2>
           <ul>
             <li className="lv-home"><span className="brief-ico"><Icon name="House" size={20} /></span><span><b>{t(lang, "briefHome")}</b> {steps[0]?.text}</span></li>
@@ -137,7 +145,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       )}
 
       {/* Quand consulter : toujours deuxième, visible sans défiler. */}
-      <section className="card sec sec-danger" id="quand-consulter">
+      <section className="card sec sec-danger" id={anchor(lang, "whenToSee")}>
         <div className="sec-art"><ArtGrave /></div>
         <div>
           <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
@@ -207,7 +215,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       ) : null}
 
       {ordered.map((s) => (
-        <section key={s.key} className={`card sec sec-illustrated${s.intent === intent ? " focus" : ""}`} id={s.key}>
+        <section key={s.key} className={`card sec sec-illustrated${s.intent === intent ? " focus" : ""}`} id={anchor(lang, s.key)}>
           <div className="sec-art">{s.art()}</div>
           <div className="sec-body">
             <h2><Icon name={s.icon} size={22} />{t(lang, s.key)}</h2>
@@ -277,7 +285,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       {children}
 
       {faq.length > 0 && (
-        <section className="card sec faq-sec" id="faq">
+        <section className="card sec faq-sec" id={anchor(lang, "faq")}>
           <h2><Icon name="MessageCircleQuestion" size={22} />{t(lang, "topicFaqTitle")}</h2>
           <div className="faq">
             {faq.map((f, i) => (
@@ -291,7 +299,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       )}
 
       {/* Sujets proches : d'autres questions du même sujet, puis d'autres sujets (comme Doctissimo / Mayo Clinic). */}
-      <section className="sec related" id="sujets-proches">
+      <section className="sec related" id={anchor(lang, "related")}>
         <h2><Icon name="Sparkles" size={22} />{t(lang, "related")}</h2>
         <div className="list-links">
           {INTENTS.filter((i) => i.id !== intent).slice(0, 2).map((i) => (

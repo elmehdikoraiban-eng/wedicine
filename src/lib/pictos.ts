@@ -41,6 +41,7 @@ const EXAM_RULES: [RegExp, Picto][] = [
   [/sommeil|polygraphie|enregistrement|epworth|somnolence/i, { icon: "Moon", tone: "purple" }],
   [/test rapide|tdr|test covid|test grippe|prick|cutané|allergique|provocation|test de grossesse/i, { icon: "Microscope", tone: "teal" }],
   [/tension|poids|tour de taille|taille/i, { icon: "Gauge", tone: "blue" }],
+  [/stéthoscope|auscultation/i, { icon: "Stethoscope", tone: "blue" }],
   [/spirométrie|souffle|poumons/i, { icon: "Wind", tone: "teal" }],
   [/vue|ophtalmo|œil|yeux|équilibre/i, { icon: "Eye", tone: "blue" }],
   [/vaccin/i, { icon: "Syringe", tone: "purple" }],

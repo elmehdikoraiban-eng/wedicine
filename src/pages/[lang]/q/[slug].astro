@@ -8,7 +8,7 @@ import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
 import { countView, pageStats, publicAskers, type PageStats } from "@/lib/db";
 import { publicName } from "@/lib/auth";
 import { alternates, formatDate, qPath, SITE_URL, timeAgo } from "@/lib/site";
-import { Answer, answerFaq, answerOutline } from "@/components/Answer";
+import { Answer, anchor, answerFaq, answerOutline } from "@/components/Answer";
 import type { UIKey } from "@/lib/i18n";
 import { Icon } from "@/components/Icon";
 
@@ -34,7 +34,7 @@ const who = (p: { sex: string | null; who: string }) => p.who === "enfant" ? t(l
 const title = pageTitle(lang, th, sy, intent);
 const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
-const toc = [...answerOutline(intent), { id: "stats", key: "statsTitle" }, { id: "ils-ont-demande", key: "othersAsked" }, { id: "sujets-proches", key: "related" }];
+const toc = [...answerOutline(lang, intent), { id: anchor(lang, "stats"), key: "statsTitle" }, { id: anchor(lang, "othersAsked"), key: "othersAsked" }, { id: anchor(lang, "related"), key: "related" }];
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -64,7 +64,7 @@ const faqLd = {
     </nav>
     <div class="read-main">
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
-      <section class="card sec stats-sec" id="stats" style="margin-top:16px">
+      <section class="card sec stats-sec" id={anchor(lang, "stats")} style="margin-top:16px">
         <h2><Icon name="ChartColumn" size={22} />{t(lang, "statsTitle")}</h2>
         {stats.total === 0 ? <p class="muted">{t(lang, "statsEmpty")}</p> : (
           <div class="stats-grid">
@@ -81,7 +81,7 @@ const faqLd = {
         )}
         <p class="muted small" style="margin:12px 0 0">{t(lang, "anonCountLine")}</p>
       </section>
-      <section class="card sec" id="ils-ont-demande" style="margin-top:16px">
+      <section class="card sec" id={anchor(lang, "othersAsked")} style="margin-top:16px">
         <h2><Icon name="Users" size={22} />{t(lang, "othersAsked")}</h2>
         {askers.length === 0 ? <p class="muted">—</p> : (
           <div class="askers">
@@ -100,7 +100,7 @@ const faqLd = {
         </p>
       </section>
     </Answer>
-    <section class="helpful" id="avis" data-page={`${th.id}/${sy.id}/${intent}`}>
+    <section class="helpful" id={anchor(lang, "feedback")} data-page={`${th.id}/${sy.id}/${intent}`}>
       <p class="helpful-q">{t(lang, "helpfulQ")}</p>
       <div class="helpful-btns">
         <button type="button" class="btn btn-ghost btn-sm" data-helpful="1"><Icon name="ThumbsUp" size={18} />{t(lang, "yes")}</button>
@@ -127,13 +127,17 @@ const faqLd = {
     }));
   }
 
-  // Sommaire : surligne la rubrique en cours de lecture.
-  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>(".toc a")].map((a) => [a.hash.slice(1), a]));
-  const seen = new Set<string>();
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id);
-    const first = [...links.keys()].find((id) => seen.has(id));
-    if (first) links.forEach((a, id) => a.toggleAttribute("aria-current", id === first));
-  }, { rootMargin: "-90px 0px -65% 0px" });
-  links.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  // Sommaire : surligne la dernière rubrique dont le haut a passé le premier tiers de l’écran (fiable aussi après un lien #ancre).
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(".toc a")];
+  const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    let current = 0;
+    targets.forEach((el, i) => { if (el && el.getBoundingClientRect().top <= innerHeight * 0.3) current = i; });
+    links.forEach((a, i) => a.toggleAttribute("aria-current", i === current));
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener("hashchange", update);
+  update();
 </script>
