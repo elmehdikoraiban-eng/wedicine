@@ -172,6 +172,8 @@ export const UI = {
   faqExams: { fr: "Quels examens pour {s} ?", ar: "ما الفحوصات في حالة {s}؟", en: "Which tests for {s}?" },
   helpfulQ: { fr: "Cette page vous a aidé ?", ar: "هل ساعدتك هذه الصفحة؟", en: "Was this page helpful?" },
   helpfulThanks: { fr: "Merci ! Votre avis nous aide à améliorer les fiches.", ar: "شكراً! رأيك يساعدنا على تحسين الصفحات.", en: "Thank you! Your feedback helps us improve these pages." },
+  moreInfo: { fr: "En savoir plus", ar: "لمعرفة المزيد", en: "Learn more" },
+  ctaOwnCase: { fr: "Votre cas est différent ? Recevez une réponse adaptée à votre âge, votre durée et vos signes.", ar: "حالتك مختلفة؟ احصل على جواب يناسب عمرك والمدة والعلامات.", en: "Your case is different? Get an answer tailored to your age, duration and signs." },
   briefTitle: { fr: "En bref", ar: "باختصار", en: "In short" },
   briefHome: { fr: "À la maison :", ar: "في المنزل:", en: "At home:" },
   briefSoon: { fr: "Consultez sous 48 h", ar: "استشر خلال 48 ساعة", en: "See a doctor within 48 h" },

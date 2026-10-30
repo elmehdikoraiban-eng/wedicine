@@ -57,16 +57,22 @@ export function answerFaq(lang: Lang, fiche: Fiche, th: Theme, sy: Symptom): { q
 
 // Ancres lisibles dans l'adresse (#quel-medecin), dans la langue de la page ; l'arabe garde les ancres françaises (latines).
 const ANCHORS = {
-  fr: { briefTitle: "en-bref", whenToSee: "quand-consulter", whatToKnow: "a-savoir", meanwhile: "en-attendant", whichDoctor: "quel-medecin", exams: "examens", askDoctor: "questions-medecin", faq: "faq", stats: "statistiques", othersAsked: "ils-ont-demande", related: "sujets-proches", feedback: "avis" },
-  en: { briefTitle: "in-short", whenToSee: "when-to-see", whatToKnow: "what-to-know", meanwhile: "meanwhile", whichDoctor: "which-doctor", exams: "tests", askDoctor: "questions-for-doctor", faq: "faq", stats: "statistics", othersAsked: "who-asked", related: "related", feedback: "feedback" },
+  fr: { briefTitle: "en-bref", whenToSee: "quand-consulter", whatToKnow: "a-savoir", meanwhile: "en-attendant", whichDoctor: "quel-medecin", exams: "examens", askDoctor: "questions-medecin", faq: "faq", stats: "statistiques", othersAsked: "ils-ont-demande", related: "sujets-proches", feedback: "avis", moreInfo: "en-savoir-plus" },
+  en: { briefTitle: "in-short", whenToSee: "when-to-see", whatToKnow: "what-to-know", meanwhile: "meanwhile", whichDoctor: "which-doctor", exams: "tests", askDoctor: "questions-for-doctor", faq: "faq", stats: "statistics", othersAsked: "who-asked", related: "related", feedback: "feedback", moreInfo: "learn-more" },
 } as const;
 export type AnchorKey = keyof typeof ANCHORS.fr;
 export const anchor = (lang: Lang, key: AnchorKey) => ANCHORS[lang === "en" ? "en" : "fr"][key];
 
 // Plan de la page (sommaire latéral) : mêmes ancres et même ordre que les sections rendues.
 export function answerOutline(lang: Lang, intent: string): { id: string; key: string }[] {
-  const ordered = [...SECTIONS].sort((a, b) => Number(b.intent === intent) - Number(a.intent === intent));
-  return [{ id: anchor(lang, "briefTitle"), key: "briefTitle" }, { id: anchor(lang, "whenToSee"), key: "whenToSee" }, ...ordered.map((s) => ({ id: anchor(lang, s.key), key: s.key })), { id: anchor(lang, "faq"), key: "topicFaqTitle" }];
+  const focus = (SECTIONS.find((x) => x.intent === intent) ?? SECTIONS[0]).key;
+  return [
+    { id: anchor(lang, "briefTitle"), key: "briefTitle" },
+    { id: anchor(lang, focus), key: focus },
+    ...(focus !== "whichDoctor" ? [{ id: anchor(lang, "whichDoctor"), key: "whichDoctor" }] : []),
+    { id: anchor(lang, "moreInfo"), key: "moreInfo" },
+    { id: anchor(lang, "faq"), key: "topicFaqTitle" },
+  ];
 }
 
 // Choix du patient utilisés pour les illustrations « Dans votre cas ».
@@ -110,6 +116,80 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
   const G = (text: string) => glossify(text, lang, used);
   const faq = personal ? [] : answerFaq(lang, fiche, th, sy);
 
+  // Contenu d'une rubrique (le même en carte ouverte ou repliée).
+  const content = (key: Key) => (
+    <>
+      {key === "whatToKnow" && (
+        <>
+          {personal && personal.know.length > 0 && (
+            <div className="for-you"><span className="tag-you"><Icon name="UserRound" size={12} />{t(lang, "forYou")}</span>{personal.know.map((p, i) => <p key={i}>{p}</p>)}</div>
+          )}
+          {personal ? (
+            <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>
+          ) : (
+            <>
+              <p>{G(firstPara[lang])}</p>
+              {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>}
+            </>
+          )}
+        </>
+      )}
+
+      {key === "meanwhile" && (
+        <ol className="steps-grid">
+          {steps.map((p, i) => (
+            <li key={i} className={p.personal ? "personal" : undefined}>
+              <Pic p={p.picto ?? stepPicto("")} />
+              <span className="num" aria-hidden="true">{i + 1}</span>
+              <span className="txt">{G(p.text)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {key === "whichDoctor" && (
+        <div className="doctor-card">
+          <span className="ico"><Icon name="Stethoscope" size={30} /></span>
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 2 }}>{personal?.doctor ? t(lang, "forYou") : t(lang, "firstContact")}</p>
+            <p style={{ margin: 0 }}>{personal?.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : G(fiche.whichDoctor[lang])}</p>
+          </div>
+        </div>
+      )}
+
+      {key === "exams" && personal?.exams && <p className="for-you" style={{ margin: "0 0 12px" }}>{personal.exams}</p>}
+      {key === "exams" && (
+        <ul className="exam-grid">
+          {fiche.exams.map((p, i) => <li key={i}><Pic p={examPicto(p.fr)} /><span className="txt">{G(p[lang])}</span></li>)}
+        </ul>
+      )}
+
+      {key === "askDoctor" && (
+        <>
+          <p className="muted small">{t(lang, "checklistHint")}</p>
+          <ul className="checklist">
+            {visibleQ.map((p, i) => <li key={i} className={p.personal ? "personal" : undefined}><label><input type="checkbox" className="box" />{p.text}</label></li>)}
+          </ul>
+          {hiddenQ.length > 0 && (
+            <More lang={lang}>
+              <ul className="checklist">{hiddenQ.map((p, i) => <li key={i}><label><input type="checkbox" className="box" />{p.text}</label></li>)}</ul>
+            </More>
+          )}
+        </>
+      )}
+    </>
+  );
+  const focusKey = (SECTIONS.find((x) => x.intent === intent) ?? SECTIONS[0]).key;
+  const section = (sx: (typeof SECTIONS)[number]) => (
+    <section key={sx.key} className={`card sec sec-illustrated${sx.intent === intent ? " focus" : ""}`} id={anchor(lang, sx.key)}>
+      <div className="sec-art">{sx.art()}</div>
+      <div className="sec-body">
+        <h2><Icon name={sx.icon} size={22} />{t(lang, sx.key)}</h2>
+        {content(sx.key)}
+      </div>
+    </section>
+  );
+
   return (
     <article className="answer-page">
       {/* En-tête : titre, verdict et grande scène qui dit quoi faire. */}
@@ -139,13 +219,17 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
           <ul>
             <li className="lv-home"><span className="brief-ico"><Icon name="House" size={20} /></span><span><b>{t(lang, "briefHome")}</b> {steps[0]?.text}</span></li>
             <li className="lv-soon"><span className="brief-ico"><Icon name="CalendarCheck" size={20} /></span><span><b>{t(lang, "briefSoon")}</b> {th.duration ? t(lang, "briefSoonText").replace("{d}", DURATIONS[th.consultAfter]?.label[lang].toLowerCase() ?? "") : t(lang, "briefSoonPlain")}</span></li>
-            <li className="lv-urgent"><span className="brief-ico"><Icon name="Siren" size={20} /></span><span><b>{t(lang, "briefUrgent")}</b> {fiche.warning[lang].split(/[,،;]\s*/).slice(0, 3).join(", ")}…</span></li>
+            <li className="lv-urgent" id={anchor(lang, "whenToSee")}><span className="brief-ico"><Icon name="Siren" size={20} /></span><span><b>{t(lang, "briefUrgent")}</b> {G(fiche.warning[lang])}
+              <span className="brief-calls">
+                <a href="tel:141" className="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "callSamu")}</a>
+                <a href="tel:15" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "callCivil")}</a>
+              </span></span></li>
           </ul>
         </section>
       )}
 
-      {/* Quand consulter : toujours deuxième, visible sans défiler. */}
-      <section className="card sec sec-danger" id={anchor(lang, "whenToSee")}>
+      {/* Quand consulter (espace patient) ; sur la page publique, c'est la ligne rouge de « En bref ». */}
+      {personal && <section className="card sec sec-danger" id={anchor(lang, "whenToSee")}>
         <div className="sec-art"><ArtGrave /></div>
         <div>
           <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
@@ -161,7 +245,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
             <a href="tel:15" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "callCivil")}</a>
           </div>
         </div>
-      </section>
+      </section>}
 
       {caseData && (dur >= 0 || inten >= 0 || who) ? (
         <section className="card sec case-sec">
@@ -214,73 +298,27 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
         </section>
       ) : null}
 
-      {ordered.map((s) => (
-        <section key={s.key} className={`card sec sec-illustrated${s.intent === intent ? " focus" : ""}`} id={anchor(lang, s.key)}>
-          <div className="sec-art">{s.art()}</div>
-          <div className="sec-body">
-            <h2><Icon name={s.icon} size={22} />{t(lang, s.key)}</h2>
-
-            {s.key === "whatToKnow" && (
-              <>
-                {personal && personal.know.length > 0 && (
-                  <div className="for-you"><span className="tag-you"><Icon name="UserRound" size={12} />{t(lang, "forYou")}</span>{personal.know.map((p, i) => <p key={i}>{p}</p>)}</div>
-                )}
-                {personal ? (
-                  <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>
-                ) : (
-                  <>
-                    <p>{G(firstPara[lang])}</p>
-                    {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>}
-                  </>
-                )}
-              </>
-            )}
-
-            {s.key === "meanwhile" && (
-              <ol className="steps-grid">
-                {steps.map((p, i) => (
-                  <li key={i} className={p.personal ? "personal" : undefined}>
-                    <Pic p={p.picto ?? stepPicto("")} />
-                    <span className="num" aria-hidden="true">{i + 1}</span>
-                    <span className="txt">{G(p.text)}</span>
-                  </li>
-                ))}
-              </ol>
-            )}
-
-            {s.key === "whichDoctor" && (
-              <div className="doctor-card">
-                <span className="ico"><Icon name="Stethoscope" size={30} /></span>
-                <div>
-                  <p className="eyebrow" style={{ marginBottom: 2 }}>{personal?.doctor ? t(lang, "forYou") : t(lang, "firstContact")}</p>
-                  <p style={{ margin: 0 }}>{personal?.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : G(fiche.whichDoctor[lang])}</p>
-                </div>
-              </div>
-            )}
-
-            {s.key === "exams" && personal?.exams && <p className="for-you" style={{ margin: "0 0 12px" }}>{personal.exams}</p>}
-            {s.key === "exams" && (
-              <ul className="exam-grid">
-                {fiche.exams.map((p, i) => <li key={i}><Pic p={examPicto(p.fr)} /><span className="txt">{G(p[lang])}</span></li>)}
-              </ul>
-            )}
-
-            {s.key === "askDoctor" && (
-              <>
-                <p className="muted small">{t(lang, "checklistHint")}</p>
-                <ul className="checklist">
-                  {visibleQ.map((p, i) => <li key={i} className={p.personal ? "personal" : undefined}><label><input type="checkbox" className="box" />{p.text}</label></li>)}
-                </ul>
-                {hiddenQ.length > 0 && (
-                  <More lang={lang}>
-                    <ul className="checklist">{hiddenQ.map((p, i) => <li key={i}><label><input type="checkbox" className="box" />{p.text}</label></li>)}</ul>
-                  </More>
-                )}
-              </>
-            )}
-          </div>
-        </section>
-      ))}
+      {personal ? ordered.map(section) : (
+        <>
+          {/* Page publique courte : l'intention choisie ouverte, le médecin en une ligne, le reste replié. */}
+          {section(SECTIONS.find((x) => x.key === focusKey)!)}
+          {focusKey !== "whichDoctor" && (
+            <section className="doctor-line" id={anchor(lang, "whichDoctor")}>
+              <span className="ico"><Icon name="Stethoscope" size={22} /></span>
+              <p><b>{t(lang, "whichDoctor")} :</b> {G(fiche.whichDoctor[lang])}</p>
+            </section>
+          )}
+          <section className="more-info" id={anchor(lang, "moreInfo")}>
+            <h2>{t(lang, "moreInfo")}</h2>
+            {SECTIONS.filter((x) => x.key !== focusKey && x.key !== "whichDoctor").map((x) => (
+              <details key={x.key} className="card fold" id={anchor(lang, x.key)}>
+                <summary><span className="fold-ico"><Icon name={x.icon} size={20} /></span>{t(lang, x.key)}<Icon name="ChevronDown" size={20} /></summary>
+                <div className="fold-body">{content(x.key)}</div>
+              </details>
+            ))}
+          </section>
+        </>
+      )}
 
       {children}
 

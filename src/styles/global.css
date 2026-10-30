@@ -809,3 +809,20 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .helpful-q { margin: 0; font-weight: 700; }
 .helpful-btns { display: flex; gap: 10px; }
 .helpful-thanks { margin: 0; display: inline-flex; align-items: center; gap: 8px; color: #1f845a; font-weight: 600; }
+
+/* Page publique courte */
+.brief-calls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.doctor-line { display: flex; gap: 14px; align-items: center; padding: 16px 20px; border-radius: var(--r-card); background: #f1efff; }
+.doctor-line p { margin: 0; }
+.doctor-line .ico { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--canvas); color: var(--purple); }
+.more-info { display: grid; gap: 10px; margin-top: 8px; }
+.more-info > h2 { font-size: var(--fs-heading-sm); margin: 8px 0 4px; }
+.fold { padding: 0; }
+.fold > summary { display: flex; align-items: center; gap: 14px; padding: 16px 20px; font-weight: 700; font-size: var(--fs-lead); cursor: pointer; list-style: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary > svg:last-child { margin-inline-start: auto; color: var(--muted); transition: transform .2s var(--ease); }
+.fold[open] > summary > svg:last-child { transform: rotate(180deg); }
+.fold-ico { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--tint-2); color: var(--brand); }
+.fold-body { padding: 0 20px 20px; animation: rise .25s var(--ease); }
+.cta-own { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-top: 16px; padding: 22px 24px; border-radius: var(--r-card); background: var(--tint-2); }
+.cta-own p { margin: 0; flex: 1 1 320px; font-weight: 600; }

@@ -34,7 +34,9 @@ const who = (p: { sex: string | null; who: string }) => p.who === "enfant" ? t(l
 const title = pageTitle(lang, th, sy, intent);
 const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
-const toc = [...answerOutline(lang, intent), { id: anchor(lang, "stats"), key: "statsTitle" }, { id: anchor(lang, "othersAsked"), key: "othersAsked" }, { id: anchor(lang, "related"), key: "related" }];
+// Les blocs « statistiques » et « ils ont posé » n'apparaissent qu'à partir de 3 questions (sinon ils seraient vides).
+const showCommunity = stats.total >= 3;
+const toc = [...answerOutline(lang, intent), ...(showCommunity ? [{ id: anchor(lang, "stats"), key: "statsTitle" }] : []), { id: anchor(lang, "related"), key: "related" }];
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -64,6 +66,11 @@ const faqLd = {
     </nav>
     <div class="read-main">
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
+      <section class="cta-own">
+        <p>{t(lang, "ctaOwnCase")}</p>
+        <a href={`/${lang}/question?theme=${th.id}`} class="btn btn-primary"><Icon name={it.icon ?? "ArrowRight"} size={18} /> {t(lang, "startFree")}</a>
+      </section>
+      {showCommunity && <>
       <section class="card sec stats-sec" id={anchor(lang, "stats")} style="margin-top:16px">
         <h2><Icon name="ChartColumn" size={22} />{t(lang, "statsTitle")}</h2>
         {stats.total === 0 ? <p class="muted">{t(lang, "statsEmpty")}</p> : (
@@ -95,10 +102,8 @@ const faqLd = {
             ))}
           </div>
         )}
-        <p style="margin:16px 0 0">
-          <a href={`/${lang}/question?theme=${th.id}`} class="btn btn-primary"><Icon name={it.icon ?? "ArrowRight"} size={18} /> {t(lang, "start")}</a>
-        </p>
       </section>
+      </>}
     </Answer>
     <section class="helpful" id={anchor(lang, "feedback")} data-page={`${th.id}/${sy.id}/${intent}`}>
       <p class="helpful-q">{t(lang, "helpfulQ")}</p>
@@ -138,6 +143,9 @@ const faqLd = {
     links.forEach((a, i) => a.toggleAttribute("aria-current", i === current));
   };
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener("hashchange", update);
+  // Un lien vers une rubrique repliée l'ouvre.
+  const openTarget = () => { const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (el instanceof HTMLDetailsElement) { el.open = true; el.scrollIntoView(); } };
+  openTarget();
+  addEventListener("hashchange", () => { openTarget(); update(); });
   update();
 </script>
