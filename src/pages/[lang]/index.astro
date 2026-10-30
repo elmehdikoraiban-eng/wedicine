@@ -6,7 +6,6 @@ import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath, SITE_URL } from "@/lib/site";
 import { Icon } from "@/components/Icon";
 import { Account, AnswerSheet, Choose } from "@/components/Illustrations";
-import { TopicScene } from "@/components/TopicScenes";
 import { visitorCity } from "@/lib/geo";
 
 const lang = langParam(Astro.params);
@@ -27,12 +26,10 @@ const FAQ = [1, 2, 3, 4, 5, 6, 7] as const;
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
-// Bande d'icônes pleine largeur : la liste est doublée pour boucler sans couture (doublons masqués aux lecteurs d'écran).
-const ribbon = [...THEMES, ...THEMES];
 const city = visitorCity(Astro.request, Astro.url, lang);
 ---
 <Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false}>
-  <!-- 1. Héros centré + ruban des 12 sujets illustrés -->
+  <!-- 1. Héros centré sur fond bleu ciel léger -->
   <section class="hero-c">
     <div class="wrap hero-c-text">
       <h1>{(([w0, ...rest]) => <><span class="word">{w0}</span> <span class="word">{rest.join(" ")}</span> </>)(t(lang, "heroTitle1").split(" "))}<span class="city">{city}</span></h1>
@@ -41,16 +38,6 @@ const city = visitorCity(Astro.request, Astro.url, lang);
         <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
       </div>
       <p class="trust">{t(lang, "trustLine")}</p>
-    </div>
-    <div class="ribbon" id="ribbon" aria-label={t(lang, "themesTitle")}>
-      <div class="ribbon-track">
-        {ribbon.map((th, i) => (
-          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
-            <TopicScene id={th.id} />
-            <span class="topic-name">{th.label[lang]}</span>
-          </a>
-        ))}
-      </div>
     </div>
   </section>
 
@@ -123,17 +110,4 @@ const city = visitorCity(Astro.request, Astro.url, lang);
     </div>
   </section>
 
-  <script>
-    // Bande des sujets : glisse lentement en continu (CSS) ; on peut la tirer à la main, sans déclencher le lien.
-    const r = document.getElementById("ribbon");
-    const track = r?.querySelector<HTMLElement>(".ribbon-track");
-    if (r && track && window.matchMedia("(min-width: 761px) and (prefers-reduced-motion: no-preference)").matches) {
-      let down = false, startX = 0, moved = 0, offset = 0;
-      r.addEventListener("pointerdown", (e) => { down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
-      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); offset += dx; startX = e.clientX; track.style.setProperty("--drag", `${offset}px`); });
-      const up = () => { down = false; r.classList.remove("dragging"); };
-      r.addEventListener("pointerup", up); r.addEventListener("pointercancel", up);
-      r.addEventListener("click", (e) => { if (moved > 8) { e.preventDefault(); e.stopPropagation(); } }, true);
-    }
-  </script>
 </Base>
