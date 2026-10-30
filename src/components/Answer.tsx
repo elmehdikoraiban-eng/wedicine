@@ -8,7 +8,7 @@ import { qPath } from "@/lib/site";
 import { Icon } from "./Icon";
 import type { Personal, Step } from "@/lib/personalize";
 import { examPicto, stepPicto, TONES, type Picto } from "@/lib/pictos";
-import { ArtAppointment, ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, ArtSoon, ArtWatchHome, DurationTimeline, IntensityGauge, ThemeArt } from "./Illustrations";
+import { ArtAppointment, ArtDoctor, ArtExams, ArtGrave, ArtKnow, ArtMeanwhile, ArtQuestions, ArtSoon, ArtWatchHome, DurationSteps, IntensityFaces, ThemeArt } from "./Illustrations";
 
 type Key = "whatToKnow" | "meanwhile" | "whichDoctor" | "exams" | "askDoctor";
 const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }[] = [
@@ -105,28 +105,49 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       {caseData && (dur >= 0 || inten >= 0 || who) ? (
         <section className="card sec case-sec">
           <h2><Icon name="UserRound" size={22} />{t(lang, "yourCase")}</h2>
-          <div className="case-grid">
+          <div className="case-tiles">
             {dur >= 0 && th.duration && (
-              <div className="case-block">
-                <h3>{t(lang, "timelineTitle")}</h3>
-                <DurationTimeline labels={DURATIONS.map((d) => d.label[lang])} current={dur} threshold={th.consultAfter}
-                  youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} rtl={rtl} />
+              <div className="ctile wide">
+                <span className="ctile-lbl"><Icon name="Clock" size={16} />{t(lang, "timelineTitle")}</span>
+                <strong className="ctile-val">{DURATIONS[dur].label[lang]}</strong>
+                <DurationSteps labels={DURATIONS.map((d) => d.label[lang])} current={dur} threshold={th.consultAfter}
+                  youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} />
               </div>
             )}
             {inten >= 0 && (
-              <div className="case-block">
-                <h3>{t(lang, "intensityTitle")}</h3>
-                <IntensityGauge labels={INTENSITIES.map((d) => d.label[lang])} current={inten} rtl={rtl} />
+              <div className="ctile wide">
+                <span className="ctile-lbl"><Icon name="Activity" size={16} />{t(lang, "intensityTitle")}</span>
+                <strong className="ctile-val">{INTENSITIES[inten].label[lang]}</strong>
+                <IntensityFaces labels={INTENSITIES.map((d) => d.label[lang])} current={inten} />
               </div>
             )}
-            <div className="case-block profile-block">
-              <h3>{t(lang, "profileTitle")}</h3>
-              <div className="pictos">
-                {who && <span className="picto"><Icon name={who.icon ?? "UserRound"} size={18} />{who.label[lang]}</span>}
-                {age && <span className="picto"><Icon name="Clock" size={18} />{age.label[lang]}</span>}
-                {city && <span className="picto"><Icon name="MapPin" size={18} />{city.label[lang]}</span>}
-                {signs.map((s) => <span key={s.id} className="picto on"><Icon name="Check" size={18} />{s.label[lang]}</span>)}
+            {who && (
+              <div className="ctile">
+                <span className="ctile-ico"><Icon name={who.icon ?? "UserRound"} size={26} /></span>
+                <span className="ctile-lbl">{t(lang, "forWhom")}</span>
+                <strong className="ctile-val">{who.label[lang]}</strong>
               </div>
+            )}
+            {age && (
+              <div className="ctile">
+                <span className="ctile-ico"><Icon name="Clock" size={26} /></span>
+                <span className="ctile-lbl">{t(lang, "age")}</span>
+                <strong className="ctile-val">{age.label[lang]}</strong>
+              </div>
+            )}
+            {city && (
+              <div className="ctile">
+                <span className="ctile-ico"><Icon name="MapPin" size={26} /></span>
+                <span className="ctile-lbl">{t(lang, "city")}</span>
+                <strong className="ctile-val">{city.label[lang]}</strong>
+              </div>
+            )}
+            <div className="ctile">
+              <span className="ctile-ico" style={{ background: signs.length ? "#E3FCEF" : undefined, color: signs.length ? "#006644" : undefined }}><Icon name={signs.length ? "ListChecks" : "Smile"} size={26} /></span>
+              <span className="ctile-lbl">{t(lang, "signsChecked")}</span>
+              {signs.length ? (
+                <span className="ctile-signs">{signs.map((s) => <span key={s.id} className="picto on"><Icon name="Check" size={16} />{s.label[lang]}</span>)}</span>
+              ) : <strong className="ctile-val small">{t(lang, "noSigns")}</strong>}
             </div>
           </div>
         </section>

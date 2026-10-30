@@ -375,3 +375,43 @@ export function ArtSoon() {
     </svg>
   );
 }
+
+// ----- « Dans votre cas », version lisible : barre à paliers et visages, en HTML. -----
+import type React from "react";
+import { Icon as PictoIcon } from "./Icon";
+
+// Durée : 5 paliers. Vert avant le seuil de consultation, rouge à partir du seuil, le palier choisi en plein.
+export function DurationSteps({ labels, current, threshold, youAreHere, consultFrom }: {
+  labels: string[]; current: number; threshold: number; youAreHere: string; consultFrom: string;
+}) {
+  return (
+    <div className="dsteps">
+      <div className="dsteps-row" role="img" aria-label={`${youAreHere}: ${labels[current] ?? ""}`}>
+        {labels.map((l, i) => (
+          <div key={i} className={`dstep${i === current ? " on" : ""}${i >= threshold ? " late" : ""}`}>
+            <span className="here">{i === current ? youAreHere : " "}</span>
+            <span className="bar" />
+            <span className="lbl">{l}</span>
+          </div>
+        ))}
+      </div>
+      {labels[threshold] && <p className="dsteps-note"><span className="dot" />{consultFrom} : <b>{labels[threshold]}</b></p>}
+    </div>
+  );
+}
+
+// Intensité : 5 visages, du sourire au cri ; le visage choisi est grand et coloré.
+const FACES = ["Smile", "Meh", "Frown", "Annoyed", "Angry"] as const;
+const FACE_COLORS = ["#36B37E", "#4C9AFF", "#FFAB00", "#FF8B00", "#DE354C"];
+export function IntensityFaces({ labels, current }: { labels: string[]; current: number }) {
+  return (
+    <div className="faces" role="img" aria-label={labels[current] ?? ""}>
+      {labels.map((l, i) => (
+        <div key={i} className={`face${i === current ? " on" : ""}`} style={{ "--c": FACE_COLORS[i] } as React.CSSProperties}>
+          <span className="ico"><PictoIcon name={FACES[i] ?? "Meh"} size={i === current ? 36 : 24} /></span>
+          <span className="lbl">{l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}

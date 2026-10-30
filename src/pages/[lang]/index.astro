@@ -5,7 +5,7 @@ import { langParam } from "@/lib/lang";
 import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath, SITE_URL } from "@/lib/site";
 import { Icon } from "@/components/Icon";
-import { Account, AnswerSheet, Choose, Community, DurationTimeline, PhoneForm, ThemeArt, Urgent } from "@/components/Illustrations";
+import { Account, AnswerSheet, Choose, Community, DurationSteps, PhoneForm, ThemeArt, Urgent } from "@/components/Illustrations";
 import { fiche } from "@/lib/content/fiches";
 import { DURATIONS } from "@/lib/content/options";
 import { countQuestions } from "@/lib/db";
@@ -113,8 +113,8 @@ const features = [
           </div>
           <div class="example-timeline">
             <p class="eyebrow" style="margin-bottom:4px">{t(lang, "timelineTitle")}</p>
-            <DurationTimeline labels={DURATIONS.map((d) => d.label[lang])} current={1} threshold={example.th.consultAfter}
-              youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} rtl={lang === "ar"} />
+            <DurationSteps labels={DURATIONS.map((d) => d.label[lang])} current={1} threshold={example.th.consultAfter}
+              youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} />
           </div>
           <ul class="example-sections">
             {EXAMPLE_SECTIONS.map(([icon, key]) => <li><Icon name={icon} size={18} />{t(lang, key)}</li>)}

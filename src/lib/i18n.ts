@@ -226,6 +226,9 @@ export const UI = {
   readMore: { fr: "Lire la suite", ar: "اقرأ المزيد", en: "Read more" },
   showLess: { fr: "Réduire", ar: "تصغير", en: "Show less" },
   moreQuestions: { fr: "Autres questions utiles", ar: "أسئلة أخرى مفيدة", en: "Other useful questions" },
+  forWhom: { fr: "Pour qui", ar: "لمن", en: "For whom" },
+  signsChecked: { fr: "Signes cochés", ar: "العلامات المختارة", en: "Signs ticked" },
+  noSigns: { fr: "Aucun autre signe", ar: "لا علامات أخرى", en: "No other sign" },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
 } satisfies Record<string, T>;
 
