@@ -6,3 +6,7 @@ data/
 .env
 .env.local
 .DS_Store
+
+# Logo : sorties du générateur
+scripts/logo/out/
+__pycache__/
