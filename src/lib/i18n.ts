@@ -36,7 +36,7 @@ export const UI = {
   },
   myQuestions: { fr: "Mes questions", ar: "أسئلتي", en: "My questions" },
   myAccount: { fr: "Mon compte", ar: "حسابي", en: "My account" },
-  accHome: { fr: "Accueil", ar: "الرئيسية", en: "Overview" },
+  accHome: { fr: "Aperçu", ar: "نظرة عامة", en: "Overview" },
   hello: { fr: "Bonjour", ar: "مرحباً", en: "Hello" },
   accPrivacyTitle: { fr: "Confidentialité", ar: "الخصوصية", en: "Privacy" },
   accQuestionsDesc: { fr: "Toutes vos réponses, à relire avant la consultation", ar: "كل أجوبتك، لقراءتها قبل الاستشارة", en: "All your answers, to reread before the visit" },
