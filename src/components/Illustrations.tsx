@@ -134,7 +134,7 @@ export function AnswerSheet({ className }: P) {
   );
 }
 
-// Urgence : téléphone avec sirène et numéro 15.
+// Urgence : téléphone avec sirène et numéro 141 (SAMU au Maroc).
 export function Urgent({ className }: P) {
   return (
     <svg viewBox="0 0 320 220" className={className} role="img" aria-hidden="true">
@@ -146,7 +146,7 @@ export function Urgent({ className }: P) {
         <rect x="-26" y="20" width="52" height="8" rx="3" fill={C.navy} />
         <path d="M0 -24v-10M-18 -17l-7-7M18 -17l7-7" stroke={C.red} strokeWidth="4" strokeLinecap="round" />
       </g>
-      <text x="160" y="150" textAnchor="middle" fontFamily="inherit" fontWeight="700" fontSize="28" fill={C.red}>15</text>
+      <text x="160" y="150" textAnchor="middle" fontFamily="inherit" fontWeight="700" fontSize="28" fill={C.red}>141</text>
       <rect x="130" y="166" width="60" height="14" rx="3" fill={C.red} />
       <circle cx="60" cy="60" r="10" fill={C.red} opacity=".3" /><circle cx="270" cy="150" r="14" fill={C.red} opacity=".2" />
     </svg>

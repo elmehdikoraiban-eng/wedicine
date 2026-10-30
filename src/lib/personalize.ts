@@ -89,7 +89,7 @@ export function personalize(a: Answers, th: Theme, fiche: Fiche, l: Lang): Perso
   const tail = [
     { fr: "rien ne presse. Surveillez à la maison et suivez les conseils ci-dessous.", ar: "لا شيء يستعجل. راقب في المنزل واتبع النصائح أدناه.", en: "nothing is pressing. Watch at home and follow the advice below." },
     { fr: "prenez rendez-vous chez le médecin cette semaine. Ce n'est pas une urgence, mais ça ne doit plus attendre.", ar: "احجز موعداً عند الطبيب هذا الأسبوع. ليست حالة طارئة، لكنها لا يجب أن تنتظر أكثر.", en: "book a doctor's appointment this week. It is not an emergency, but it should not wait any longer." },
-    { fr: "consultez dans les 48 heures. Si un signe en rouge apparaît, appelez le 15.", ar: "استشر طبيباً خلال 48 ساعة. إذا ظهرت علامة حمراء، اتصل بالرقم 15.", en: "see a doctor within 48 hours. If a red sign appears, call 15." },
+    { fr: "consultez dans les 48 heures. Si un signe en rouge apparaît, appelez le 141 (SAMU).", ar: "استشر طبيباً خلال 48 ساعة. إذا ظهرت علامة حمراء، اتصل بالرقم 141 (الإسعاف الطبي).", en: "see a doctor within 48 hours. If a red sign appears, call 141 (SAMU)." },
   ][level];
   const verdict = `${head} ${pick(l, tail)}`;
 
@@ -187,7 +187,7 @@ export function personalize(a: Answers, th: Theme, fiche: Fiche, l: Lang): Perso
     why: pick(l, { fr: "Pendant la grossesse, ils connaissent votre suivi et les médicaments compatibles. Le généraliste reste possible.", ar: "أثناء الحمل، يعرفون متابعتك والأدوية المناسبة. الطبيب العام يبقى خياراً.", en: "During pregnancy they know your follow-up and which medicines are compatible. The GP remains an option." }) };
   else if (senior) doctor = { who: pick(l, { fr: "Votre médecin généraliste habituel", ar: "طبيبك العام المعتاد", en: "Your usual general practitioner" }),
     why: pick(l, { fr: "Il connaît vos traitements et vos antécédents, ce qui évite les interactions et les examens inutiles.", ar: "يعرف أدويتك وتاريخك الصحي، ما يجنّب التداخلات والفحوصات غير الضرورية.", en: "They know your medicines and history, which avoids interactions and unnecessary tests." }) };
-  if (doctor && city) doctor.why += pick(l, { fr: ` À ${city}, en cas d'urgence : 15 ou 141.`, ar: ` في ${city}، في حالة الطوارئ: 15 أو 141.`, en: ` In ${city}, in an emergency: 15 or 141.` });
+  if (doctor && city) doctor.why += pick(l, { fr: ` À ${city}, en cas d'urgence : 141 (SAMU) ou 15 (Protection civile).`, ar: ` في ${city}، في حالة الطوارئ: 141 (الإسعاف الطبي) أو 15 (الوقاية المدنية).`, en: ` In ${city}, in an emergency: 141 (SAMU) or 15 (Civil Protection).` });
 
   // ---- Examens -----------------------------------------------------------
   let exams: string | null = null;

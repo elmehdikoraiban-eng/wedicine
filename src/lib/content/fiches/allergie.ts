@@ -6,9 +6,9 @@ const AMELI_URTICAIRE = { label: "Ameli, Urticaire", url: "https://www.ameli.fr/
 const AMELI_ALIMENTAIRE = { label: "Ameli, Allergie alimentaire", url: "https://www.ameli.fr/assure/sante/themes/allergie-alimentaire" };
 
 const RED_ALLERGIE = {
-  fr: "gonflement des lèvres, de la langue ou de la gorge, difficulté à respirer ou à avaler, voix qui change, malaise ou vertiges après un aliment, une piqûre ou un médicament : appelez le 15 immédiatement.",
-  ar: "تورّم الشفتين أو اللسان أو الحلق، صعوبة في التنفس أو البلع، تغيّر الصوت، إغماء أو دوخة بعد طعام أو لسعة أو دواء: اتصل بـ 15 فوراً.",
-  en: "swelling of lips, tongue or throat, difficulty breathing or swallowing, a changing voice, fainting or dizziness after a food, a sting or a medicine: call 15 immediately.",
+  fr: "gonflement des lèvres, de la langue ou de la gorge, difficulté à respirer ou à avaler, voix qui change, malaise ou vertiges après un aliment, une piqûre ou un médicament : appelez le 141 (SAMU) immédiatement.",
+  ar: "تورّم الشفتين أو اللسان أو الحلق، صعوبة في التنفس أو البلع، تغيّر الصوت، إغماء أو دوخة بعد طعام أو لسعة أو دواء: اتصل بـ 141 (الإسعاف الطبي) فوراً.",
+  en: "swelling of lips, tongue or throat, difficulty breathing or swallowing, a changing voice, fainting or dizziness after a food, a sting or a medicine: call 141 (SAMU) immediately.",
 };
 
 export const allergie: ThemeFiches = {
@@ -124,7 +124,7 @@ export const allergie: ThemeFiches = {
       { fr: "Notez précisément ce qui a été mangé, l'heure, les symptômes et leur durée. Gardez l'emballage du produit.", ar: "سجّل بدقة ما تم تناوله، والوقت، والأعراض ومدتها. احتفظ بغلاف المنتج.", en: "Write down exactly what was eaten, the time, the symptoms and how long they lasted. Keep the product packaging." },
       { fr: "Évitez l'aliment suspect en attendant la consultation, mais ne retirez pas d'autres aliments sans avis médical.", ar: "تجنب الطعام المشتبه به في انتظار الاستشارة، لكن لا تحذف أطعمة أخرى دون رأي طبي.", en: "Avoid the suspected food until the appointment, but don't remove other foods without medical advice." },
       { fr: "Antihistaminique si urticaire ou démangeaisons isolées.", ar: "مضاد هيستامين عند الشرى أو الحكة المعزولة.", en: "Antihistamine if hives or isolated itching." },
-      { fr: "Si gonflement du visage, gêne respiratoire ou malaise : 15 immédiatement, allongez la personne jambes surélevées.", ar: "عند تورّم الوجه أو ضيق التنفس أو الإغماء: 15 فوراً، وأرقد الشخص مع رفع الساقين.", en: "If face swelling, breathing difficulty or fainting: call 15 immediately, lay the person down with legs raised." },
+      { fr: "Si gonflement du visage, gêne respiratoire ou malaise : 141 (SAMU) immédiatement, allongez la personne jambes surélevées.", ar: "عند تورّم الوجه أو ضيق التنفس أو الإغماء: 141 (الإسعاف الطبي) فوراً، وأرقد الشخص مع رفع الساقين.", en: "If face swelling, breathing difficulty or fainting: call 141 (SAMU) immediately, lay the person down with legs raised." },
     ],
     whichDoctor: { fr: "Un allergologue (pédiatre allergologue pour un enfant), via votre médecin généraliste. Toute réaction avec gonflement ou gêne respiratoire justifie une consultation rapide.", ar: "طبيب حساسية (طبيب أطفال مختص بالحساسية للطفل) عبر طبيبك العام. أي رد فعل مع تورّم أو ضيق تنفس يستوجب استشارة سريعة.", en: "An allergist (paediatric allergist for a child), via your GP. Any reaction with swelling or breathing difficulty warrants a prompt appointment." },
     exams: [

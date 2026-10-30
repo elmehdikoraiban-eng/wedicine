@@ -258,8 +258,8 @@ function Urgent({ lang, onBack }: { lang: Lang; onBack: () => void }) {
       <h1>{t(lang, "urgentTitle")}</h1>
       <p className="muted" style={{ fontSize: "1.1rem" }}>{t(lang, "urgentText")}</p>
       <div className="calls">
-        <a href="tel:15" className="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "call15")}</a>
-        <a href="tel:141" className="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "call141")}</a>
+        <a href="tel:141" className="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "callSamu")}</a>
+        <a href="tel:15" className="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "callCivil")}</a>
       </div>
       <button type="button" className="btn btn-text" onClick={onBack}>{t(lang, "urgentBack")}</button>
     </div>

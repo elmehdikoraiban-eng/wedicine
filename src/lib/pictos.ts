@@ -5,7 +5,7 @@
 export type Picto = { icon: string; tone: "blue" | "green" | "red" | "purple" | "teal" | "yellow" };
 
 const STEP_RULES: [RegExp, Picto][] = [
-  [/15 immédiatement|appelez le 15|urgences/i, { icon: "Siren", tone: "red" }],
+  [/141 \(SAMU\)|141 immédiatement|appelez le 141|urgences/i, { icon: "Siren", tone: "red" }],
   [/rendez-vous|prenez rendez|consultez|laboratoire|allez au|le jour même/i, { icon: "CalendarCheck", tone: "blue" }],
   [/paracétamol|ibuprofène|antidouleur|comprimé|antihistaminique|laxatif|médicament|somnifère|antibiotique|sirop|collyre|larmes artificielles|aspirine|vaccin/i, { icon: "Pill", tone: "purple" }],
   [/température|thermomètre/i, { icon: "Thermometer", tone: "red" }],

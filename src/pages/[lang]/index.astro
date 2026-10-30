@@ -35,7 +35,7 @@ const city = visitorCity(Astro.request, Astro.url, lang);
   <!-- 1. Héros centré + ruban des 12 sujets illustrés -->
   <section class="hero-c">
     <div class="wrap hero-c-text">
-      <h1>{t(lang, "heroTitle1").split(" ").map((w) => <><span class="word">{w}</span>{" "}</>)}<span class="city">{city}</span></h1>
+      <h1>{(([w0, ...rest]) => <><span class="word">{w0}</span> <span class="word">{rest.join(" ")}</span> </>)(t(lang, "heroTitle1").split(" "))}<span class="city">{city}</span></h1>
       <p class="lead">{t(lang, "heroTitle2")}</p>
       <div class="actions">
         <a href={`/${lang}/question`} class="btn btn-primary btn-lg">{t(lang, "startFree")} <Icon name={arrow} size={20} /></a>
@@ -85,8 +85,8 @@ const city = visitorCity(Astro.request, Astro.url, lang);
         <li><Icon name="Frown" size={20} />{t(lang, "urgentSign3")}</li>
       </ul>
       <div class="urgent-calls">
-        <a href="tel:15" class="btn btn-danger"><Icon name="Phone" size={18} /> {t(lang, "call15")}</a>
-        <a href="tel:141" class="btn btn-ghost"><Icon name="Phone" size={18} /> {t(lang, "call141")}</a>
+        <a href="tel:141" class="btn btn-danger"><Icon name="Phone" size={18} /> {t(lang, "callSamu")}</a>
+        <a href="tel:15" class="btn btn-ghost"><Icon name="Phone" size={18} /> {t(lang, "callCivil")}</a>
       </div>
     </div>
   </section>

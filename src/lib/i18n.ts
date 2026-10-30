@@ -25,9 +25,9 @@ export const UI = {
   themesTitle: { fr: "Choisissez un sujet", ar: "اختر موضوعاً", en: "Pick a topic" },
   popular: { fr: "Questions fréquentes", ar: "أسئلة شائعة", en: "Popular questions" },
   footer: {
-    fr: "Wedicine fournit une information générale et ne remplace pas un médecin. En cas d'urgence, appelez le 15 (SAMU) ou le 141.",
-    ar: "يقدّم Wedicine معلومات عامة ولا يعوّض الطبيب. في حالة الطوارئ، اتصل بالرقم 15 (الإسعاف) أو 141.",
-    en: "Wedicine provides general information and does not replace a doctor. In an emergency, call 15 (SAMU) or 141.",
+    fr: "Wedicine fournit une information générale et ne remplace pas un médecin. En cas d'urgence, appelez le 141 (SAMU) ou le 15 (Protection civile).",
+    ar: "يقدّم Wedicine معلومات عامة ولا يعوّض الطبيب. في حالة الطوارئ، اتصل بالرقم 141 (الإسعاف الطبي) أو 15 (الوقاية المدنية).",
+    en: "Wedicine provides general information and does not replace a doctor. In an emergency, call 141 (SAMU) or 15 (Civil Protection).",
   },
   myQuestions: { fr: "Mes questions", ar: "أسئلتي", en: "My questions" },
   myAccount: { fr: "Mon compte", ar: "حسابي", en: "My account" },
@@ -110,8 +110,9 @@ export const UI = {
     ar: "لا تنتظر جواباً عبر الإنترنت. اتصل الآن أو توجّه إلى أقرب مصلحة للمستعجلات.",
     en: "Don't wait for an online answer. Call now or go to the nearest emergency department.",
   },
-  call15: { fr: "Appeler le 15 (SAMU)", ar: "اتصل بـ 15 (الإسعاف)", en: "Call 15 (SAMU)" },
-  call141: { fr: "Appeler le 141", ar: "اتصل بـ 141", en: "Call 141" },
+  // Maroc : 141 = SAMU (urgence médicale), 15 = Protection civile.
+  callSamu: { fr: "Appeler le 141 (SAMU)", ar: "اتصل بـ 141 (الإسعاف الطبي)", en: "Call 141 (SAMU)" },
+  callCivil: { fr: "Appeler le 15 (Protection civile)", ar: "اتصل بـ 15 (الوقاية المدنية)", en: "Call 15 (Civil Protection)" },
   urgentBack: { fr: "Je me suis trompé, revenir", ar: "أخطأت، رجوع", en: "I made a mistake, go back" },
   // Aperçu et inscription
   previewReady: { fr: "Votre réponse est prête", ar: "جوابك جاهز", en: "Your answer is ready" },
@@ -254,7 +255,7 @@ export const UI = {
   faq3q: { fr: "Qui voit mes réponses ?", ar: "من يرى أجوبتي؟", en: "Who sees my answers?" },
   faq3a: { fr: "Vous seul. Si vous l'acceptez, votre question apparaît sur la page publique avec votre prénom et l'initiale de votre nom, votre tranche d'âge et votre ville. Jamais votre nom complet, votre email ou votre téléphone.", ar: "أنت فقط. إذا وافقت، يظهر سؤالك على الصفحة العامة باسمك الشخصي والحرف الأول من اسمك العائلي وفئتك العمرية ومدينتك. أبداً اسمك الكامل أو بريدك أو هاتفك.", en: "Only you. If you agree, your question appears on the public page with your first name and last initial, age range and city. Never your full name, email or phone." },
   faq4q: { fr: "Et si c'est une urgence ?", ar: "وإذا كانت حالة طارئة؟", en: "What if it is an emergency?" },
-  faq4a: { fr: "Si vous cochez un signe d'alerte, le questionnaire s'arrête et affiche le 15 et le 141. N'attendez pas une réponse en ligne.", ar: "إذا اخترت علامة إنذار، يتوقف الاستبيان ويعرض 15 و141. لا تنتظر جواباً عبر الإنترنت.", en: "If you tick a warning sign, the questionnaire stops and shows 15 and 141. Don't wait for an online answer." },
+  faq4a: { fr: "Si vous cochez un signe d'alerte, le questionnaire s'arrête et affiche le 141 (SAMU) et le 15 (Protection civile). N'attendez pas une réponse en ligne.", ar: "إذا اخترت علامة إنذار، يتوقف الاستبيان ويعرض 141 و15. لا تنتظر جواباً عبر الإنترنت.", en: "If you tick a warning sign, the questionnaire stops and shows 141 (SAMU) and 15 (Civil Protection). Don't wait for an online answer." },
   faq5q: { fr: "D'où vient le contenu ?", ar: "من أين يأتي المحتوى؟", en: "Where does the content come from?" },
   faq5a: { fr: "De sources officielles (Assurance Maladie, OMS), citées sous chaque réponse. Une relecture par un médecin est en cours.", ar: "من مصادر رسمية (التأمين الصحي الفرنسي، منظمة الصحة العالمية) مذكورة تحت كل جواب. المراجعة من طرف طبيب جارية.", en: "From official sources (French health insurance, WHO), cited under each answer. A doctor's review is in progress." },
   faq6q: { fr: "Puis-je l'utiliser pour mon enfant ?", ar: "هل يمكن استعماله لطفلي؟", en: "Can I use it for my child?" },

@@ -102,9 +102,9 @@ export const fatigue: ThemeFiches = {
       { fr: "Un arrêt de travail peut-il m'aider ?", ar: "هل يمكن أن تساعدني راحة من العمل؟", en: "Could time off work help me?" },
     ],
     warning: {
-      fr: "idées de mort ou de se faire du mal, impossibilité de se lever ou de manger depuis plusieurs jours, ou isolement total : appelez le 15 ou allez aux urgences, ne restez pas seul.",
-      ar: "أفكار عن الموت أو إيذاء النفس، عدم القدرة على النهوض أو الأكل منذ عدة أيام، أو عزلة تامة: اتصل بالرقم 15 أو توجه إلى المستعجلات، ولا تبق وحيداً.",
-      en: "thoughts of death or self-harm, unable to get up or eat for several days, or total isolation: call 15 or go to the emergency department, don't stay alone.",
+      fr: "idées de mort ou de se faire du mal, impossibilité de se lever ou de manger depuis plusieurs jours, ou isolement total : appelez le 141 (SAMU) ou allez aux urgences, ne restez pas seul.",
+      ar: "أفكار عن الموت أو إيذاء النفس، عدم القدرة على النهوض أو الأكل منذ عدة أيام، أو عزلة تامة: اتصل بالرقم 141 (الإسعاف الطبي) أو توجه إلى المستعجلات، ولا تبق وحيداً.",
+      en: "thoughts of death or self-harm, unable to get up or eat for several days, or total isolation: call 141 (SAMU) or go to the emergency department, don't stay alone.",
     },
     sources: [AMELI_DEPRESSION],
   },

@@ -95,8 +95,8 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
             </>
           )}
           <div className="row">
-            <a href="tel:15" className="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call15")}</a>
-            <a href="tel:141" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "call141")}</a>
+            <a href="tel:141" className="btn btn-danger btn-sm"><Icon name="Phone" size={16} /> {t(lang, "callSamu")}</a>
+            <a href="tel:15" className="btn btn-ghost btn-sm"><Icon name="Phone" size={16} /> {t(lang, "callCivil")}</a>
           </div>
         </div>
       </section>
