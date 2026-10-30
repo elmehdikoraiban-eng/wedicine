@@ -9,7 +9,7 @@ import { Icon } from "@/components/Icon";
 interface Props { lang: Lang; active: AccountPage; title: string; name: string; avatar: string }
 const { lang, active, title, name, avatar } = Astro.props;
 ---
-<Base lang={lang} title={title} noindex wrap={false}>
+<Base lang={lang} title={title} noindex wrap={false} footer={false}>
   <div class="acc-shell">
     <aside class="acc-side" aria-label={t(lang, "myAccount")}>
       <nav class="acc-menu">

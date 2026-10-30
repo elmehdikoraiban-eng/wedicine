@@ -14,9 +14,10 @@ interface Props {
   noindex?: boolean;      // pages privées (compte, formulaire, connexion)
   canonical?: string;     // chemin canonique, sinon l'URL courante
   alternates?: Record<string, string>;
+  footer?: boolean;       // pied de page (masqué dans l'espace patient)
   wrap?: boolean;         // enveloppe le contenu dans .wrap (toutes les pages sauf l'accueil)
 }
-const { lang, title, description, noindex = false, canonical, alternates, wrap = true } = Astro.props;
+const { lang, title, description, noindex = false, canonical, alternates, wrap = true, footer = true } = Astro.props;
 const user = await currentUser(Astro.cookies);
 const fullTitle = title ? `${title} | Wedicine` : `Wedicine, ${t(lang, "tagline")}`;
 const desc = description ?? t(lang, "heroSub");
@@ -48,6 +49,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <main>
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>
+    {footer && (
     <footer>
       <div class="wrap">
         <div class="foot-cols">
@@ -76,6 +78,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
         </div>
       </div>
     </footer>
+    )}
     <script>
       // Ombre de la barre de navigation dès que la page défile.
       const nav = document.querySelector(".nav");
