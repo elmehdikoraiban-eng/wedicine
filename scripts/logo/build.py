@@ -1,7 +1,7 @@
-"""Construction géométrique du logo Wedicine (redessiné d'après le logo fourni par El Mehdi, 2026-10-30).
+"""Lettres du mot « wedicine » (dessinées d'après le logo fourni par El Mehdi, 2026-10-30).
 
 Cotes en pixels de l'image de référence (2172x724). make(params) renvoie les formes (pip install skia-pathops fonttools).
-Export : cd scripts/logo && mkdir -p out && python3 export.py, puis copier out/*.svg dans public/brand/.
+Le « w » en rubans croisés de make() n'est plus utilisé : le logo (symbole و + mot) s'exporte avec symboles.py.
 """
 import json, math, sys
 from pathops import Path, PathOp, LineCap, LineJoin, op
