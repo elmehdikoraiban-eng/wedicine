@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { Icon } from "./Icon";
 // Elles sont décoratives : le texte à côté porte le sens.
 
-const C = { blue: "#0065FF", deep: "#0747A6", purple: "#8777D9", teal: "#00C7E5", navy: "#091E42", tint: "#DEEBFF", grey: "#F4F5F7", line: "#DFE1E6", white: "#FFFFFF", red: "#DE354C", green: "#36B37E", yellow: "#FFAB00", skin: "#F3C9A6" };
+export const C = { blue: "#0F7B6C", deep: "#0B5F53", purple: "#7A6BD1", teal: "#2F8FD6", navy: "#14262F", tint: "#D7EEE8", grey: "#F3F0EA", line: "#E0DCD4", white: "#FFFFFF", red: "#D9442F", green: "#2E9E6B", yellow: "#E39B2E", coral: "#F26B4E", sand: "#F3F0EA", skin: "#F1C6A5" };
 
 type P = { className?: string; rtl?: boolean };
 
@@ -417,7 +417,7 @@ export function IntensityFaces({ labels, current }: { labels: string[]; current:
 }
 
 // ----- Scènes des 12 sujets (ruban de l'accueil). Même style : traits bleu marine, aplats pastel. -----
-const S = { bg: "#EEF4FF", bg2: "#EAE6FF", bg3: "#E6FCFF", bg4: "#FFF4F2", bg5: "#E3FCEF", bg6: "#FFFAE6" };
+const S = { bg: "#EAF5F2", bg2: "#EDEAFA", bg3: "#E4F0FB", bg4: "#FCEBE6", bg5: "#E3F4EA", bg6: "#FBF1DE" };
 const head = (cx: number, cy: number, r = 22) => (
   <>
     <circle cx={cx} cy={cy} r={r} fill={C.skin} stroke={C.navy} strokeWidth="2.5" />

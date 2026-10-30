@@ -142,7 +142,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
               </div>
             )}
             <div className="ctile">
-              <span className="ctile-ico" style={{ background: signs.length ? "#E3FCEF" : undefined, color: signs.length ? "#006644" : undefined }}><Icon name={signs.length ? "ListChecks" : "Smile"} size={26} /></span>
+              <span className="ctile-ico" style={{ background: signs.length ? "#E3F4EA" : undefined, color: signs.length ? "#1E6B49" : undefined }}><Icon name={signs.length ? "ListChecks" : "Smile"} size={26} /></span>
               <span className="ctile-lbl">{t(lang, "signsChecked")}</span>
               {signs.length ? (
                 <span className="ctile-signs">{signs.map((s) => <span key={s.id} className="picto on"><Icon name="Check" size={16} />{s.label[lang]}</span>)}</span>

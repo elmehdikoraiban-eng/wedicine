@@ -1,41 +1,42 @@
 /* Charte Wedicine, v4
    - Système visuel : asana.com (typographie large et serrée, sections très aérées, grands arrondis,
      ombres douces, panneaux pastel, boutons « pill », champs 1 px). Structure de parcours : himynona.
-   - Couleurs : inchangées (bleu #0065FF, encre #091E42, bandes neutres Trello/Atlassian).
+   - Couleurs (2026-10-30) : vert d'eau profond #0F7B6C, ardoise #14262F, sable #F3F0EA, menthe #D7EEE8, corail #F26B4E.
    - Polices : Nunito Sans (FR/EN, variable, OFL) et Ramis Arabic (AR, licence Kutype, version d'essai
      fournie par El Mehdi : licence commerciale à acquérir avant le lancement). Fichiers dans public/fonts. */
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
 @font-face { font-family: "Ramis Arabic"; src: url("/fonts/ramis-arabic.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
 :root {
-  --brand: #0065ff;        /* bande bleue, accents, sélection */
-  --brand-hover: #0747a6;
-  --link: #0052cc;
-  --ink: #091e42;          /* texte principal */
-  --ink-2: #172b4d;
-  --muted: #44546f;
-  --muted-2: #626f86;
+  --brand: #0f7b6c;        /* vert d'eau profond : boutons, accents, sélection */
+  --brand-hover: #0b5f53;
+  --coral: #f26b4e;        /* accent chaud, touches d'illustration */
+  --link: #0b6b5e;
+  --ink: #14262f;          /* texte principal (ardoise) */
+  --ink-2: #22343f;
+  --muted: #4e606a;
+  --muted-2: #6d7e88;
   --canvas: #ffffff;
-  --neutral: #f4f5f7;
-  --soft: #f7f9fc;         /* fond de section très léger */
-  --tint: #deebff;
-  --tint-2: #eef4ff;       /* panneau pastel bleu */
-  --line: #dfe1e6;
-  --line-2: #ebecf0;       /* filet presque invisible */
-  --purple: #6554c0; --purple-bg: #eae6ff;
-  --teal: #00a3bf; --teal-bg: #e6fcff;
-  --green: #36b37e; --green-bg: #e3fcef;
-  --yellow: #ffab00; --yellow-bg: #fffae6;
-  --red: #de354c; --red-bg: #ffebe6;
+  --neutral: #f3f0ea;      /* sable */
+  --soft: #f8f6f1;         /* fond de section très léger, chaud */
+  --tint: #d7eee8;         /* menthe */
+  --tint-2: #eaf5f2;       /* panneau pastel menthe */
+  --line: #e0dcd4;
+  --line-2: #ece9e3;       /* filet presque invisible */
+  --purple: #7a6bd1; --purple-bg: #edeafa;
+  --teal: #2f8fd6; --teal-bg: #e4f0fb;
+  --green: #2e9e6b; --green-bg: #e3f4ea;
+  --yellow: #e39b2e; --yellow-bg: #fbf1de;
+  --red: #d9442f; --red-bg: #fcebe6;
   /* Boutons et champs (asana.com) */
-  --btn: #0065ff; --btn-hover: #0747a6; --btn-text: #ffffff;
-  --btn-2: #ffffff; --btn-2-hover: #f4f5f7; --btn-2-border: #c1c7d0;
-  --field-border: #e1e1e1; --field-hover: #c6c6c6; --field-focus: #888888; --ring: #4075cf;
+  --btn: #0f7b6c; --btn-hover: #0b5f53; --btn-text: #ffffff;
+  --btn-2: #ffffff; --btn-2-hover: #f3f0ea; --btn-2-border: #c8cfcb;
+  --field-border: #e1e1e1; --field-hover: #c6c6c6; --field-focus: #888888; --ring: #2e9e8c;
   /* Arrondis asana : panneaux 24, cartes 16, éléments 12, champs 6 */
   --r-pill: 100px; --r-field: 6px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
-  --shadow-hover: 0 12px 32px rgba(9, 30, 66, .10);
-  --shadow-card: 0 2px 12px rgba(9, 30, 66, .06);
-  --shadow-float: 0 24px 64px rgba(9, 30, 66, .12);
+  --shadow-hover: 0 12px 32px rgba(20, 38, 47, .10);
+  --shadow-card: 0 2px 12px rgba(20, 38, 47, .06);
+  --shadow-float: 0 24px 64px rgba(20, 38, 47, .12);
   --focus: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ring);
   --max: 1200px;
   --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -82,7 +83,7 @@ main > .page { padding-block: 48px 96px; }
 
 /* Navigation : 72 px, blanche, sans filet (ombre légère au défilement). */
 .nav { background: rgba(255,255,255,.92); backdrop-filter: saturate(1.4) blur(10px); position: sticky; top: 0; z-index: 10; transition: box-shadow .25s; }
-.nav.scrolled { box-shadow: 0 1px 0 var(--line-2), 0 8px 24px rgba(9, 30, 66, .06); }
+.nav.scrolled { box-shadow: 0 1px 0 var(--line-2), 0 8px 24px rgba(20, 38, 47, .06); }
 .nav .wrap { display: flex; align-items: center; gap: 8px; height: 72px; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.4rem; letter-spacing: -.02em; color: var(--ink); }
 .logo:hover { text-decoration: none; }
@@ -114,7 +115,7 @@ main > .page { padding-block: 48px 96px; }
 .btn-on-dark { background: #fff; color: var(--btn); }
 .btn-on-dark:hover { background: var(--btn-2-hover); }
 .btn-danger { background: var(--red); color: #fff; font-size: 1.125rem; }
-.btn-danger:hover { background: #bf2600; }
+.btn-danger:hover { background: #b5351f; }
 .btn-text { background: none; border: 0; color: var(--ink); padding: 8px 16px; min-height: 42px; font-weight: 500; }
 .btn-text:hover { background: var(--neutral); }
 .btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
@@ -126,7 +127,7 @@ main > .page { padding-block: 48px 96px; }
 .panel { background: var(--tint-2); border-radius: var(--r-panel); padding: 40px; display: grid; place-items: center; }
 .panel-purple { background: var(--purple-bg); }
 .panel-teal { background: var(--teal-bg); }
-.panel-red { background: #fff4f2; }
+.panel-red { background: #fcefea; }
 .panel-neutral { background: var(--neutral); }
 .panel > svg { width: 100%; max-width: 440px; height: auto; }
 .notice { border-radius: var(--r-sm); padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start; }
@@ -255,7 +256,7 @@ main > .page { padding-block: 48px 96px; }
 .asker b { color: var(--link); }
 .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r-pill); padding: 5px 13px; font-size: .8125rem; font-weight: 500; }
-.badge-ok { background: var(--green-bg); color: #006644; }
+.badge-ok { background: var(--green-bg); color: #1e6b49; }
 .badge-muted { background: var(--neutral); color: var(--muted); }
 .badge-info { background: var(--tint); color: var(--link); }
 .badge-danger { background: var(--red-bg); color: var(--red); }
@@ -373,7 +374,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .sec-illustrated, .sec-danger { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 28px; align-items: start; }
 .sec-art { width: 150px; }
 .sec-art svg { width: 100%; height: auto; }
-.sec-danger { background: #fff6f4; border-color: transparent; }
+.sec-danger { background: #fcefea; border-color: transparent; }
 .sec-danger h2 svg { color: var(--red); }
 .sec-danger .row { margin-top: 14px; }
 .case-sec .case-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 0; }
@@ -389,7 +390,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .pictos { display: flex; flex-wrap: wrap; gap: 8px; }
 .picto { display: inline-flex; align-items: center; gap: 6px; background: var(--canvas); border: 1px solid var(--line-2); border-radius: var(--r-pill); padding: 7px 13px; font-size: .875rem; font-weight: 500; }
 .picto svg { color: var(--link); }
-.picto.on { border-color: var(--green); color: #006644; }
+.picto.on { border-color: var(--green); color: #1e6b49; }
 .picto.on svg { color: var(--green); }
 .steps-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .steps-list li { display: flex; gap: 14px; align-items: flex-start; background: var(--soft); border-radius: var(--r-sm); padding: 14px 16px; }
@@ -405,7 +406,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 
 /* Réponse personnalisée */
 .verdict { display: grid; gap: 10px; background: var(--soft); border-radius: var(--r-card); padding: 18px 20px; margin: 18px 0; border-inline-start: 4px solid var(--lv); }
-.verdict.lv0 { --lv: var(--green); } .verdict.lv1 { --lv: var(--brand); } .verdict.lv2 { --lv: #FF8B00; }
+.verdict.lv0 { --lv: var(--green); } .verdict.lv1 { --lv: var(--brand); } .verdict.lv2 { --lv: #e07a2e; }
 .verdict .lvl { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--lv); font-size: .9375rem; }
 .verdict .lvl svg { color: var(--lv); }
 .verdict p { margin: 0; font-size: 1.0625rem; line-height: 1.5; }
@@ -414,7 +415,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .for-you { background: var(--tint-2); border-radius: var(--r-card); padding: 16px 18px; margin-bottom: 16px; }
 .for-you p { margin: 0 0 8px; } .for-you p:last-child { margin-bottom: 0; }
 .tag-you { display: inline-flex; align-items: center; gap: 4px; background: var(--brand); color: #fff; border-radius: var(--r-pill); padding: 3px 10px; font-size: .75rem; font-weight: 600; margin-bottom: 10px; }
-.steps-list li.personal { background: var(--tint-2); box-shadow: inset 0 0 0 1px #B3D4FF; }
+.steps-list li.personal { background: var(--tint-2); box-shadow: inset 0 0 0 1px #bfe3da; }
 .steps-list li.personal .num { background: var(--brand); }
 .checklist li.personal { background: var(--tint-2); border-radius: var(--r-sm); padding: 9px 12px; margin: 0 -12px; }
 .checklist li.personal .box { border-color: var(--brand); }
@@ -442,7 +443,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .steps-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); counter-reset: step; }
 .steps-grid li { position: relative; display: flex; gap: 14px; align-items: center; background: var(--soft); border-radius: var(--r-card); padding: 16px 18px 16px 16px; min-height: 88px; }
 .steps-grid li .num { position: absolute; top: 10px; inset-inline-start: 10px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: #fff; font-size: .7rem; font-weight: 600; display: grid; place-items: center; }
-.steps-grid li.personal { background: var(--tint-2); box-shadow: inset 0 0 0 1px #B3D4FF; }
+.steps-grid li.personal { background: var(--tint-2); box-shadow: inset 0 0 0 1px #bfe3da; }
 .steps-grid li.personal .num { background: var(--brand); }
 .steps-grid .txt, .exam-grid .txt { font-size: 1rem; line-height: 1.45; }
 .exam-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
@@ -493,7 +494,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .faces { display: flex; gap: 8px; align-items: flex-end; }
 .face { flex: 1; display: grid; gap: 8px; justify-items: center; text-align: center; }
 .face .ico { width: 44px; height: 44px; border-radius: 50%; background: var(--line-2); color: var(--muted-2); display: grid; place-items: center; transition: transform .25s var(--ease); }
-.face.on .ico { width: 64px; height: 64px; background: var(--c); color: #fff; box-shadow: 0 8px 20px rgba(9, 30, 66, .15); animation: pop .3s var(--ease); }
+.face.on .ico { width: 64px; height: 64px; background: var(--c); color: #fff; box-shadow: 0 8px 20px rgba(20, 38, 47, .15); animation: pop .3s var(--ease); }
 .face .lbl { font-size: .8125rem; color: var(--muted); }
 .face.on .lbl { color: var(--ink); font-weight: 600; }
 @media (max-width: 600px) {
@@ -509,7 +510,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 .hero-c { padding-top: clamp(40px, 7vw, 88px); overflow: hidden; }
 .hero-c-text { text-align: center; max-width: 880px; }
 .hero-c h1 { font-size: clamp(2.5rem, 5.5vw, 4rem); margin-bottom: 20px; }
-.hero-c h1 .city { color: var(--muted-2); font-weight: 500; }
+.hero-c h1 .city { color: var(--muted-2); font-weight: 600; }
 .hero-c .lead { max-width: 640px; margin: 0 auto 28px; font-size: clamp(1.25rem, 2vw, 1.5rem); color: var(--ink); }
 .hero-c .actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; }
 .link-ul { color: var(--ink); font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
