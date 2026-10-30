@@ -2,7 +2,7 @@ import {
   Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, CalendarCheck, Check, ChevronRight, CircleAlert, Hand, House,
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
-  ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,
+  ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap, IdCard,
   Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
   type LucideProps,
 } from "lucide-react";
@@ -12,7 +12,7 @@ export const ICONS = {
   Activity, Angry, Annoyed, ArrowLeft, ArrowRight, Baby, BatteryLow, Bone, Brain, CalendarCheck, Check, ChevronRight, CircleAlert, Hand, House,
   ClipboardList, Clock, Droplet, Droplets, Eye, EyeOff, FileText, Flower2, Footprints, Frown, Gauge, Globe, HeartPulse,
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
-  ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap,
+  ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap, IdCard,
   Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
 };
 export type IconName = keyof typeof ICONS;

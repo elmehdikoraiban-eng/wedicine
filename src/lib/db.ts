@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS wedicine.questions (
   is_public BOOLEAN NOT NULL DEFAULT false,
   consent_publish_at TIMESTAMPTZ
 );
+ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS avatar INTEGER;
 CREATE INDEX IF NOT EXISTS questions_page ON wedicine.questions (theme, symptom, intent) WHERE is_public;
 `;
 
@@ -74,7 +75,14 @@ async function open(): Promise<Q> {
 
 export const db = () => (ready ??= open());
 
-export type UserRow = { id: number; first_name: string; last_name: string; contact: string; lang: string };
+export type UserRow = { id: number; first_name: string; last_name: string; contact: string; lang: string; avatar: number | null };
+export type AccountRow = UserRow & { created_at: string | Date; consent_info_at: string | Date; consent_terms_at: string | Date };
+
+// Stock de 50 avatars illustrés (public/avatars/01.svg … 50.svg), femmes et hommes mélangés.
+export const AVATAR_COUNT = 50;
+export const randomAvatar = () => 1 + Math.floor(Math.random() * AVATAR_COUNT);
+// Comptes créés avant les avatars : un avatar stable dérivé de l'id.
+export const avatarOf = (u: { id: number; avatar: number | null }) => u.avatar ?? ((u.id - 1) % AVATAR_COUNT) + 1;
 
 export type QuestionInput = {
   lang: string; who: string; theme: string; symptom: string; zone: string | null; intensity: number | null;
@@ -141,9 +149,9 @@ export async function countQuestions() {
 export async function createUser(u: { firstName: string; lastName: string; contact: string; passwordHash: string; lang: string }) {
   const d = await db();
   const r = await d.query(
-    `INSERT INTO wedicine.users (first_name, last_name, contact, password_hash, lang, consent_info_at, consent_terms_at)
-     VALUES ($1,$2,$3,$4,$5,now(),now()) RETURNING id`,
-    [u.firstName, u.lastName, u.contact, u.passwordHash, u.lang]
+    `INSERT INTO wedicine.users (first_name, last_name, contact, password_hash, lang, consent_info_at, consent_terms_at, avatar)
+     VALUES ($1,$2,$3,$4,$5,now(),now(),$6) RETURNING id`,
+    [u.firstName, u.lastName, u.contact, u.passwordHash, u.lang, randomAvatar()]
   );
   return Number(r.rows[0].id);
 }
@@ -162,7 +170,7 @@ export async function createSession(userId: number, token: string) {
 export async function userBySession(token: string): Promise<UserRow | undefined> {
   const d = await db();
   const r = await d.query(
-    "SELECT u.id, u.first_name, u.last_name, u.contact, u.lang FROM wedicine.sessions s JOIN wedicine.users u ON u.id = s.user_id WHERE s.token = $1",
+    "SELECT u.id, u.first_name, u.last_name, u.contact, u.lang, u.avatar FROM wedicine.sessions s JOIN wedicine.users u ON u.id = s.user_id WHERE s.token = $1",
     [token]
   );
   return r.rows[0] as UserRow | undefined;
@@ -179,4 +187,14 @@ export async function claimQuestion(id: number, userId: number, consentPublish: 
     "UPDATE wedicine.questions SET user_id = $2, is_public = ($3 AND NOT urgent), consent_publish_at = CASE WHEN $3 THEN now() ELSE NULL END WHERE id = $1 AND user_id IS NULL",
     [id, userId, consentPublish]
   );
+}
+
+// Toutes les infos du compte pour la page « Mon compte » (jamais le mot de passe).
+export async function accountById(id: number): Promise<AccountRow | undefined> {
+  const d = await db();
+  const r = await d.query(
+    "SELECT id, first_name, last_name, contact, lang, avatar, created_at, consent_info_at, consent_terms_at FROM wedicine.users WHERE id = $1",
+    [id]
+  );
+  return r.rows[0] as AccountRow | undefined;
 }

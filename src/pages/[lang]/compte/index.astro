@@ -1,49 +1,128 @@
 ---
 import Base from "@/layouts/Base.astro";
-import { t } from "@/lib/i18n";
+import { t, LANG_NAMES } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { currentUser } from "@/lib/auth";
-import { questionsForUser } from "@/lib/db";
+import { accountById, avatarOf, questionsForUser } from "@/lib/db";
 import { pageTitle, symptom, theme } from "@/lib/content/themes";
+import { AGES, CITIES } from "@/lib/content/options";
 import { formatDate } from "@/lib/site";
 import { Icon } from "@/components/Icon";
+import { TopicScene } from "@/components/TopicScenes";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const user = await currentUser(Astro.cookies);
 if (!user) return Astro.redirect(`/${lang}/connexion`, 302);
-const qs = (await questionsForUser(user.id)).map((q) => {
+const acc = (await accountById(user.id))!;
+const avatar = String(avatarOf(acc)).padStart(2, "0");
+const all = await questionsForUser(user.id);
+const qs = all.map((q) => {
   const th = theme(q.theme); const sy = th && symptom(th, q.symptom);
   return th && sy ? { q, th, sy } : null;
 }).filter((x) => x != null);
+
+// Profil santé : la dernière question posée pour soi-même (les questions sont triées de la plus récente à la plus ancienne).
+const me = all.find((q) => q.who === "moi" && !q.urgent);
+const label = (list: { id: string; label: Record<string, string> }[], id: string | null | undefined) => list.find((o) => o.id === id)?.label[lang];
+const health = me ? [
+  { icon: "UserRound", k: t(lang, "sex"), v: me.sex === "f" ? t(lang, "female") : me.sex === "m" ? t(lang, "male") : null },
+  { icon: "CalendarCheck", k: t(lang, "age"), v: label(AGES, me.age) },
+  { icon: "MapPin", k: t(lang, "city"), v: label(CITIES, me.city) },
+  ...(me.sex === "f" && me.pregnant != null ? [{ icon: "Baby", k: t(lang, "pregnant").replace(/\s*[?؟]$/, ""), v: me.pregnant ? t(lang, "yes") : t(lang, "no") }] : []),
+].filter((x) => x.v) : [];
+const topics = [...new Map(qs.map(({ th }) => [th.id, th])).values()];
+const nPub = qs.filter(({ q }) => q.is_public).length;
+const stats = [
+  { n: qs.length, k: t(lang, qs.length === 1 ? "accStatQuestion" : "accStatQuestions") },
+  { n: nPub, k: t(lang, nPub === 1 ? "accStatPublishedOne" : "accStatPublished") },
+  { n: qs.filter(({ q }) => q.who !== "moi").length, k: t(lang, "accStatRelatives") },
+];
 ---
-<Base lang={lang} title={t(lang, "myQuestions")} noindex>
-  <div class="narrow">
-    <div class="step-head">
-      <h1>{t(lang, "myQuestions")}</h1>
-      <form action="/api/logout" method="post">
-        <input type="hidden" name="lang" value={lang} />
-        <button type="submit" class="btn btn-text"><Icon name="LogOut" size={16} /> {t(lang, "logout")}</button>
-      </form>
+<Base lang={lang} title={t(lang, "myAccount")} noindex>
+  <div class="account">
+    <section class="acc-hero">
+      <img src={`/avatars/${avatar}.svg`} alt="" width="112" height="112" class="acc-avatar" />
+      <div class="acc-id">
+        <h1>{acc.first_name} {acc.last_name}</h1>
+        <p class="muted">{t(lang, "memberSince")} {formatDate(acc.created_at, lang)}</p>
+      </div>
+      <div class="acc-actions">
+        <a href={`/${lang}/question`} class="btn btn-primary">{t(lang, "newQuestion")}</a>
+        <form action="/api/logout" method="post">
+          <input type="hidden" name="lang" value={lang} />
+          <button type="submit" class="btn btn-ghost"><Icon name="LogOut" size={16} /> {t(lang, "logout")}</button>
+        </form>
+      </div>
+    </section>
+
+    <div class="acc-stats">
+      {stats.map((s) => <div><b>{s.n}</b><span>{s.k}</span></div>)}
     </div>
-    <p class="muted">{user.first_name} {user.last_name}</p>
-    {qs.length === 0 && <p class="card">{t(lang, "noQuestions")}</p>}
-    <div class="qlist">
-      {qs.map(({ q, th, sy }) => (
-        <a href={`/${lang}/compte/q/${q.id}`}>
-          <span class="ico"><Icon name={th.icon} size={20} /></span>
-          <span>
-            <b>{pageTitle(lang, th, sy, q.intent)}</b>
-            <br /><span class="muted small">{formatDate(q.created_at, lang)}</span>
-          </span>
-          <span class="meta">
-            {q.urgent
-              ? <span class="badge badge-danger">!</span>
-              : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? t(lang, "published") : t(lang, "private")}</span>}
-          </span>
-        </a>
-      ))}
+
+    <div class="acc-grid">
+      <section class="acc-card">
+        <h2><Icon name="IdCard" size={22} /> {t(lang, "accIdentity")}</h2>
+        <dl class="acc-list">
+          <div><dt>{t(lang, "firstName")}</dt><dd>{acc.first_name}</dd></div>
+          <div><dt>{t(lang, "lastName")}</dt><dd>{acc.last_name}</dd></div>
+          <div><dt>{t(lang, "contact")}</dt><dd dir="ltr">{acc.contact}</dd></div>
+          <div><dt>{t(lang, "accLanguage")}</dt><dd>{LANG_NAMES[acc.lang as keyof typeof LANG_NAMES] ?? acc.lang}</dd></div>
+        </dl>
+      </section>
+
+      <section class="acc-card">
+        <h2><Icon name="HeartPulse" size={22} /> {t(lang, "accHealth")}</h2>
+        {health.length
+          ? <>
+              <div class="acc-tiles">
+                {health.map((h) => <div class="acc-tile"><Icon name={h.icon} size={22} /><span class="muted small">{h.k}</span><b>{h.v}</b></div>)}
+              </div>
+              <p class="muted small">{t(lang, "accHealthHint")}</p>
+            </>
+          : <p class="muted">{t(lang, "accHealthEmpty")}</p>}
+      </section>
     </div>
-    <p style="margin-top:24px"><a href={`/${lang}/question`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
+
+    {topics.length > 0 && (
+      <section class="acc-section">
+        <h2>{t(lang, "accTopics")}</h2>
+        <div class="acc-topics">
+          {topics.map((th) => (
+            <a href={`/${lang}/question?theme=${th.id}`} class="topic-card"><TopicScene id={th.id} /><span class="topic-name">{th.label[lang]}</span></a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="acc-section">
+      <h2>{t(lang, "myQuestions")}</h2>
+      {qs.length === 0 && <p class="card">{t(lang, "noQuestions")}</p>}
+      <div class="qlist">
+        {qs.map(({ q, th, sy }) => (
+          <a href={`/${lang}/compte/q/${q.id}`}>
+            <span class="ico"><Icon name={th.icon} size={20} /></span>
+            <span>
+              <b>{pageTitle(lang, th, sy, q.intent)}</b>
+              <br /><span class="muted small">{formatDate(q.created_at, lang)}</span>
+            </span>
+            <span class="meta">
+              {q.urgent
+                ? <span class="badge badge-danger">!</span>
+                : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? t(lang, "published") : t(lang, "private")}</span>}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="acc-card acc-consents">
+      <h2><Icon name="ShieldCheck" size={22} /> {t(lang, "accConsents")}</h2>
+      <ul>
+        <li><Icon name="Check" size={18} /> {t(lang, "accConsentInfo")} {formatDate(acc.consent_info_at, lang)}</li>
+        <li><Icon name="Check" size={18} /> {t(lang, "accConsentTerms")} {formatDate(acc.consent_terms_at, lang)}</li>
+      </ul>
+      <p class="muted small">{t(lang, "accPrivacy")}</p>
+    </section>
   </div>
 </Base>

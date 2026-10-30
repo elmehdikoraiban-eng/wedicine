@@ -2,7 +2,7 @@
 import { LANG_NAMES, LANGS, t, type Lang } from "@/lib/i18n";
 import { Icon } from "./Icon";
 
-interface Props { lang: Lang; user: { firstName: string } | null }
+interface Props { lang: Lang; user: { firstName: string; avatar: number } | null }
 const { lang, user } = Astro.props;
 // Le sélecteur de langue garde la page courante.
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
@@ -22,7 +22,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
         ))}
       </div>
       {user
-        ? <a href={`/${lang}/compte`} class="plain"><span class="hide-sm">{user.firstName} · </span>{t(lang, "myQuestions")}</a>
+        ? <a href={`/${lang}/compte`} class="plain nav-me"><img src={`/avatars/${String(user.avatar).padStart(2, "0")}.svg`} alt="" width="32" height="32" /><span class="hide-sm">{t(lang, "myAccount")}</span></a>
         : <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>}
       <a href={`/${lang}/question`} class="btn btn-primary btn-sm">{t(lang, "start")}</a>
     </nav>

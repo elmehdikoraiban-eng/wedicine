@@ -2,6 +2,7 @@
 import "@/styles/global.css";
 import { dir, isLang, LANG_NAMES, LANGS, t, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
+import { avatarOf } from "@/lib/db";
 import { THEMES } from "@/lib/content/themes";
 import { SITE_URL, CONTENT_REVIEWED } from "@/lib/site";
 import Nav from "@/components/Nav.astro";
@@ -43,7 +44,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <slot name="head" />
   </head>
   <body>
-    <Nav lang={lang} user={user ? { firstName: user.first_name } : null} />
+    <Nav lang={lang} user={user ? { firstName: user.first_name, avatar: avatarOf(user) } : null} />
     <main>
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>
@@ -62,7 +63,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
             <h4>{t(lang, "footerAbout")}</h4>
             <a href={`/${lang}/question`}>{t(lang, "start")}</a>
             <a href={`/${lang}/connexion`}>{t(lang, "login")}</a>
-            <a href={`/${lang}/compte`}>{t(lang, "myQuestions")}</a>
+            <a href={`/${lang}/compte`}>{t(lang, "myAccount")}</a>
           </div>
           <div>
             <h4>{t(lang, "footerLang")}</h4>
