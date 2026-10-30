@@ -204,12 +204,14 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
         {step === "signs" && <button type="button" className="opt" disabled={busy} onClick={() => advance({ ...cleared(a, "signs", themeFirst), signs: [] })}>{t(lang, "noneSigns")}</button>}
       </div>
       {error && <p className="error" role="alert" style={{ margin: 0, fontSize: 14 }}>{error}</p>}
-      <div className="composer-foot">
-        {intro ? <span>{counter}</span> : <button type="button" className="link" onClick={back} disabled={busy}>{t(lang, "editPrev")}</button>}
-        {step === "signs" && a.signs.length > 0
-          ? <button type="button" className="btn btn-primary btn-xs" disabled={busy} onClick={() => advance(cleared(a, "signs", themeFirst))}>{t(lang, "next")}</button>
-          : <span>{intro ? t(lang, greeting ? "tapAnswer" : "freeNoAccount") : counter}</span>}
-      </div>
+      {!intro && (
+        <div className="composer-foot">
+          <button type="button" className="link" onClick={back} disabled={busy}>{t(lang, "editPrev")}</button>
+          {step === "signs" && a.signs.length > 0
+            ? <button type="button" className="btn btn-primary btn-xs" disabled={busy} onClick={() => advance(cleared(a, "signs", themeFirst))}>{t(lang, "next")}</button>
+            : <span>{counter}</span>}
+        </div>
+      )}
     </div>
   );
 
@@ -258,7 +260,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
               <p className="resume"><span>{t(lang, "orResume")}</span>{recent.map((r) => <a key={r.href} href={r.href}>{r.title}</a>)}</p>
             )
             : <nav className="topics" aria-label={t(lang, "themesTitle")}>
-              {THEMES.map((x) => <a key={x.id} className="topic" href={`/${lang}?theme=${x.id}`} onClick={(e) => { e.preventDefault(); startWith(x.id); }}>{x.label[lang]}</a>)}
+              {THEMES.map((x) => <a key={x.id} className="topic" href={`/${lang}?theme=${x.id}`} onClick={(e) => { e.preventDefault(); startWith(x.id); }}><Icon name={x.icon} size={16} />{x.label[lang]}</a>)}
             </nav>}
         </div>
         {legal}

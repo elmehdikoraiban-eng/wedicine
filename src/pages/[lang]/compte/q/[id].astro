@@ -1,17 +1,19 @@
 ---
-// La réponse, dans la conversation : la bulle du patient résume ses choix, puis Wedicine répond
-// (verdict, ligne rouge 141, frise des durées, quatre rubriques courtes, actions), et le composeur propose la suite.
+// La réponse, dans la conversation : la discussion est rejouée (chaque question, chaque réponse touchée),
+// puis Wedicine répond (verdict, ligne rouge 141, frise des durées, quatre rubriques courtes, actions),
+// et le composeur propose la suite.
 import Account from "@/layouts/Account.astro";
 import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { loadAccount, shortTitle } from "@/lib/account";
 import { questionById } from "@/lib/db";
-import { AGES, CITIES, DURATIONS, INTENTS, WHO } from "@/lib/content/options";
+import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
 import { publicName } from "@/lib/auth";
 import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
 import { personalize } from "@/lib/personalize";
 import { stepPicto } from "@/lib/pictos";
+import { exchange } from "@/lib/conversation";
 import { qPath, whenLabel } from "@/lib/site";
 import { PublishToggle } from "@/components/PublishToggle";
 import { Icon } from "@/components/Icon";
@@ -31,11 +33,8 @@ const personal = q.urgent ? null : personalize(answers, th, f, lang);
 const low = (x: string) => (lang === "ar" ? x : x.toLowerCase());
 const label = (list: { id: string; label: Record<string, string> }[], v: string | null | undefined) => list.find((o) => o.id === v)?.label[lang];
 
-// La bulle du patient : ses réponses, en une ligne.
-const signLabels = (q.signs ?? []).map((s) => th.signs.find((x) => x.id === s)?.label[lang]).filter((x) => !!x) as string[];
-const signsTxt = signLabels.length ? signLabels.map(low).join(", ") : th.signs.length ? low(t(lang, "noneSigns")) : null;
 const city = q.city && q.city !== "autre" ? label(CITIES, q.city) : null;
-const recap = [label(WHO, q.who), sy.label[lang], label(DURATIONS, q.duration), signsTxt, label(AGES, q.age), city, label(INTENTS, q.intent)].filter(Boolean).join(" · ");
+const talk = exchange(lang, q, th);
 
 const dur = DURATIONS.findIndex((d) => d.id === q.duration);
 const hasTimeline = !!personal && th.duration && dur >= 0;
@@ -57,7 +56,12 @@ const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || 
 <Account lang={lang} active="q" currentId={q.id} title={title} meta={whenLabel(q.created_at, lang, t(lang, "today"))} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
   <div class="chat answer-chat">
     <div class="chat-log">
-      <div class="msg-me">{recap}</div>
+      {talk.map((x, k) => (
+        <>
+          <div class="msg-wd">{k === 0 ? <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" /> : <span class="wd-sp" aria-hidden="true"></span>}<p>{x.q}</p></div>
+          <div class="msg-me">{x.a}</div>
+        </>
+      ))}
       {q.urgent || !personal ? (
         <div class="msg-wd urgent-msg" role="alert">
           <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" />
