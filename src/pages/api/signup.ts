@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { isLang } from "@/lib/i18n";
 import { hashPassword, startSession } from "@/lib/auth";
-import { claimQuestion, createUser, userByContact } from "@/lib/db";
+import { claimQuestion, matchAvatarToSex, createUser, userByContact } from "@/lib/db";
 import { json, readJson, safePath } from "@/lib/api";
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
@@ -24,6 +24,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const qid = Number(b.questionId);
   if (Number.isInteger(qid) && qid > 0) {
     await claimQuestion(qid, userId, !!b.consentPublish);
+    await matchAvatarToSex(userId);
     return json({ url: `/${lang}/compte/q/${qid}` });
   }
   return json({ url: safePath(b.redirectTo, `/${lang}/compte`) });

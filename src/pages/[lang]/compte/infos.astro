@@ -4,25 +4,64 @@ import { t, LANG_NAMES } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { loadAccount } from "@/lib/account";
 import { formatDate } from "@/lib/site";
+import { AVATAR_COUNT, avatarSex } from "@/lib/db";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const a = await loadAccount(Astro, lang);
 if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
 const { acc } = a;
+const current = Number(a.avatar);
+const saved = Astro.url.searchParams.get("ok") === "1";
+// Les avatars du sexe du patient d'abord, puis les autres.
+const sex = acc.sex ?? avatarSex(current);
+const all = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1);
+const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => avatarSex(n) !== sex)];
 ---
 <Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={`${acc.first_name} ${acc.last_name}`} avatar={a.avatar}>
   <section class="acc-card">
     <div class="acc-avatar-row">
       <img src={`/avatars/${a.avatar}.svg`} alt="" width="88" height="88" class="acc-avatar" />
-      <p class="muted small">{t(lang, "accAvatarNote")}</p>
+      <div>
+        <p class="muted small">{saved ? t(lang, "accAvatarSaved") : t(lang, "accAvatarNote")}</p>
+        <details class="avatar-pick">
+          <summary class="btn btn-ghost btn-sm">{t(lang, "accAvatarChange")}</summary>
+          <div class="avatar-grid">
+            {order.map((n) => {
+              const id = String(n).padStart(2, "0");
+              return <button type="button" data-set="avatar" data-value={n} aria-pressed={n === current ? "true" : "false"} aria-label={`Avatar ${n}`}><img src={`/avatars/${id}.svg`} alt="" width="64" height="64" loading="lazy" /></button>;
+            })}
+          </div>
+        </details>
+      </div>
     </div>
     <dl class="acc-list">
       <div><dt>{t(lang, "firstName")}</dt><dd>{acc.first_name}</dd></div>
       <div><dt>{t(lang, "lastName")}</dt><dd>{acc.last_name}</dd></div>
+      <div><dt>{t(lang, "sex")}</dt><dd>
+        <div class="sex-pick" role="group" aria-label={t(lang, "sex")}>
+          <button type="button" class="chip" data-set="sex" data-value="f" aria-pressed={acc.sex === "f" ? "true" : "false"}>{t(lang, "female")}</button>
+          <button type="button" class="chip" data-set="sex" data-value="m" aria-pressed={acc.sex === "m" ? "true" : "false"}>{t(lang, "male")}</button>
+        </div>
+      </dd></div>
       <div><dt>{t(lang, "contact")}</dt><dd dir="ltr">{acc.contact}</dd></div>
       <div><dt>{t(lang, "accLanguage")}</dt><dd>{LANG_NAMES[acc.lang as keyof typeof LANG_NAMES] ?? acc.lang}</dd></div>
       <div><dt>{t(lang, "memberSince")}</dt><dd>{formatDate(acc.created_at, lang)}</dd></div>
     </dl>
   </section>
 </Account>
+
+<script>
+  // Sexe et avatar : enregistrés tout de suite, puis la page se recharge pour montrer le nouvel avatar.
+  document.querySelectorAll<HTMLButtonElement>("[data-set]").forEach((b) => {
+    b.addEventListener("click", async () => {
+      b.disabled = true;
+      const res = await fetch("/api/profile", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ [b.dataset.set!]: b.dataset.value }),
+      }).catch(() => null);
+      if (res?.ok) location.replace(location.pathname + "?ok=1");
+      else b.disabled = false;
+    });
+  });
+</script>

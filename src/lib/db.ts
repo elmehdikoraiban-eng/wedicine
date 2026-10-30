@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS wedicine.questions (
   consent_publish_at TIMESTAMPTZ
 );
 ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS avatar INTEGER;
+ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS avatar_chosen BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS sex TEXT;
+-- Rattrapage : un avatar qui ne correspond pas au sexe déclaré (dernière question « pour moi ») est remplacé.
+-- Impairs = femmes, pairs = hommes. Ne touche jamais un avatar choisi par le patient.
+UPDATE wedicine.users u SET sex = s.sex
+FROM (SELECT DISTINCT ON (user_id) user_id, sex FROM wedicine.questions WHERE who = 'moi' AND sex IN ('f','m') ORDER BY user_id, id DESC) s
+WHERE s.user_id = u.id AND u.sex IS NULL;
+UPDATE wedicine.users u SET avatar = CASE u.sex WHEN 'f' THEN 1 + 2 * (u.id % 25) ELSE 2 + 2 * (u.id % 25) END
+WHERE u.sex IN ('f','m') AND NOT u.avatar_chosen AND (u.avatar IS NULL OR (u.sex = 'f') <> (u.avatar % 2 = 1));
 CREATE INDEX IF NOT EXISTS questions_page ON wedicine.questions (theme, symptom, intent) WHERE is_public;
 `;
 
@@ -76,11 +85,17 @@ async function open(): Promise<Q> {
 export const db = () => (ready ??= open());
 
 export type UserRow = { id: number; first_name: string; last_name: string; contact: string; lang: string; avatar: number | null };
-export type AccountRow = UserRow & { created_at: string | Date; consent_info_at: string | Date; consent_terms_at: string | Date };
+export type AccountRow = UserRow & { sex: "f" | "m" | null; created_at: string | Date; consent_info_at: string | Date; consent_terms_at: string | Date };
 
 // Stock de 50 avatars illustrés (public/avatars/01.svg … 50.svg), femmes et hommes mélangés.
 export const AVATAR_COUNT = 50;
-export const randomAvatar = () => 1 + Math.floor(Math.random() * AVATAR_COUNT);
+// Numéros impairs = femmes, pairs = hommes (voir scripts/avatars.mjs).
+export type AvatarSex = "f" | "m";
+export const avatarSex = (n: number): AvatarSex => (n % 2 === 1 ? "f" : "m");
+export const randomAvatar = (sex?: AvatarSex | null) => {
+  const pool = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1).filter((n) => !sex || avatarSex(n) === sex);
+  return pool[Math.floor(Math.random() * pool.length)];
+};
 // Comptes créés avant les avatars : un avatar stable dérivé de l'id.
 export const avatarOf = (u: { id: number; avatar: number | null }) => u.avatar ?? ((u.id - 1) % AVATAR_COUNT) + 1;
 
@@ -193,8 +208,43 @@ export async function claimQuestion(id: number, userId: number, consentPublish: 
 export async function accountById(id: number): Promise<AccountRow | undefined> {
   const d = await db();
   const r = await d.query(
-    "SELECT id, first_name, last_name, contact, lang, avatar, created_at, consent_info_at, consent_terms_at FROM wedicine.users WHERE id = $1",
+    "SELECT id, first_name, last_name, contact, lang, avatar, sex, created_at, consent_info_at, consent_terms_at FROM wedicine.users WHERE id = $1",
     [id]
   );
   return r.rows[0] as AccountRow | undefined;
+}
+
+// Le sexe du compte : celui que le patient a indiqué, sinon celui de sa dernière question « pour moi ».
+// L'avatar suit ce sexe, sauf si le patient l'a choisi lui-même.
+export async function matchAvatarToSex(userId: number) {
+  const d = await db();
+  const r = await d.query(
+    `SELECT u.avatar, u.avatar_chosen, COALESCE(u.sex,
+       (SELECT q.sex FROM wedicine.questions q WHERE q.user_id = u.id AND q.who = 'moi' AND q.sex IN ('f','m') ORDER BY q.id DESC LIMIT 1)) AS sex, u.sex AS own
+     FROM wedicine.users u WHERE u.id = $1`,
+    [userId]
+  );
+  const row = r.rows[0] as { avatar: number | null; avatar_chosen: boolean; sex: AvatarSex | null; own: string | null } | undefined;
+  if (!row) return;
+  if (!row.own && row.sex) await d.query("UPDATE wedicine.users SET sex = $2 WHERE id = $1", [userId, row.sex]);
+  if (row.avatar_chosen) return;
+  if (row.avatar != null && (!row.sex || avatarSex(row.avatar) === row.sex)) return;
+  await d.query("UPDATE wedicine.users SET avatar = $2 WHERE id = $1", [userId, randomAvatar(row.sex)]);
+}
+
+// Le patient indique son sexe : l'avatar (s'il ne l'a pas choisi) est remplacé par un avatar du même sexe.
+export async function setSex(userId: number, sex: string) {
+  if (sex !== "f" && sex !== "m") return false;
+  const d = await db();
+  await d.query("UPDATE wedicine.users SET sex = $2 WHERE id = $1", [userId, sex]);
+  await matchAvatarToSex(userId);
+  return true;
+}
+
+// Le patient choisit son avatar dans le stock.
+export async function chooseAvatar(userId: number, n: number) {
+  if (!Number.isInteger(n) || n < 1 || n > AVATAR_COUNT) return false;
+  const d = await db();
+  await d.query("UPDATE wedicine.users SET avatar = $2, avatar_chosen = true WHERE id = $1", [userId, n]);
+  return true;
 }

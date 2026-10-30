@@ -22,10 +22,7 @@ const { lang, active, title, name, avatar } = Astro.props;
             <Icon name={p.icon} size={20} /><span>{t(lang, p.key as UIKey)}</span>
           </a>
         ))}
-        <form action="/api/logout" method="post">
-          <input type="hidden" name="lang" value={lang} />
-          <button type="submit"><Icon name="LogOut" size={20} /><span>{t(lang, "logout")}</span></button>
-        </form>
+        <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={20} /><span>{t(lang, "logout")}</span></a>
       </nav>
     </aside>
     <div class="acc-main">

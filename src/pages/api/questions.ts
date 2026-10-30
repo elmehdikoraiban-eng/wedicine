@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { isLang, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
-import { insertQuestion } from "@/lib/db";
+import { insertQuestion, matchAvatarToSex } from "@/lib/db";
 import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
 import { isUrgent, validate } from "@/lib/triage";
@@ -27,6 +27,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   // Urgence : écran d'urgence, jamais de compte. Connecté : la réponse directement.
   // Sinon : la page d'authentification, qui débloque la réponse.
+  if (user) await matchAvatarToSex(user.id).catch(() => {});
   const next = urgent ? null : user ? `/${lang}/compte/q/${id}` : `/${lang}/connexion?q=${id}`;
   return json({ id, urgent, next });
 };

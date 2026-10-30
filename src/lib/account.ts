@@ -2,7 +2,7 @@
 import type { AstroGlobal } from "astro";
 import { t, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
-import { accountById, avatarOf, questionsForUser } from "@/lib/db";
+import { accountById, avatarOf, matchAvatarToSex, questionsForUser } from "@/lib/db";
 import { symptom, theme } from "@/lib/content/themes";
 import { AGES, CITIES } from "@/lib/content/options";
 
@@ -19,6 +19,7 @@ export type AccountPage = (typeof ACCOUNT_PAGES)[number]["id"];
 export async function loadAccount(Astro: AstroGlobal, lang: Lang) {
   const user = await currentUser(Astro.cookies);
   if (!user) return null;
+  await matchAvatarToSex(user.id).catch(() => {}); // rattrape les comptes créés avant cette règle
   const acc = await accountById(user.id);
   if (!acc) return null;
   const all = await questionsForUser(user.id);

@@ -15,13 +15,15 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
       <span class="word">Wedicine</span>
     </a>
     <nav class="nav-links" aria-label="Navigation">
-      <div class={`lang${user ? " lang-in" : ""}`} aria-label="Langue">
-        {LANGS.map((l) => (
-          <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>
-            <span class="full">{LANG_NAMES[l]}</span><span class="short">{l.toUpperCase()}</span>
-          </a>
-        ))}
-      </div>
+      {!user && (
+        <div class="lang" aria-label="Langue">
+          {LANGS.map((l) => (
+            <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>
+              <span class="full">{LANG_NAMES[l]}</span><span class="short">{l.toUpperCase()}</span>
+            </a>
+          ))}
+        </div>
+      )}
       {user
         ? (
           <details class="me-menu">
@@ -42,10 +44,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
                 <span class="muted small"><Icon name="Globe" size={16} /> {t(lang, "accLanguage")}</span>
                 <div>{LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}</div>
               </div>
-              <form action="/api/logout" method="post">
-                <input type="hidden" name="lang" value={lang} />
-                <button type="submit"><Icon name="LogOut" size={18} />{t(lang, "logout")}</button>
-              </form>
+              <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={18} />{t(lang, "logout")}</a>
             </div>
           </details>
         )
