@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type FormEvent } from "react";
 import { LANG_NAMES, LANGS, UI, t, type Lang, type UIKey } from "@/lib/i18n";
 import { ADULT_AGES, AGES, ALERTS, CHILD_AGES, CITIES, DURATIONS, INTENSITIES, INTENTS, WHO, ZONES, type Option } from "@/lib/content/options";
 import { THEMES, theme as getTheme } from "@/lib/content/themes";
@@ -58,6 +58,8 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
   const [busy, setBusy] = useState(false);
   const [urgent, setUrgent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [qid, setQid] = useState<number | null>(null);  // question enregistrée, en attente d'un compte
+  const [showPw, setShowPw] = useState(false);
   const footRef = useRef<HTMLDivElement>(null);
 
   const th = getTheme(a.theme);
@@ -71,7 +73,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
     if (intro) return;
     const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: smooth ? "smooth" : "auto" });
-  }, [i, urgent, busy, intro]);
+  }, [i, urgent, busy, intro, qid]);
 
   const lbl = (list: { id: string; label: Record<Lang, string> }[], id: string | null) => list.find((o) => o.id === id)?.label[lang] ?? "";
   const question = (s: Step) => { const k = `${QUESTION[s]}${variant}`; return t(lang, (k in UI ? k : QUESTION[s]) as UIKey); };
@@ -121,7 +123,10 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
       if (!r.ok) throw new Error(String(r.status));
       const data: Result = await r.json();
       if (data.urgent) { setUrgent(true); setBusy(false); return; }
-      if (follow && data.next) { window.location.assign(data.next); return; }  // on reste « occupé » jusqu'à la nouvelle page
+      if (follow) {
+        if (data.next) { window.location.assign(data.next); return; }  // connecté : la réponse tout de suite, on reste « occupé » jusqu'à la nouvelle page
+        setQid(data.id);  // sans compte : le formulaire de compte prend la place du composeur
+      }
       setBusy(false);
     } catch {
       setBusy(false);
@@ -157,6 +162,25 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
     setA(cleared({ ...a, [step]: EMPTY[step] }, step, themeFirst));
   }
 
+  // Le compte se crée ici, à la fin des questions : prénom, e-mail ou téléphone, mot de passe, un consentement.
+  async function signup(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (qid == null) return;
+    const f = new FormData(e.currentTarget);
+    setBusy(true); setError(null);
+    try {
+      const r = await fetch("/api/signup", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ firstName: f.get("firstName"), contact: f.get("contact"), password: f.get("password"), consent: f.get("consent") === "on", lang, questionId: qid }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) { setError(data.error === "taken" ? t(lang, "contactTaken") : t(lang, "error")); setBusy(false); return; }
+      window.location.assign(data.url);
+    } catch {
+      setError(t(lang, "error")); setBusy(false);
+    }
+  }
+
   function startWith(themeId: string) {
     setThemeFirst(true);
     setA({ ...EMPTY, theme: themeId });
@@ -187,6 +211,28 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
           : <span>{intro ? t(lang, "freeNoAccount") : counter}</span>}
       </div>
     </div>
+  );
+
+  const account = (
+    <form className="composer account" onSubmit={signup} autoComplete="on">
+      <div className="acc-grid">
+        <div className="cf"><label htmlFor="firstName">{t(lang, "firstName")}</label><input id="firstName" name="firstName" required maxLength={40} autoComplete="given-name" /></div>
+        <div className="cf"><label htmlFor="contact">{t(lang, "contact")}</label><input id="contact" name="contact" required maxLength={80} autoComplete="username" inputMode="email" dir="ltr" /></div>
+      </div>
+      <div className="cf">
+        <label htmlFor="password">{t(lang, "password")}</label>
+        <div className="pw">
+          <input id="password" name="password" type={showPw ? "text" : "password"} required minLength={6} maxLength={100} autoComplete="new-password" dir="ltr" />
+          <button type="button" className="link" onClick={() => setShowPw((s) => !s)}>{showPw ? t(lang, "hidePw") : t(lang, "showPw")}</button>
+        </div>
+      </div>
+      <label className="consent"><input id="consent" name="consent" type="checkbox" required /><span>{t(lang, "consentOne")}</span></label>
+      {error && <p className="error" role="alert" style={{ margin: 0, fontSize: 14 }}>{error}</p>}
+      <div className="acc-foot">
+        <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? "…" : t(lang, "createAccount")}</button>
+        <span>{t(lang, "alreadyAccount")} <a href={`/${lang}/connexion?q=${qid}&mode=connexion`}>{t(lang, "login")}</a></span>
+      </div>
+    </form>
   );
 
   const legal = (
@@ -225,8 +271,9 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
           </Fragment>
         ))}
         <div className="msg-wd"><span className="wd-sp" aria-hidden="true" /><p>{question(step)}</p></div>
-        {(urgent || finishing) && <div className="msg-me">{answerText(step)}</div>}
+        {(urgent || finishing || qid != null) && <div className="msg-me">{answerText(step)}</div>}
         {finishing && <div className="msg-wd"><span className="wd-sp" aria-hidden="true" /><p className="typing" aria-label="…">•••</p></div>}
+        {qid != null && <div className="msg-wd">{sym}<p>{t(lang, "accountReady")}</p></div>}
         {urgent && (
           <div className="msg-wd urgent-msg" role="alert">
             {sym}
@@ -243,7 +290,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
         )}
       </div>
       <div className="chat-foot" ref={footRef}>
-        {!urgent && !finishing && composer}
+        {qid != null ? account : !urgent && !finishing && composer}
         {legal}
       </div>
     </div>

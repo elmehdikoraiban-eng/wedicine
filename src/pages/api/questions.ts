@@ -26,8 +26,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   );
 
   // Urgence : écran d'urgence, jamais de compte. Connecté : la réponse directement.
-  // Sinon : la page d'authentification, qui débloque la réponse.
+  // Sinon : pas d'adresse, la conversation affiche le formulaire de compte qui débloque la réponse.
   if (user) await matchAvatarToSex(user.id).catch(() => {});
-  const next = urgent ? null : user ? `/${lang}/compte/q/${id}` : `/${lang}/connexion?q=${id}`;
+  const next = urgent || !user ? null : `/${lang}/compte/q/${id}`;
   return json({ id, urgent, next });
 };

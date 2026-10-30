@@ -20,7 +20,7 @@ const sex = acc.sex ?? avatarSex(current);
 const all = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1);
 const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => avatarSex(n) !== sex)];
 ---
-<Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={`${acc.first_name} ${acc.last_name}`} avatar={a.avatar}>
+<Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={[acc.first_name, acc.last_name].filter(Boolean).join(" ")} avatar={a.avatar}>
   <section class="acc-card">
     <div class="acc-avatar-row">
       <img src={`/avatars/${a.avatar}.svg`} alt="" width="88" height="88" class="acc-avatar" />
@@ -57,7 +57,7 @@ const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => 
     </dl>
     <form id="info-edit" class="info-edit" hidden>
       <div class="field"><label for="f-first">{t(lang, "firstName")}</label><input class="input" id="f-first" name="firstName" value={acc.first_name} maxlength="40" required autocomplete="given-name" /></div>
-      <div class="field"><label for="f-last">{t(lang, "lastName")}</label><input class="input" id="f-last" name="lastName" value={acc.last_name} maxlength="40" required autocomplete="family-name" /></div>
+      <div class="field"><label for="f-last">{t(lang, "lastName")}</label><input class="input" id="f-last" name="lastName" value={acc.last_name} maxlength="40" autocomplete="family-name" /></div>
       <div class="field"><label for="f-contact">{t(lang, "contact")}</label><input class="input" id="f-contact" name="contact" value={acc.contact} maxlength="80" required dir="ltr" autocomplete="email" /></div>
       <div class="field"><label for="f-lang">{t(lang, "accLanguage")}</label>
         <select class="input" id="f-lang" name="lang">{LANGS.map((l) => <option value={l} selected={l === acc.lang}>{LANG_NAMES[l]}</option>)}</select>

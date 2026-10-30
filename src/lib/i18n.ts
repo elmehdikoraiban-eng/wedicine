@@ -140,7 +140,7 @@ export const UI = {
     ar: "أوافق على نشر سؤالي دون كشف هويتي (الاسم الشخصي + الحرف الأول من الاسم العائلي، العمر، المدينة) لمساعدة مرضى آخرين.",
     en: "I agree that my question is published anonymously (first name + last initial, age, city) to help other patients.",
   },
-  createAccount: { fr: "Créer mon compte et lire la réponse", ar: "أنشئ حسابي واقرأ الجواب", en: "Create my account and read the answer" },
+  createAccount: { fr: "Créer mon compte et voir la réponse", ar: "أنشئ حسابي واقرأ الجواب", en: "Create my account and read the answer" },
   haveAccount: { fr: "J'ai déjà un compte", ar: "لدي حساب بالفعل", en: "I already have an account" },
   noAccount: { fr: "Créer un compte", ar: "إنشاء حساب", en: "Create an account" },
   loginAndRead: { fr: "Me connecter et lire la réponse", ar: "تسجيل الدخول وقراءة الجواب", en: "Log in and read the answer" },
@@ -369,6 +369,11 @@ export const UI = {
   freeNoAccount: { fr: "Gratuit, sans compte pour commencer", ar: "مجاني، بدون حساب للبدء", en: "Free, no account to start" },
   editPrev: { fr: "Modifier ma réponse précédente", ar: "تعديل جوابي السابق", en: "Change my previous answer" },
   emergencyLine: { fr: "En cas d'urgence, appelez le 141 (SAMU) ou le 15.", ar: "في حالة الطوارئ، اتصل بـ 141 (الإسعاف الطبي) أو 15.", en: "In an emergency, call 141 (SAMU) or 15." },
+  accountReady: { fr: "Votre réponse est prête. Créez votre compte pour la recevoir et la retrouver plus tard.", ar: "جوابك جاهز. أنشئ حسابك لتستلمه وتجده لاحقاً.", en: "Your answer is ready. Create your account to receive it and find it again later." },
+  consentOne: { fr: "J'accepte que mes réponses servent à me donner cette information, qui n'est pas un diagnostic, et qu'elles soient gardées dans mon espace (données de santé, loi 09-08).", ar: "أوافق على استعمال أجوبتي لإعطائي هذه المعلومة، التي ليست تشخيصاً، وعلى حفظها في حسابي (بيانات صحية، القانون 09-08).", en: "I agree that my answers are used to give me this information, which is not a diagnosis, and kept in my space (health data, law 09-08)." },
+  alreadyAccount: { fr: "Déjà un compte ?", ar: "لديك حساب؟", en: "Already have an account?" },
+  showPw: { fr: "Afficher", ar: "إظهار", en: "Show" },
+  hidePw: { fr: "Masquer", ar: "إخفاء", en: "Hide" },
   notDoctor: { fr: "Wedicine ne remplace pas un médecin.", ar: "لا يعوّض Wedicine الطبيب.", en: "Wedicine does not replace a doctor." },
 } satisfies Record<string, T>;
 

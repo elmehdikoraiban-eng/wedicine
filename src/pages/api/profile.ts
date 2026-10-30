@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (b.identity && typeof b.identity === "object") {
     const i = b.identity as Record<string, unknown>;
     const f = { firstName: clean(i.firstName, 40), lastName: clean(i.lastName, 40), contact: clean(i.contact, 80).toLowerCase(), lang: clean(i.lang, 2) };
-    if (!f.firstName || !f.lastName || !f.contact || !isLang(f.lang)) return json({ error: "invalid" }, 400);
+    if (!f.firstName || !f.contact || !isLang(f.lang)) return json({ error: "invalid" }, 400);  // le nom de famille reste facultatif
     if ((await updateIdentity(user.id, f)) === "taken") return json({ error: "taken" }, 409);
     done = true;
   }

@@ -783,3 +783,22 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
   .msg-wd { max-width: 100%; }
   .msg-me { max-width: 85%; }
 }
+/* Le compte se crée dans le composeur : trois champs, une case, un bouton. */
+.composer.account { gap: 14px; padding: 18px; }
+.acc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cf label { font-size: 13px; font-weight: 600; }
+.cf input { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 10px; background: var(--canvas); color: var(--ink); font-size: 14px; transition: border-color var(--t), box-shadow var(--t); }
+.cf input:hover { border-color: #b8c1cf; }
+.cf input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 2px #b3d4ff; }
+.pw { position: relative; }
+.pw input { padding-inline-end: 80px; }
+.pw .link { position: absolute; inset-inline-end: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: var(--muted-2); cursor: pointer; }
+.consent input { width: 18px; height: 18px; margin: 2px 0 0; flex: none; accent-color: var(--brand); }
+.acc-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted-2); }
+.acc-foot .btn { min-height: 44px; font-size: 15px; padding: 0 20px; }
+@media (max-width: 600px) {
+  .acc-grid { grid-template-columns: 1fr; }
+  .acc-foot .btn { width: 100%; }
+}

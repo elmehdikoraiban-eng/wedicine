@@ -13,7 +13,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const lastName = clean(b.lastName, 40);
   const contact = clean(b.contact, 80).toLowerCase();
   const password = typeof b.password === "string" ? b.password : "";
-  if (!firstName || !lastName || !contact || password.length < 6 || !b.consentInfo || !b.consentTerms) {
+  // Depuis la conversation, une seule case couvre les deux consentements et le nom de famille n'est pas demandé.
+  const consentInfo = !!b.consentInfo || !!b.consent, consentTerms = !!b.consentTerms || !!b.consent;
+  if (!firstName || !contact || password.length < 6 || !consentInfo || !consentTerms) {
     return json({ error: "invalid" }, 400);
   }
   if (await userByContact(contact)) return json({ error: "taken" }, 409);

@@ -38,4 +38,5 @@ export async function currentUser(cookies: AstroCookies) {
 }
 
 // Nom affiché publiquement : prénom + initiale du nom.
-export const publicName = (first: string, last: string) => `${first.trim()} ${last.trim().charAt(0).toUpperCase()}.`;
+// « Prénom N. », ou le prénom seul quand le nom n'a pas été donné (le compte créé dans la conversation ne le demande pas).
+export const publicName = (first: string, last: string) => { const i = last.trim().charAt(0); return i ? `${first.trim()} ${i.toUpperCase()}.` : first.trim(); };
