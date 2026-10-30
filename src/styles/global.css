@@ -826,3 +826,27 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .fold-body { padding: 0 20px 20px; animation: rise .25s var(--ease); }
 .cta-own { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-top: 16px; padding: 22px 24px; border-radius: var(--r-card); background: var(--tint-2); }
 .cta-own p { margin: 0; flex: 1 1 320px; font-weight: 600; }
+
+/* Page réponse sans cadres : les blocs se séparent par l'espace et un filet fin, pas par des bordures. */
+.answer-page .card { border: 0; box-shadow: none; border-radius: 0; background: none; padding: 28px 0; }
+.answer-page .card + .card, .answer-page .card + .more-info, .answer-page .more-info + .card { border-top: 1px solid var(--line-2); }
+.answer-page .more-info { border-top: 0 !important; margin-top: 24px; }
+.answer-page .answer-head { padding-top: 0; }
+.answer-page .sec.focus { box-shadow: none; }
+.answer-page .sec-danger { background: none; }
+.brief { border: 0; background: none; }
+.brief-title { padding-inline: 0; }
+.brief ul { padding-inline: 0; }
+.answer-page .fold { padding: 0; border-top: 1px solid var(--line-2); }
+.answer-page .more-info .fold:last-child { border-bottom: 1px solid var(--line-2); }
+.answer-page .more-info { gap: 0; }
+.answer-page .fold > summary { padding-inline: 0; }
+.answer-page .fold-body { padding-inline: 0; }
+.answer-page .faq-sec .faq { gap: 0; }
+.answer-page .faq-item { border: 0; border-top: 1px solid var(--line-2); border-radius: 0; background: none; box-shadow: none !important; }
+.answer-page .faq-item:last-child { border-bottom: 1px solid var(--line-2); }
+.answer-page .faq-item summary, .answer-page .faq-sec .faq-item p { padding-inline: 0; }
+.answer-page .related .list-links { gap: 0 32px; }
+.answer-page .related .list-links a { border: 0; border-bottom: 1px solid var(--line-2); border-radius: 0; padding: 16px 0; background: none; box-shadow: none; transform: none; }
+.answer-page .related .list-links a:hover { color: var(--brand); }
+.read-main > .card { border: 0; background: none; border-radius: 0; padding-inline: 0; }
