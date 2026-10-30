@@ -162,7 +162,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
     setA(cleared({ ...a, [step]: EMPTY[step] }, step, themeFirst));
   }
 
-  // Le compte se crée ici, à la fin des questions : prénom, e-mail ou téléphone, mot de passe, un consentement.
+  // Le compte se crée ici, à la fin des questions : prénom, nom (il ne sert qu'à l'initiale de la signature publique, « Mehdi K. »), e-mail ou téléphone, mot de passe, un consentement.
   async function signup(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (qid == null) return;
@@ -171,7 +171,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
     try {
       const r = await fetch("/api/signup", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ firstName: f.get("firstName"), contact: f.get("contact"), password: f.get("password"), consent: f.get("consent") === "on", lang, questionId: qid }),
+        body: JSON.stringify({ firstName: f.get("firstName"), lastName: f.get("lastName"), contact: f.get("contact"), password: f.get("password"), consent: f.get("consent") === "on", lang, questionId: qid }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) { setError(data.error === "taken" ? t(lang, "contactTaken") : t(lang, "error")); setBusy(false); return; }
@@ -217,13 +217,14 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
     <form className="composer account" onSubmit={signup} autoComplete="on">
       <div className="acc-grid">
         <div className="cf"><label htmlFor="firstName">{t(lang, "firstName")}</label><input id="firstName" name="firstName" required maxLength={40} autoComplete="given-name" /></div>
+        <div className="cf"><label htmlFor="lastName">{t(lang, "lastName")}</label><input id="lastName" name="lastName" required maxLength={40} autoComplete="family-name" /></div>
         <div className="cf"><label htmlFor="contact">{t(lang, "contact")}</label><input id="contact" name="contact" required maxLength={80} autoComplete="username" inputMode="email" dir="ltr" /></div>
-      </div>
-      <div className="cf">
-        <label htmlFor="password">{t(lang, "password")}</label>
-        <div className="pw">
-          <input id="password" name="password" type={showPw ? "text" : "password"} required minLength={6} maxLength={100} autoComplete="new-password" dir="ltr" />
-          <button type="button" className="link" onClick={() => setShowPw((s) => !s)}>{showPw ? t(lang, "hidePw") : t(lang, "showPw")}</button>
+        <div className="cf">
+          <label htmlFor="password">{t(lang, "password")}</label>
+          <div className="pw">
+            <input id="password" name="password" type={showPw ? "text" : "password"} required minLength={6} maxLength={100} autoComplete="new-password" dir="ltr" />
+            <button type="button" className="link" onClick={() => setShowPw((s) => !s)}>{showPw ? t(lang, "hidePw") : t(lang, "showPw")}</button>
+          </div>
         </div>
       </div>
       <label className="consent"><input id="consent" name="consent" type="checkbox" required /><span>{t(lang, "consentOne")}</span></label>
