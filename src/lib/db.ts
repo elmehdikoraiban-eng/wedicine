@@ -48,6 +48,12 @@ CREATE TABLE IF NOT EXISTS wedicine.questions (
 ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS avatar INTEGER;
 ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS avatar_chosen BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE wedicine.users ADD COLUMN IF NOT EXISTS sex TEXT;
+ALTER TABLE wedicine.questions ADD COLUMN IF NOT EXISTS anonymous BOOLEAN NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS wedicine.page_views (
+  theme TEXT NOT NULL, symptom TEXT NOT NULL, intent TEXT NOT NULL,
+  views INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (theme, symptom, intent)
+);
 -- Rattrapage : un avatar qui ne correspond pas au sexe déclaré (dernière question « pour moi ») est remplacé.
 -- Impairs = femmes, pairs = hommes. Ne touche jamais un avatar choisi par le patient.
 UPDATE wedicine.users u SET sex = s.sex
@@ -117,7 +123,7 @@ export async function insertQuestion(q: QuestionInput, userId: number | null, co
 }
 
 export type QuestionRow = QuestionInput & {
-  id: number; created_at: string | Date; user_id: number | null; is_public: boolean;
+  id: number; created_at: string | Date; user_id: number | null; is_public: boolean; anonymous?: boolean;
   first_name?: string; last_name?: string;
 };
 
@@ -133,11 +139,16 @@ export async function questionsForUser(userId: number): Promise<QuestionRow[]> {
   return r.rows as QuestionRow[];
 }
 
-export async function setPublic(id: number, userId: number, isPublic: boolean) {
+// Publication choisie par le patient : "named" (prénom + initiale), "anonymous" (sans prénom) ou "private".
+export type PublishMode = "named" | "anonymous" | "private";
+export async function setPublic(id: number, userId: number, mode: PublishMode) {
   const d = await db();
+  const pub = mode !== "private";
   await d.query(
-    "UPDATE wedicine.questions SET is_public = $3, consent_publish_at = CASE WHEN $3 THEN now() ELSE consent_publish_at END WHERE id = $1 AND user_id = $2 AND NOT urgent",
-    [id, userId, isPublic]
+    `UPDATE wedicine.questions SET is_public = $3, anonymous = $4,
+       consent_publish_at = CASE WHEN $3 THEN now() ELSE consent_publish_at END
+     WHERE id = $1 AND user_id = $2 AND NOT urgent`,
+    [id, userId, pub, mode === "anonymous"]
   );
 }
 
@@ -145,13 +156,15 @@ export async function setPublic(id: number, userId: number, isPublic: boolean) {
 export async function publicAskers(theme: string, symptom: string, intent: string) {
   const d = await db();
   const r = await d.query(
-    `SELECT q.id, q.created_at, q.age, q.city, u.first_name, u.last_name
+    `SELECT q.id, q.created_at, q.age, q.city, q.sex, q.who, q.anonymous, u.first_name, u.last_name
      FROM wedicine.questions q JOIN wedicine.users u ON u.id = q.user_id
      WHERE q.theme = $1 AND q.symptom = $2 AND q.intent = $3 AND q.is_public
      ORDER BY q.id DESC LIMIT 20`,
     [theme, symptom, intent]
   );
-  return r.rows as { id: number; created_at: string | Date; age: string | null; city: string | null; first_name: string; last_name: string }[];
+  // Mode anonyme : le prénom et le nom ne quittent jamais la base.
+  return (r.rows as { id: number; created_at: string | Date; age: string | null; city: string | null; sex: string | null; who: string; anonymous: boolean; first_name: string; last_name: string }[])
+    .map((x) => (x.anonymous ? { ...x, first_name: "", last_name: "" } : x));
 }
 
 // Nombre de questions posées (compteur de l'accueil).
@@ -257,4 +270,59 @@ export async function updateIdentity(userId: number, f: { firstName: string; las
   await d.query("UPDATE wedicine.users SET first_name = $2, last_name = $3, contact = $4, lang = $5 WHERE id = $1",
     [userId, f.firstName, f.lastName, f.contact, f.lang]);
   return "ok" as const;
+}
+
+// Statistiques anonymes d'une page publique, calculées sur TOUTES les questions du symptôme (publiées ou non).
+// Aucune donnée individuelle ne sort : seulement des totaux, et une part n'est montrée que si au moins
+// MIN_GROUP personnes la partagent, pour qu'on ne puisse reconnaître personne.
+export const MIN_GROUP = 3;
+export type PageStats = {
+  total: number; lastAt: string | Date | null;
+  durations: { id: string; n: number }[]; ages: { id: string; n: number }[]; cities: { id: string; n: number }[];
+};
+export async function pageStats(theme: string, symptom: string): Promise<PageStats> {
+  const d = await db();
+  const base = "FROM wedicine.questions WHERE theme = $1 AND symptom = $2 AND NOT urgent";
+  const t = await d.query(`SELECT count(*)::int AS n, max(created_at) AS last ${base}`, [theme, symptom]);
+  const group = async (col: string) => {
+    const r = await d.query(
+      `SELECT ${col} AS id, count(*)::int AS n ${base} AND ${col} IS NOT NULL AND ${col} <> 'autre' GROUP BY ${col} HAVING count(*) >= ${MIN_GROUP} ORDER BY n DESC`,
+      [theme, symptom]
+    );
+    return r.rows.map((x) => ({ id: String(x.id), n: Number(x.n) }));
+  };
+  const total = Number(t.rows[0].n);
+  return {
+    total, lastAt: (t.rows[0].last as string | Date | null) ?? null,
+    durations: await group("duration"), ages: await group("age"), cities: await group("city"),
+  };
+}
+
+// Vues d'une page publique (sert à « votre question a aidé N personnes »).
+export async function countView(theme: string, symptom: string, intent: string) {
+  const d = await db();
+  await d.query(
+    `INSERT INTO wedicine.page_views (theme, symptom, intent, views) VALUES ($1,$2,$3,1)
+     ON CONFLICT (theme, symptom, intent) DO UPDATE SET views = wedicine.page_views.views + 1`,
+    [theme, symptom, intent]
+  );
+}
+
+// Personnes aidées : vues des pages où le patient a publié une question (signée ou anonyme).
+export async function helpedCount(userId: number) {
+  const d = await db();
+  const r = await d.query(
+    `SELECT COALESCE(sum(v.views), 0)::int AS n FROM wedicine.page_views v
+     WHERE EXISTS (SELECT 1 FROM wedicine.questions q WHERE q.user_id = $1 AND q.is_public
+       AND q.theme = v.theme AND q.symptom = v.symptom AND q.intent = v.intent)`,
+    [userId]
+  );
+  return Number(r.rows[0].n);
+}
+
+// Le patient efface une de ses questions : elle disparaît aussi des chiffres publics (droit à l'effacement, loi 09-08).
+export async function deleteQuestion(id: number, userId: number) {
+  const d = await db();
+  const r = await d.query("DELETE FROM wedicine.questions WHERE id = $1 AND user_id = $2 RETURNING id", [id, userId]);
+  return r.rows.length > 0;
 }

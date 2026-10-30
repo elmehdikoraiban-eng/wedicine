@@ -4,17 +4,36 @@ import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { loadAccount } from "@/lib/account";
 import QuestionRow from "@/components/QuestionRow.astro";
+import { Icon } from "@/components/Icon";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const a = await loadAccount(Astro, lang);
 if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
-const mine = a.qs.filter(({ q }) => q.who === "moi");
-const others = a.qs.filter(({ q }) => q.who !== "moi");
+// Trois onglets (pour moi, un enfant, un proche ; lien ?tab=, sans JavaScript) + un quatrième qui ouvre le questionnaire.
+const TABS = [
+  { id: "moi", icon: "UserRound", key: "accForMe" },
+  { id: "enfant", icon: "Baby", key: "accForChild" },
+  { id: "proche", icon: "Users", key: "accForRelative" },
+] as const;
+const by = (id: string) => a.qs.filter(({ q }) => q.who === id);
+const asked = Astro.url.searchParams.get("tab");
+const tab = TABS.find((x) => x.id === asked)?.id ?? TABS.find((x) => by(x.id).length)?.id ?? "moi";
+const list = by(tab);
 ---
 <Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={`${a.acc.first_name} ${a.acc.last_name}`} avatar={a.avatar}>
-  {a.qs.length === 0 && <p class="card">{t(lang, "noQuestions")}</p>}
-  {mine.length > 0 && <section class="acc-section"><h2>{t(lang, "accForMe")}</h2><div class="qlist">{mine.map((x) => <QuestionRow lang={lang} {...x} />)}</div></section>}
-  {others.length > 0 && <section class="acc-section"><h2>{t(lang, "accForOthers")}</h2><div class="qlist">{others.map((x) => <QuestionRow lang={lang} {...x} />)}</div></section>}
-  <p><a href={`/${lang}/question`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
+  {Astro.url.searchParams.get("deleted") === "1" && <p class="notice notice-ok" role="status"><Icon name="Check" size={18} /> {t(lang, "delQDone")}</p>}
+  <nav class="acc-tabs" role="tablist" aria-label={t(lang, "myQuestions")}>
+    {TABS.map((x) => (
+      <a role="tab" href={`?tab=${x.id}`} aria-selected={x.id === tab ? "true" : "false"} class="tab">
+        <Icon name={x.icon} size={18} />{t(lang, x.key)}<span class="tab-count">{by(x.id).length}</span>
+      </a>
+    ))}
+    <a href={`/${lang}/question`} class="tab tab-new"><Icon name="Plus" size={18} />{t(lang, "newQuestionTab")}</a>
+  </nav>
+  <div role="tabpanel">
+    {list.length === 0
+      ? <p class="tab-empty muted">{t(lang, "accTabEmpty")}</p>
+      : <div class="qlist">{list.map((x) => <QuestionRow lang={lang} {...x} />)}</div>}
+  </div>
 </Account>

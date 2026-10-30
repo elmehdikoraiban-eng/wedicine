@@ -3,7 +3,9 @@ import Base from "@/layouts/Base.astro";
 import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { currentUser } from "@/lib/auth";
-import { questionById } from "@/lib/db";
+import { accountById, questionById } from "@/lib/db";
+import { AGES, CITIES } from "@/lib/content/options";
+import { publicName } from "@/lib/auth";
 import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
 import { personalize } from "@/lib/personalize";
@@ -23,6 +25,13 @@ const th = theme(q.theme); const sy = th && symptom(th, q.symptom); const f = th
 if (!th || !sy || !f) return new Response(null, { status: 404 });
 const answers = { ...q, intensity: q.intensity == null ? null : String(q.intensity), signs: q.signs ?? [] };
 const personal = q.urgent ? undefined : personalize(answers, th, f, lang);
+// Aperçu exact de ce que les autres verront sur la page publique.
+const acc = await accountById(user.id);
+const tail = [AGES.find((x) => x.id === q.age)?.label[lang], q.city && q.city !== "autre" ? CITIES.find((x) => x.id === q.city)?.label[lang] : null].filter(Boolean).join(", ");
+const anonName = q.who === "enfant" ? t(lang, "aParent") : (q.sex ?? acc?.sex) === "f" ? t(lang, "aPatientF") : t(lang, "aPatientM");
+const previewNamed = [publicName(acc?.first_name ?? user.first_name, acc?.last_name ?? user.last_name), tail].filter(Boolean).join(", ");
+const previewAnon = [anonName, tail].filter(Boolean).join(", ");
+const mode = !q.is_public ? "private" : q.anonymous ? "anonymous" : "named";
 ---
 <Base lang={lang} title={t(lang, "myQuestions")} noindex>
   {q.urgent ? (
@@ -41,14 +50,27 @@ const personal = q.urgent ? undefined : personalize(answers, th, f, lang);
       <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} personal={personal}
         caseData={{ who: q.who, duration: q.duration, intensity: q.intensity == null ? null : String(q.intensity), age: q.age, sex: q.sex, city: q.city, signs: q.signs ?? [] }}>
         <section class="card no-print" style="margin-top:16px">
-          <PublishToggle client:load lang={lang} id={q.id} isPublic={q.is_public} />
-          <p class="muted small" style="margin:10px 0 0">{t(lang, "consentPublish")}</p>
-          <div class="row" style="margin-top:12px">
+          <PublishToggle client:load lang={lang} id={q.id} mode={mode} previewNamed={previewNamed} previewAnon={previewAnon} />
+          <div class="row" style="margin-top:16px">
             <a href={qPath(lang, th, sy, q.intent)} class="btn btn-ghost btn-sm"><Icon name="Globe" size={16} /> {t(lang, "publicPage")}</a>
             <a href={`/${lang}/question`} class="btn btn-ghost btn-sm">{t(lang, "newQuestion")}</a>
           </div>
+        </section>
+        <section class="no-print del-zone">
+          <button type="button" class="btn btn-text btn-del" id="del-q" data-id={q.id} data-lang={lang} data-confirm={t(lang, "delQConfirm")}><Icon name="Trash2" size={16} /> {t(lang, "delQ")}</button>
         </section>
       </Answer>
     </div>
   )}
 </Base>
+
+<script>
+  // Suppression : confirmation, puis retour à « Mes questions ».
+  const b = document.getElementById("del-q");
+  b?.addEventListener("click", async () => {
+    if (!confirm(b.dataset.confirm)) return;
+    b.setAttribute("disabled", "");
+    const r = await fetch("/api/question-delete", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.id) }) }).catch(() => null);
+    if (r?.ok) location.replace(`/${b.dataset.lang}/compte/questions?deleted=1`); else b.removeAttribute("disabled");
+  });
+</script>

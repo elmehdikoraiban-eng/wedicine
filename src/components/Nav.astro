@@ -49,7 +49,6 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
           </details>
         )
         : <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>}
-      <a href={`/${lang}/question`} class="btn btn-primary btn-sm">{t(lang, "start")}</a>
     </nav>
   </div>
 </header>

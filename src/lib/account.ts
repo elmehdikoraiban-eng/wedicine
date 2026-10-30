@@ -2,7 +2,7 @@
 import type { AstroGlobal } from "astro";
 import { t, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
-import { accountById, avatarOf, matchAvatarToSex, questionsForUser } from "@/lib/db";
+import { accountById, avatarOf, helpedCount, matchAvatarToSex, questionsForUser } from "@/lib/db";
 import { symptom, theme } from "@/lib/content/themes";
 import { AGES, CITIES } from "@/lib/content/options";
 
@@ -44,5 +44,6 @@ export async function loadAccount(Astro: AstroGlobal, lang: Lang) {
     { n: nPub, k: t(lang, nPub === 1 ? "accStatPublishedOne" : "accStatPublished"), href: "confidentialite" },
     { n: qs.filter(({ q }) => q.who !== "moi").length, k: t(lang, "accStatRelatives"), href: "questions" },
   ];
-  return { acc, avatar: String(avatarOf(acc)).padStart(2, "0"), qs, health, topics, stats, nPub };
+  const helped = nPub ? await helpedCount(user.id).catch(() => 0) : 0;
+  return { helped, acc, avatar: String(avatarOf(acc)).padStart(2, "0"), qs, health, topics, stats, nPub };
 }

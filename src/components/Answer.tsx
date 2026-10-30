@@ -207,11 +207,11 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
               <>
                 <p className="muted small">{t(lang, "checklistHint")}</p>
                 <ul className="checklist">
-                  {visibleQ.map((p, i) => <li key={i} className={p.personal ? "personal" : undefined}><span className="box" aria-hidden="true" />{p.text}</li>)}
+                  {visibleQ.map((p, i) => <li key={i} className={p.personal ? "personal" : undefined}><label><input type="checkbox" className="box" />{p.text}</label></li>)}
                 </ul>
                 {hiddenQ.length > 0 && (
                   <More lang={lang}>
-                    <ul className="checklist">{hiddenQ.map((p, i) => <li key={i}><span className="box" aria-hidden="true" />{p.text}</li>)}</ul>
+                    <ul className="checklist">{hiddenQ.map((p, i) => <li key={i}><label><input type="checkbox" className="box" />{p.text}</label></li>)}</ul>
                   </More>
                 )}
               </>

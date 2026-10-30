@@ -17,6 +17,6 @@ const { lang, q, th, sy } = Astro.props;
   <span class="meta">
     {q.urgent
       ? <span class="badge badge-danger">!</span>
-      : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? t(lang, "published") : t(lang, "private")}</span>}
+      : <span class={`badge ${q.is_public ? "badge-ok" : "badge-muted"}`}><Icon name={q.is_public ? "Globe" : "Lock"} size={12} /> {q.is_public ? (q.anonymous ? t(lang, "pubAnonBadge") : t(lang, "published")) : t(lang, "private")}</span>}
   </span>
 </a>

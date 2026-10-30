@@ -72,7 +72,7 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
         </>
       )}
       {questionId != null && (
-        <label className="check small"><input type="checkbox" name="consentPublish" /> <span>{t(lang, "consentPublish")}</span></label>
+        <p className="muted small public-note"><Icon name="ChartColumn" size={16} /> <span>{t(lang, "signupPublicNote")}</span></p>
       )}
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" className="btn btn-primary" disabled={busy} style={{ width: "100%", marginTop: 8 }}>

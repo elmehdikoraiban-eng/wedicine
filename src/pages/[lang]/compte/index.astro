@@ -17,6 +17,12 @@ const DESC = { questions: "accQuestionsDesc", infos: "accIdentityDesc", sante: "
 ---
 <Account lang={lang} active="" title={`${t(lang, "hello")} ${a.acc.first_name}`} name={`${a.acc.first_name} ${a.acc.last_name}`} avatar={a.avatar}>
   <p class="muted acc-lead">{t(lang, "memberSince")} {formatDate(a.acc.created_at, lang)}</p>
+  <a href={`/${lang}/compte/questions`} class={`helped${a.nPub ? "" : " helped-empty"}`}>
+    <span class="ico"><Icon name="HeartHandshake" size={28} /></span>
+    {a.nPub
+      ? <span><span class="muted small">{t(lang, "helpedTitle")}</span><b>{a.helped} {t(lang, "helpedPeople")}</b></span>
+      : <span>{t(lang, "helpedNone")}</span>}
+  </a>
   <div class="acc-stats">
     {a.stats.map((s) => <a href={`/${lang}/compte/${s.href}`}><b>{s.n}</b><span>{s.k}</span></a>)}
   </div>

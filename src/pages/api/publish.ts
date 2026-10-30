@@ -8,7 +8,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (!user) return json({ error: "auth" }, 401);
   const b = await readJson(request);
   const id = Number(b.id);
-  if (!Number.isInteger(id) || typeof b.isPublic !== "boolean") return json({ error: "invalid" }, 400);
-  await setPublic(id, user.id, b.isPublic);
+  // { mode: "named" | "anonymous" | "private" } ; l'ancien { isPublic } reste accepté.
+  const mode = b.mode === "named" || b.mode === "anonymous" || b.mode === "private" ? b.mode
+    : typeof b.isPublic === "boolean" ? (b.isPublic ? "named" : "private") : null;
+  if (!Number.isInteger(id) || !mode) return json({ error: "invalid" }, 400);
+  await setPublic(id, user.id, mode);
   return json({ ok: true });
 };

@@ -4,10 +4,10 @@ import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { fiche } from "@/lib/content/fiches";
 import { findPage, pageTitle } from "@/lib/content/themes";
-import { AGES, CITIES, INTENTS } from "@/lib/content/options";
-import { publicAskers } from "@/lib/db";
+import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
+import { countView, pageStats, publicAskers, type PageStats } from "@/lib/db";
 import { publicName } from "@/lib/auth";
-import { alternates, formatDate, qPath, SITE_URL } from "@/lib/site";
+import { alternates, formatDate, qPath, SITE_URL, timeAgo } from "@/lib/site";
 import { Answer } from "@/components/Answer";
 import { Icon } from "@/components/Icon";
 
@@ -21,6 +21,15 @@ if (!f) return new Response(null, { status: 404 });
 
 // La liste des patients change : page rendue à la demande.
 const askers = await publicAskers(th.id, sy.id, intent).catch((e) => { console.error("publicAskers", e); return []; });
+const empty: PageStats = { total: 0, lastAt: null, durations: [], ages: [], cities: [] };
+const stats = await pageStats(th.id, sy.id).catch((e) => { console.error("pageStats", e); return empty; });
+// Une vue = une personne qui lit la page (les robots ne comptent pas).
+if (!/bot|crawl|spider|slurp|preview|lighthouse|headless/i.test(Astro.request.headers.get("user-agent") ?? "")) {
+  await countView(th.id, sy.id, intent).catch(() => {});
+}
+const lbl = (list: { id: string; label: Record<string, string> }[], id: string) => list.find((o) => o.id === id)?.label[lang] ?? id;
+const pct = (n: number) => `${Math.round((n / Math.max(stats.total, 1)) * 100)} %`;
+const who = (p: { sex: string | null; who: string }) => p.who === "enfant" ? t(lang, "aParent") : p.sex === "f" ? t(lang, "aPatientF") : t(lang, "aPatientM");
 const title = pageTitle(lang, th, sy, intent);
 const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
@@ -41,13 +50,30 @@ const jsonLd = {
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <div class="narrow">
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
+      <section class="card sec stats-sec" style="margin-top:16px">
+        <h2><Icon name="ChartColumn" size={22} />{t(lang, "statsTitle")}</h2>
+        {stats.total === 0 ? <p class="muted">{t(lang, "statsEmpty")}</p> : (
+          <div class="stats-grid">
+            <div class="stat big"><b>{stats.total}</b><span>{t(lang, stats.total === 1 ? "statsAskedOne" : "statsAsked")}</span></div>
+            {stats.lastAt && <div class="stat"><Icon name="Clock" size={20} /><span class="muted small">{t(lang, "statsLast")}</span><b>{timeAgo(stats.lastAt, lang)}</b></div>}
+            {stats.durations[0] && <div class="stat"><Icon name="Timer" size={20} /><span class="muted small">{t(lang, "statsDuration")}</span><b>{lbl(DURATIONS, stats.durations[0].id)}</b><span class="muted small">{pct(stats.durations[0].n)}</span></div>}
+            {stats.ages.length > 0 && <div class="stat"><Icon name="Users" size={20} /><span class="muted small">{t(lang, "statsAges")}</span>
+              {stats.ages.slice(0, 2).map((a) => <span class="bar-row"><span>{lbl(AGES, a.id)}</span><span class="bar"><i style={`width:${pct(a.n)}`}></i></span><span class="muted small">{pct(a.n)}</span></span>)}
+            </div>}
+            {stats.cities.length > 0 && <div class="stat"><Icon name="MapPin" size={20} /><span class="muted small">{t(lang, "statsCities")}</span>
+              {stats.cities.slice(0, 3).map((c) => <span class="bar-row"><span>{lbl(CITIES, c.id)}</span><span class="bar"><i style={`width:${pct(c.n)}`}></i></span><span class="muted small">{pct(c.n)}</span></span>)}
+            </div>}
+          </div>
+        )}
+        <p class="muted small" style="margin:12px 0 0">{t(lang, "anonCountLine")}</p>
+      </section>
       <section class="card sec" style="margin-top:16px">
         <h2><Icon name="Users" size={22} />{t(lang, "othersAsked")}</h2>
         {askers.length === 0 ? <p class="muted">—</p> : (
           <div class="askers">
             {askers.map((p) => (
               <span class="asker">
-                <b>{publicName(p.first_name, p.last_name)}</b>
+                <b>{p.anonymous ? who(p) : publicName(p.first_name, p.last_name)}</b>
                 {p.age && <>, {AGES.find((x) => x.id === p.age)?.label[lang]}</>}
                 {p.city && p.city !== "autre" && <>, {CITIES.find((x) => x.id === p.city)?.label[lang]}</>}
                 <span class="muted"> · {formatDate(p.created_at, lang)}</span>
