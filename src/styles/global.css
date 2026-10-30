@@ -527,7 +527,11 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 }
 
 /* ----- Accueil v5 : héros centré + ruban des sujets ----- */
-.hero-c { padding-block: clamp(56px, 8vw, 112px); overflow: hidden; background: linear-gradient(180deg, #eaf5ff 0%, #f4faff 100%); }  /* bleu ciel léger */
+.hero-c { padding-block: clamp(56px, 8vw, 112px); overflow: hidden; position: relative; isolation: isolate; background: linear-gradient(180deg, #eaf5ff 0%, #f4faff 100%); }  /* bleu ciel léger */
+/* Motif de petites icônes santé : visible sur les bords, effacé au centre derrière le texte. */
+.hero-c::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: url("/hero-pattern.svg") center / 240px 240px repeat; opacity: .14;
+  -webkit-mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, transparent 0%, transparent 55%, #000 100%); mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, transparent 0%, transparent 55%, #000 100%); }
+@media (max-width: 760px) { .hero-c::before { background-size: 180px 180px; opacity: .1; } }
 .hero-c-text { text-align: center; max-width: 880px; }
 .hero-c h1 { font-size: var(--fs-hero); line-height: 1.08; margin-bottom: 20px; font-weight: 700; }
 .hero-c h1 .word { white-space: nowrap; }  /* « Pré-consultation » ne se coupe jamais au tiret, « en ligne, » reste groupé */
