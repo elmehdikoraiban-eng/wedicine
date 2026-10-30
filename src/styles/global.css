@@ -83,6 +83,7 @@ button, input, select { font: inherit; }
 [hidden] { display: none !important; }
 img, svg { display: block; max-width: 100%; }
 :focus-visible { outline: none; box-shadow: var(--focus); }
+:focus:not(:focus-visible) { outline: none; }  /* pas de cadre noir après un clic ou un toucher */
 .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 24px; }
 main { flex: 1; }
 main > .page { padding-block: 48px 96px; }
@@ -416,7 +417,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .checklist label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
 .checklist .box { appearance: none; flex: none; width: 22px; height: 22px; margin: 2px 0 0; border: 2px solid var(--line); border-radius: 6px; background: var(--canvas) center / 14px no-repeat; cursor: pointer; transition: background-color var(--t), border-color var(--t); }
 .checklist .box:hover { border-color: var(--brand); }
-.checklist .box:focus-visible { outline: 3px solid var(--focus, var(--brand)); outline-offset: 2px; }
+.checklist .box:focus-visible { outline: none; box-shadow: var(--focus); }
 .checklist .box:checked { background-color: var(--brand); border-color: var(--brand); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E"); }
 .checklist label:has(.box:checked) { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
 
