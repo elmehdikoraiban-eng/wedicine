@@ -68,6 +68,7 @@ p { margin: 0 0 1em; }
 ul { margin: 0; padding-inline-start: 1.25rem; }
 li { margin-bottom: .35rem; }
 button, input, select { font: inherit; }
+[hidden] { display: none !important; }
 img, svg { display: block; max-width: 100%; }
 :focus-visible { outline: none; box-shadow: var(--focus); }
 .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 24px; }
@@ -688,3 +689,8 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: .9375rem
 }
 .sex-pick { display: flex; gap: 8px; flex-wrap: wrap; }
 .sex-pick .chip { padding: 7px 18px; flex: none; width: auto; min-width: 96px; }
+.acc-card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 8px 0 12px; padding-top: 20px; border-top: 1px solid var(--line-2); }
+.acc-card-head h2 { margin: 0; font-size: 1.25rem; }
+.info-edit { max-width: 520px; }
+.info-edit .row { display: flex; gap: 12px; flex-wrap: wrap; }
+.notice-ok { background: var(--green-bg); color: #006644; display: flex; align-items: center; gap: 8px; }

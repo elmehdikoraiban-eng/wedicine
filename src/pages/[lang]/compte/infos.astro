@@ -1,6 +1,7 @@
 ---
 import Account from "@/layouts/Account.astro";
-import { t, LANG_NAMES } from "@/lib/i18n";
+import { t, LANG_NAMES, LANGS } from "@/lib/i18n";
+import { Icon } from "@/components/Icon";
 import { langParam } from "@/lib/lang";
 import { loadAccount } from "@/lib/account";
 import { formatDate } from "@/lib/site";
@@ -13,6 +14,7 @@ if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
 const { acc } = a;
 const current = Number(a.avatar);
 const saved = Astro.url.searchParams.get("ok") === "1";
+const savedInfo = Astro.url.searchParams.get("ok") === "infos";
 // Les avatars du sexe du patient d'abord, puis les autres.
 const sex = acc.sex ?? avatarSex(current);
 const all = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1);
@@ -35,7 +37,12 @@ const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => 
         </details>
       </div>
     </div>
-    <dl class="acc-list">
+    {savedInfo && <p class="notice notice-ok" role="status"><Icon name="Check" size={18} /> {t(lang, "accSaved")}</p>}
+    <div class="acc-card-head">
+      <h2>{t(lang, "accDetails")}</h2>
+      <button type="button" class="btn btn-ghost btn-sm" id="edit-open"><Icon name="Pencil" size={16} /> {t(lang, "edit")}</button>
+    </div>
+    <dl class="acc-list" id="info-view">
       <div><dt>{t(lang, "firstName")}</dt><dd>{acc.first_name}</dd></div>
       <div><dt>{t(lang, "lastName")}</dt><dd>{acc.last_name}</dd></div>
       <div><dt>{t(lang, "sex")}</dt><dd>
@@ -48,8 +55,39 @@ const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => 
       <div><dt>{t(lang, "accLanguage")}</dt><dd>{LANG_NAMES[acc.lang as keyof typeof LANG_NAMES] ?? acc.lang}</dd></div>
       <div><dt>{t(lang, "memberSince")}</dt><dd>{formatDate(acc.created_at, lang)}</dd></div>
     </dl>
+    <form id="info-edit" class="info-edit" hidden>
+      <div class="field"><label for="f-first">{t(lang, "firstName")}</label><input class="input" id="f-first" name="firstName" value={acc.first_name} maxlength="40" required autocomplete="given-name" /></div>
+      <div class="field"><label for="f-last">{t(lang, "lastName")}</label><input class="input" id="f-last" name="lastName" value={acc.last_name} maxlength="40" required autocomplete="family-name" /></div>
+      <div class="field"><label for="f-contact">{t(lang, "contact")}</label><input class="input" id="f-contact" name="contact" value={acc.contact} maxlength="80" required dir="ltr" autocomplete="email" /></div>
+      <div class="field"><label for="f-lang">{t(lang, "accLanguage")}</label>
+        <select class="input" id="f-lang" name="lang">{LANGS.map((l) => <option value={l} selected={l === acc.lang}>{LANG_NAMES[l]}</option>)}</select>
+      </div>
+      <p class="notice notice-danger" id="edit-error" hidden></p>
+      <div class="row">
+        <button type="submit" class="btn btn-primary">{t(lang, "save")}</button>
+        <button type="button" class="btn btn-ghost" id="edit-cancel">{t(lang, "cancel")}</button>
+      </div>
+    </form>
   </section>
 </Account>
+
+<script define:vars={{ msgTaken: t(lang, "contactTaken"), msgError: t(lang, "error") }}>
+  // Modifier : bascule entre la fiche et le formulaire, puis enregistre en JSON.
+  const view = document.getElementById("info-view"), form = document.getElementById("info-edit"), open = document.getElementById("edit-open");
+  const err = document.getElementById("edit-error");
+  const toggle = (editing) => { view.hidden = editing; form.hidden = !editing; open.hidden = editing; if (editing) form.querySelector("input").focus(); };
+  open.addEventListener("click", () => toggle(true));
+  document.getElementById("edit-cancel").addEventListener("click", () => { form.reset(); err.hidden = true; toggle(false); });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('[type="submit"]'); btn.disabled = true; err.hidden = true;
+    const res = await fetch("/api/profile", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ identity: Object.fromEntries(new FormData(form)) }) }).catch(() => null);
+    if (res && res.ok) { location.replace(location.pathname + "?ok=infos"); return; }
+    const data = res ? await res.json().catch(() => ({})) : {};
+    err.textContent = data.error === "taken" ? msgTaken : msgError; err.hidden = false; btn.disabled = false;
+  });
+</script>
 
 <script>
   // Sexe et avatar : enregistrés tout de suite, puis la page se recharge pour montrer le nouvel avatar.

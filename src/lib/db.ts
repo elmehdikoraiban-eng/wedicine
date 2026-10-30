@@ -248,3 +248,13 @@ export async function chooseAvatar(userId: number, n: number) {
   await d.query("UPDATE wedicine.users SET avatar = $2, avatar_chosen = true WHERE id = $1", [userId, n]);
   return true;
 }
+
+// « Mes informations » : prénom, nom, contact et langue modifiables. Renvoie "taken" si le contact est déjà pris.
+export async function updateIdentity(userId: number, f: { firstName: string; lastName: string; contact: string; lang: string }) {
+  const d = await db();
+  const other = await d.query("SELECT id FROM wedicine.users WHERE contact = $1 AND id <> $2", [f.contact, userId]);
+  if (other.rows.length) return "taken" as const;
+  await d.query("UPDATE wedicine.users SET first_name = $2, last_name = $3, contact = $4, lang = $5 WHERE id = $1",
+    [userId, f.firstName, f.lastName, f.contact, f.lang]);
+  return "ok" as const;
+}
