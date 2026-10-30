@@ -1,6 +1,6 @@
-"""Construction géométrique du logo Wedicine (redessiné d après le logo fourni par El Mehdi, 2026-10-30).
+"""Construction géométrique du logo Wedicine (redessiné d'après le logo fourni par El Mehdi, 2026-10-30).
 
-Cotes en pixels de l image de référence (2172x724). make(params) renvoie les formes (pip install skia-pathops fonttools).
+Cotes en pixels de l'image de référence (2172x724). make(params) renvoie les formes (pip install skia-pathops fonttools).
 Export : cd scripts/logo && mkdir -p out && python3 export.py, puis copier out/*.svg dans public/brand/.
 """
 import json, math, sys
