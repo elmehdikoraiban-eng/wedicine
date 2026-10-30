@@ -151,6 +151,8 @@ const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || 
 </Account>
 
 <script>
+  // Comme une discussion : on arrive sur la réponse, la discussion reste au-dessus (sauf lien vers une rubrique).
+  if (!location.hash) document.querySelector(".ans, .urgent-msg")?.scrollIntoView({ block: "start" });
   // Enregistrer en PDF : la boîte d'impression du navigateur, la page est prévue pour (barre et composeur masqués).
   document.getElementById("save-pdf")?.addEventListener("click", () => window.print());
   // Suppression : confirmation, puis retour à « Mes questions ».
