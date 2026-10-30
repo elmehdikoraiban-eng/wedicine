@@ -20,6 +20,9 @@ const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }
   { key: "exams", icon: "Microscope", intent: "examens", art: ArtExams },
   { key: "askDoctor", icon: "MessageCircleQuestion", intent: "questions", art: ArtQuestions },
 ];
+// Ordre des onglets et libellés courts.
+const TAB_ORDER: Key[] = ["meanwhile", "whichDoctor", "whatToKnow", "exams", "askDoctor"];
+const TAB_LABEL = { meanwhile: "tabMeanwhile", whichDoctor: "tabDoctor", whatToKnow: "tabKnow", exams: "tabExams", askDoctor: "tabQuestions" } as const;
 const VERDICT_ART = [ArtWatchHome, ArtAppointment, ArtSoon] as const;
 const LEVEL_ICON = ["House", "CalendarCheck", "Clock"] as const;
 const VISIBLE_QUESTIONS = 3;
@@ -57,8 +60,8 @@ export function answerFaq(lang: Lang, fiche: Fiche, th: Theme, sy: Symptom): { q
 
 // Ancres lisibles dans l'adresse (#quel-medecin), dans la langue de la page ; l'arabe garde les ancres françaises (latines).
 const ANCHORS = {
-  fr: { briefTitle: "en-bref", whenToSee: "quand-consulter", whatToKnow: "a-savoir", meanwhile: "en-attendant", whichDoctor: "quel-medecin", exams: "examens", askDoctor: "questions-medecin", faq: "faq", stats: "statistiques", othersAsked: "ils-ont-demande", related: "sujets-proches", feedback: "avis", moreInfo: "en-savoir-plus" },
-  en: { briefTitle: "in-short", whenToSee: "when-to-see", whatToKnow: "what-to-know", meanwhile: "meanwhile", whichDoctor: "which-doctor", exams: "tests", askDoctor: "questions-for-doctor", faq: "faq", stats: "statistics", othersAsked: "who-asked", related: "related", feedback: "feedback", moreInfo: "learn-more" },
+  fr: { briefTitle: "en-bref", whenToSee: "quand-consulter", whatToKnow: "a-savoir", meanwhile: "en-attendant", whichDoctor: "quel-medecin", exams: "examens", askDoctor: "questions-medecin", faq: "faq", stats: "statistiques", othersAsked: "ils-ont-demande", related: "sujets-proches", feedback: "avis", moreInfo: "en-savoir-plus", yourCase: "votre-cas" },
+  en: { briefTitle: "in-short", whenToSee: "when-to-see", whatToKnow: "what-to-know", meanwhile: "meanwhile", whichDoctor: "which-doctor", exams: "tests", askDoctor: "questions-for-doctor", faq: "faq", stats: "statistics", othersAsked: "who-asked", related: "related", feedback: "feedback", moreInfo: "learn-more", yourCase: "your-case" },
 } as const;
 export type AnchorKey = keyof typeof ANCHORS.fr;
 export const anchor = (lang: Lang, key: AnchorKey) => ANCHORS[lang === "en" ? "en" : "fr"][key];
@@ -124,14 +127,7 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
           {personal && personal.know.length > 0 && (
             <div className="for-you"><span className="tag-you"><Icon name="UserRound" size={12} />{t(lang, "forYou")}</span>{personal.know.map((p, i) => <p key={i}>{p}</p>)}</div>
           )}
-          {personal ? (
-            <More lang={lang}>{fiche.explanation.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>
-          ) : (
-            <>
-              <p>{G(firstPara[lang])}</p>
-              {restParas.length > 0 && <More lang={lang}>{restParas.map((p, i) => <p key={i}>{G(p[lang])}</p>)}</More>}
-            </>
-          )}
+          {fiche.explanation.map((p, i) => <p key={i}>{G(p[lang])}</p>)}
         </>
       )}
 
@@ -179,16 +175,13 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
       )}
     </>
   );
+  const hasCase = !!(caseData && (dur >= 0 || inten >= 0 || who));
   const focusKey = (SECTIONS.find((x) => x.intent === intent) ?? SECTIONS[0]).key;
-  const section = (sx: (typeof SECTIONS)[number]) => (
-    <section key={sx.key} className={`card sec sec-illustrated${sx.intent === intent ? " focus" : ""}`} id={anchor(lang, sx.key)}>
-      <div className="sec-art">{sx.art()}</div>
-      <div className="sec-body">
-        <h2><Icon name={sx.icon} size={22} />{t(lang, sx.key)}</h2>
-        {content(sx.key)}
-      </div>
-    </section>
-  );
+  const tabs = [
+    ...(hasCase ? [{ id: anchor(lang, "yourCase"), icon: "UserRound", label: "tabCase" as const }] : []),
+    ...TAB_ORDER.map((key) => ({ id: anchor(lang, key), icon: SECTIONS.find((x) => x.key === key)!.icon, label: TAB_LABEL[key] })),
+  ];
+  const defaultTab = hasCase ? anchor(lang, "yourCase") : anchor(lang, focusKey);
 
   return (
     <article className="answer-page">
@@ -247,78 +240,79 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
         </div>
       </section>}
 
-      {caseData && (dur >= 0 || inten >= 0 || who) ? (
-        <section className="card sec case-sec">
-          <h2><Icon name="UserRound" size={22} />{t(lang, "yourCase")}</h2>
-          <div className="case-tiles">
-            {dur >= 0 && th.duration && (
-              <div className="ctile wide">
-                <span className="ctile-lbl"><Icon name="Clock" size={16} />{t(lang, "timelineTitle")}</span>
-                <strong className="ctile-val">{DURATIONS[dur].label[lang]}</strong>
-                <DurationSteps labels={DURATIONS.map((d) => d.label[lang])} current={dur} threshold={th.consultAfter}
-                  youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} />
-              </div>
-            )}
-            {inten >= 0 && (
-              <div className="ctile wide">
-                <span className="ctile-lbl"><Icon name="Activity" size={16} />{t(lang, "intensityTitle")}</span>
-                <strong className="ctile-val">{INTENSITIES[inten].label[lang]}</strong>
-                <IntensityFaces labels={INTENSITIES.map((d) => d.label[lang])} current={inten} />
-              </div>
-            )}
-            {who && (
-              <div className="ctile">
-                <span className="ctile-ico"><Icon name={who.icon ?? "UserRound"} size={26} /></span>
-                <span className="ctile-lbl">{t(lang, "forWhom")}</span>
-                <strong className="ctile-val">{who.label[lang]}</strong>
-              </div>
-            )}
-            {age && (
-              <div className="ctile">
-                <span className="ctile-ico"><Icon name="Clock" size={26} /></span>
-                <span className="ctile-lbl">{t(lang, "age")}</span>
-                <strong className="ctile-val">{age.label[lang]}</strong>
-              </div>
-            )}
-            {city && (
-              <div className="ctile">
-                <span className="ctile-ico"><Icon name="MapPin" size={26} /></span>
-                <span className="ctile-lbl">{t(lang, "city")}</span>
-                <strong className="ctile-val">{city.label[lang]}</strong>
-              </div>
-            )}
-            <div className="ctile">
-              <span className="ctile-ico" style={{ background: signs.length ? "#E3FCEF" : undefined, color: signs.length ? "#006644" : undefined }}><Icon name={signs.length ? "ListChecks" : "Smile"} size={26} /></span>
-              <span className="ctile-lbl">{t(lang, "signsChecked")}</span>
-              {signs.length ? (
-                <span className="ctile-signs">{signs.map((s) => <span key={s.id} className="picto on"><Icon name="Check" size={16} />{s.label[lang]}</span>)}</span>
-              ) : <strong className="ctile-val small">{t(lang, "noSigns")}</strong>}
-            </div>
-          </div>
-        </section>
-      ) : null}
 
-      {personal ? ordered.map(section) : (
-        <>
-          {/* Page publique courte : l'intention choisie ouverte, le médecin en une ligne, le reste replié. */}
-          {section(SECTIONS.find((x) => x.key === focusKey)!)}
-          {focusKey !== "whichDoctor" && (
-            <section className="doctor-line" id={anchor(lang, "whichDoctor")}>
-              <span className="ico"><Icon name="Stethoscope" size={22} /></span>
-              <p><b>{t(lang, "whichDoctor")} :</b> {G(fiche.whichDoctor[lang])}</p>
-            </section>
-          )}
-          <section className="more-info" id={anchor(lang, "moreInfo")}>
-            <h2>{t(lang, "moreInfo")}</h2>
-            {SECTIONS.filter((x) => x.key !== focusKey && x.key !== "whichDoctor").map((x) => (
-              <details key={x.key} className="card fold" id={anchor(lang, x.key)}>
-                <summary><span className="fold-ico"><Icon name={x.icon} size={20} /></span>{t(lang, x.key)}<Icon name="ChevronDown" size={20} /></summary>
-                <div className="fold-body">{content(x.key)}</div>
-              </details>
-            ))}
+      {/* La réponse en onglets : l'onglet de la question choisie est ouvert ; chaque onglet a son lien (#examens). */}
+      <section className="ans-tabs">
+        <div className="tabbar" role="tablist" aria-label={pageTitle(lang, th, sy, intent)}>
+          {tabs.map((x) => (
+            <a key={x.id} href={`#${x.id}`} role="tab" className="tabbar-tab" aria-selected={x.id === defaultTab ? "true" : "false"} aria-controls={x.id} data-tab={x.id}>
+              <Icon name={x.icon} size={18} />{t(lang, x.label)}
+            </a>
+          ))}
+        </div>
+        {hasCase && (
+          <section role="tabpanel" className="tabpanel case-sec" id={anchor(lang, "yourCase")} hidden={defaultTab !== anchor(lang, "yourCase")}>
+            <h2><Icon name="UserRound" size={22} />{t(lang, "yourCase")}</h2>
+          <div className="case-tiles">
+              {dur >= 0 && th.duration && (
+                <div className="ctile wide">
+                  <span className="ctile-lbl"><Icon name="Clock" size={16} />{t(lang, "timelineTitle")}</span>
+                  <strong className="ctile-val">{DURATIONS[dur].label[lang]}</strong>
+                  <DurationSteps labels={DURATIONS.map((d) => d.label[lang])} current={dur} threshold={th.consultAfter}
+                    youAreHere={t(lang, "youAreHere")} consultFrom={t(lang, "consultFrom")} />
+                </div>
+              )}
+              {inten >= 0 && (
+                <div className="ctile wide">
+                  <span className="ctile-lbl"><Icon name="Activity" size={16} />{t(lang, "intensityTitle")}</span>
+                  <strong className="ctile-val">{INTENSITIES[inten].label[lang]}</strong>
+                  <IntensityFaces labels={INTENSITIES.map((d) => d.label[lang])} current={inten} />
+                </div>
+              )}
+              {who && (
+                <div className="ctile">
+                  <span className="ctile-ico"><Icon name={who.icon ?? "UserRound"} size={26} /></span>
+                  <span className="ctile-lbl">{t(lang, "forWhom")}</span>
+                  <strong className="ctile-val">{who.label[lang]}</strong>
+                </div>
+              )}
+              {age && (
+                <div className="ctile">
+                  <span className="ctile-ico"><Icon name="Clock" size={26} /></span>
+                  <span className="ctile-lbl">{t(lang, "age")}</span>
+                  <strong className="ctile-val">{age.label[lang]}</strong>
+                </div>
+              )}
+              {city && (
+                <div className="ctile">
+                  <span className="ctile-ico"><Icon name="MapPin" size={26} /></span>
+                  <span className="ctile-lbl">{t(lang, "city")}</span>
+                  <strong className="ctile-val">{city.label[lang]}</strong>
+                </div>
+              )}
+              <div className="ctile">
+                <span className="ctile-ico" style={{ background: signs.length ? "#E3FCEF" : undefined, color: signs.length ? "#006644" : undefined }}><Icon name={signs.length ? "ListChecks" : "Smile"} size={26} /></span>
+                <span className="ctile-lbl">{t(lang, "signsChecked")}</span>
+                {signs.length ? (
+                  <span className="ctile-signs">{signs.map((s) => <span key={s.id} className="picto on"><Icon name="Check" size={16} />{s.label[lang]}</span>)}</span>
+                ) : <strong className="ctile-val small">{t(lang, "noSigns")}</strong>}
+              </div>
+            </div>
           </section>
-        </>
-      )}
+        )}
+        {TAB_ORDER.map((key) => {
+          const sx = SECTIONS.find((x) => x.key === key)!;
+          return (
+            <section key={key} role="tabpanel" className="tabpanel" id={anchor(lang, key)} hidden={defaultTab !== anchor(lang, key)}>
+              <div className="tabpanel-art">{sx.art()}</div>
+              <div className="tabpanel-body">
+                <h2>{t(lang, key)}</h2>
+                {content(key)}
+              </div>
+            </section>
+          );
+        })}
+      </section>
 
       {children}
 

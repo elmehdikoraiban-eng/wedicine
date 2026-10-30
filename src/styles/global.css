@@ -850,3 +850,24 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .answer-page .related .list-links a { border: 0; border-bottom: 1px solid var(--line-2); border-radius: 0; padding: 16px 0; background: none; box-shadow: none; transform: none; }
 .answer-page .related .list-links a:hover { color: var(--brand); }
 .read-main > .card { border: 0; background: none; border-radius: 0; padding-inline: 0; }
+
+/* Réponse en onglets */
+.ans-tabs { margin-top: 8px; min-width: 0; }
+.answer-page { grid-template-columns: minmax(0, 1fr); }
+.tabbar { position: sticky; top: 72px; z-index: 6; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 0; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line-2); }
+.tabbar::-webkit-scrollbar { display: none; }
+.tabbar-tab { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--r-pill); color: var(--muted); font-weight: 600; font-size: var(--fs-small); white-space: nowrap; transition: background var(--t), color var(--t); }
+.tabbar-tab:hover { background: var(--neutral); color: var(--ink); text-decoration: none; }
+.tabbar-tab[aria-selected="true"] { background: var(--brand); color: #fff; }
+.tabpanel { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; align-items: start; padding: 32px 0 8px; animation: rise .25s var(--ease); }
+.tabpanel[hidden] { display: none !important; }
+.tabpanel-art svg { width: 100%; height: auto; }
+.tabpanel h2 { display: flex; align-items: center; gap: 12px; font-size: var(--fs-heading-sm); margin-bottom: 16px; }
+.tabpanel h2 svg { color: var(--link); flex: none; }
+.tabpanel.case-sec { display: block; }
+@media (max-width: 760px) {
+  .tabbar { top: 60px; margin-inline: -16px; padding-inline: 16px; }
+  .tabpanel { grid-template-columns: 1fr; gap: 12px; padding-top: 24px; }
+  .tabpanel-art { width: 96px; }
+}
+@media print { .tabbar { display: none; } .tabpanel[hidden] { display: grid !important; } }

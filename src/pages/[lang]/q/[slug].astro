@@ -8,7 +8,8 @@ import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
 import { countView, pageStats, publicAskers, type PageStats } from "@/lib/db";
 import { publicName } from "@/lib/auth";
 import { alternates, formatDate, qPath, SITE_URL, timeAgo } from "@/lib/site";
-import { Answer, anchor, answerFaq, answerOutline } from "@/components/Answer";
+import { Answer, anchor, answerFaq } from "@/components/Answer";
+import AnswerTabs from "@/components/AnswerTabs.astro";
 import type { UIKey } from "@/lib/i18n";
 import { Icon } from "@/components/Icon";
 
@@ -36,7 +37,6 @@ const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
 // Les blocs « statistiques » et « ils ont posé » n'apparaissent qu'à partir de 3 questions (sinon ils seraient vides).
 const showCommunity = stats.total >= 3;
-const toc = [...answerOutline(lang, intent), ...(showCommunity ? [{ id: anchor(lang, "stats"), key: "statsTitle" }] : []), { id: anchor(lang, "related"), key: "related" }];
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -59,12 +59,7 @@ const faqLd = {
 <Base lang={lang} title={title} description={f.summary[lang].slice(0, 160)} canonical={path} alternates={alternates(th, sy, intent)}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqLd)} />
-  <div class="read-layout">
-    <nav class="toc" aria-label={t(lang, "tocTitle")}>
-      <p class="toc-title">{t(lang, "tocTitle")}</p>
-      <ol>{toc.map((x) => <li><a href={`#${x.id}`}>{t(lang, x.key as UIKey)}</a></li>)}</ol>
-    </nav>
-    <div class="read-main">
+  <div class="narrow">
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
       <section class="cta-own">
         <p>{t(lang, "ctaOwnCase")}</p>
@@ -113,9 +108,9 @@ const faqLd = {
       </div>
       <p class="helpful-thanks" role="status" hidden><Icon name="Check" size={18} /> {t(lang, "helpfulThanks")}</p>
     </section>
-    </div>
   </div>
 </Base>
+<AnswerTabs />
 
 <script>
   // « Cette page vous a aidé ? » : un vote par page et par navigateur.
@@ -132,20 +127,4 @@ const faqLd = {
     }));
   }
 
-  // Sommaire : surligne la dernière rubrique dont le haut a passé le premier tiers de l’écran (fiable aussi après un lien #ancre).
-  const links = [...document.querySelectorAll<HTMLAnchorElement>(".toc a")];
-  const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
-  let ticking = false;
-  const update = () => {
-    ticking = false;
-    let current = 0;
-    targets.forEach((el, i) => { if (el && el.getBoundingClientRect().top <= innerHeight * 0.3) current = i; });
-    links.forEach((a, i) => a.toggleAttribute("aria-current", i === current));
-  };
-  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  // Un lien vers une rubrique repliée l'ouvre.
-  const openTarget = () => { const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (el instanceof HTMLDetailsElement) { el.open = true; el.scrollIntoView(); } };
-  openTarget();
-  addEventListener("hashchange", () => { openTarget(); update(); });
-  update();
 </script>

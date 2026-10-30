@@ -1,0 +1,41 @@
+---
+// Comportement des onglets de la réponse (Answer.tsx est rendu côté serveur, sans JavaScript React).
+---
+<script>
+  const bar = document.querySelector<HTMLElement>(".tabbar");
+  if (bar) {
+    const tabs = [...bar.querySelectorAll<HTMLAnchorElement>("[data-tab]")];
+    const show = (id: string, focus = false) => {
+      if (!tabs.some((a) => a.dataset.tab === id)) return false;
+      tabs.forEach((a) => {
+        const on = a.dataset.tab === id;
+        a.setAttribute("aria-selected", String(on));
+        a.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(a.dataset.tab!);
+        if (panel) panel.hidden = !on;
+        if (on) { a.scrollIntoView({ block: "nearest", inline: "center" }); if (focus) a.focus(); }
+      });
+      return true;
+    };
+    const fromHash = () => { const id = decodeURIComponent(location.hash.slice(1)); if (id && show(id)) bar.scrollIntoView({ block: "start" }); };
+    tabs.forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      show(a.dataset.tab!);
+      history.replaceState(null, "", `#${a.dataset.tab}`);
+      if (bar.getBoundingClientRect().top < 0 || bar.getBoundingClientRect().top > innerHeight / 2) bar.scrollIntoView({ block: "start", behavior: "smooth" });
+    }));
+    // Flèches gauche / droite entre les onglets (sens inversé en arabe).
+    bar.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const i = tabs.findIndex((a) => a.getAttribute("aria-selected") === "true");
+      const dir = (e.key === "ArrowRight" ? 1 : -1) * (document.dir === "rtl" ? -1 : 1);
+      const next = tabs[(i + dir + tabs.length) % tabs.length];
+      show(next.dataset.tab!, true);
+      history.replaceState(null, "", `#${next.dataset.tab}`);
+      e.preventDefault();
+    });
+    tabs.forEach((a) => { a.tabIndex = a.getAttribute("aria-selected") === "true" ? 0 : -1; });
+    fromHash();
+    addEventListener("hashchange", fromHash);
+  }
+</script>

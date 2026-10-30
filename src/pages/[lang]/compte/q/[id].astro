@@ -11,6 +11,7 @@ import { symptom, theme } from "@/lib/content/themes";
 import { personalize } from "@/lib/personalize";
 import { qPath } from "@/lib/site";
 import { Answer } from "@/components/Answer";
+import AnswerTabs from "@/components/AnswerTabs.astro";
 import { PublishToggle } from "@/components/PublishToggle";
 import { Icon } from "@/components/Icon";
 
@@ -63,6 +64,7 @@ const mode = !q.is_public ? "private" : q.anonymous ? "anonymous" : "named";
     </div>
   )}
 </Base>
+<AnswerTabs />
 
 <script>
   // Suppression : confirmation, puis retour à « Mes questions ».
