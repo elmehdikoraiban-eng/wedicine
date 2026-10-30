@@ -529,7 +529,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 /* ----- Accueil v5 : héros centré + ruban des sujets ----- */
 .hero-c { padding-top: clamp(40px, 7vw, 88px); overflow: hidden; }
 .hero-c-text { text-align: center; max-width: 880px; }
-.hero-c h1 { font-size: var(--fs-hero); line-height: 1.02; margin-bottom: 24px; font-weight: 700; }
+.hero-c h1 { font-size: var(--fs-hero); line-height: 1.08; margin-bottom: 20px; font-weight: 700; }
 .hero-c h1 .word { white-space: nowrap; }  /* « Pré-consultation » ne se coupe jamais au tiret */
 .hero-c h1 .city { color: var(--brand); font-weight: 700; }
 .hero-c .lead { max-width: 640px; margin: 0 auto 28px; font-size: var(--fs-lead); color: var(--ink); }
