@@ -4,9 +4,10 @@ Trois symboles dans un repère 100 x 100 (y vers le bas) :
   waw     : le « و », tête ronde = bulle de dialogue, creux = croix du soin, queue effilée
   bubbles : deux bulles (question couchée, réponse debout) qui se croisent en croix
   stetho  : un stéthoscope qui dessine une bulle
+  ecoute  : un stéthoscope qui dessine le « و » (tête = tubes et embouts, queue = tuyau, bout = pavillon)
 Le mot « wedicine » reprend les lettres de build.py avec un « w » simple.
 
-Export : cd scripts/logo && mkdir -p out && python3 symboles.py waw
+Export : cd scripts/logo && mkdir -p out && python3 symboles.py ecoute
 puis copier out/*.svg dans public/brand/ (favicon.svg dans public/). Dépendances : pip install skia-pathops fonttools
 """
 import json, math, sys
@@ -74,8 +75,7 @@ def bubbles():
     r = U(r, var_stroke([(xb - 8, b - 16), (xb + 2, b - 14), (xb + 7, b - 9), (xb + tl, b - 1)], 15, 2.2))
     return [q, r, I(q, r)]
 
-def stetho():
-    t, gap, cr, drop = 10.5, 13.0, 10.5, 15.0
+def stetho(t=10.5, gap=13.0, cr=10.5, drop=15.0):
     x0, y0, x1, y1, r = 12.0, 14.0, 88.0, 66.0, 22.0
     k = 0.5522847498 * r
     left = Path(); left.moveTo(50 - gap, y0); left.lineTo(x0 + r, y0); left.cubicTo(x0 + r - k, y0, x0, y0 + r - k, x0, y0 + r)
@@ -89,13 +89,46 @@ def stetho():
     cx, cy = x0 + 4, y1 + drop + 8
     return [U(left, right, hang, tips), D(ellipse(cx, cy, cr, cr), ellipse(cx, cy, cr * 0.45, cr * 0.45))]
 
+def arc(p, cx, cy, r, a0, a1):
+    """Arc de cercle de a0 à a1 (degrés, y vers le bas) en cubiques de 45° au plus."""
+    n = max(1, math.ceil(abs(a1 - a0) / 45)); da = (a1 - a0) / n
+    for i in range(n):
+        s, e = math.radians(a0 + i * da), math.radians(a0 + (i + 1) * da)
+        k = 4 / 3 * math.tan((e - s) / 4) * r
+        x0, y0, x1, y1 = cx + r * math.cos(s), cy + r * math.sin(s), cx + r * math.cos(e), cy + r * math.sin(e)
+        if i == 0: p.moveTo(x0, y0)
+        p.cubicTo(x0 - k * math.sin(s), y0 + k * math.cos(s), x1 + k * math.sin(e), y1 - k * math.cos(e), x1, y1)
+    return p
+
+def ecoute(t=11.0, tip=0.8, cr=11.5, cross=False):
+    """La bulle qui écoute en forme de و : anneau ouvert en haut (embouts), le tuyau part du flanc droit
+    et passe sous la tête vers la gauche, jusqu'au pavillon."""
+    hx, hy, R, gap = 50.0, 38.0, 26.0, 11.0
+    al = math.degrees(math.asin(gap / R))
+    ring = arc(Path(), hx, hy, R, -90 + al, 270 - al)
+    ring.stroke(t, LineCap.ROUND_CAP, LineJoin.ROUND_JOIN, 4); ring.convertConicsToQuads()
+    tx, ty = R * math.sin(math.radians(al)), hy - R * math.cos(math.radians(al))
+    tips = U(ellipse(hx - tx, ty, tip * t, tip * t), ellipse(hx + tx, ty, tip * t, tip * t))
+    ex, ey = hx - 26, hy + 46
+    tail = Path(); tail.moveTo(hx + R, hy)              # part à la verticale, dans le prolongement de l'anneau
+    tail.cubicTo(hx + R, hy + 30, hx + 10, hy + 49, ex, ey)
+    tail.stroke(t, LineCap.ROUND_CAP, LineJoin.ROUND_JOIN, 4); tail.convertConicsToQuads()
+    disc = ellipse(ex, ey, cr, cr)
+    tube = D(U(ring, tips, tail), disc)
+    if cross:
+        tube = U(tube, plus(hx, hy, 9.0, 7.5))
+    return [tube, D(disc, ellipse(ex, ey, cr * 0.45, cr * 0.45))]
+
 # Couleurs des couches de chaque symbole : fond clair, fond bleu, fond marine.
 COLORS = {
     "waw":     ([BLUE], ["#FFFFFF"], [SKY]),
     "bubbles": ([BLUE, SKY, DEEP], ["#FFFFFF", PALE, "#FFFFFF"], [SKY, ICE, "#2684FF"]),
     "stetho":  ([BLUE, NAVY], ["#FFFFFF", "#FFFFFF"], [SKY, "#FFFFFF"]),
+    "ecoute":  ([BLUE, NAVY], ["#FFFFFF", "#FFFFFF"], [SKY, "#FFFFFF"]),
 }
-SYMBOLS = {"waw": waw, "bubbles": bubbles, "stetho": stetho}
+SYMBOLS = {"waw": waw, "bubbles": bubbles, "stetho": stetho, "ecoute": ecoute}
+# Version des petites tailles (favicon) : traits plus épais, pavillon plus grand.
+SMALL = {"stetho": lambda: stetho(t=15.0, gap=15.0, cr=13.5, drop=11.0), "ecoute": lambda: ecoute(t=14.0, tip=0.78, cr=13.0)}
 
 def wordmark():
     """Le mot « wedicine » avec un w simple, de la même graisse que les autres lettres."""
@@ -141,6 +174,7 @@ def paths(layers, fills, nd=1):
 
 def export(key):
     layers = SYMBOLS[key]()
+    small = SMALL[key]() if key in SMALL else layers
     light, on_blue, on_navy = COLORS[key]
     lk, W = lockup(layers)
     n = len(layers)
@@ -153,7 +187,7 @@ def export(key):
         "logo-noir.svg": logo([NAVY] * n, NAVY, NAVY),           # une couleur
         "symbole.svg": svg("0 0 100 100", paths(place(layers, 100, 4), light, 2)),
         "symbole-blanc.svg": svg("0 0 100 100", paths(place(layers, 100, 4), on_blue, 2)),
-        "favicon.svg": svg("0 0 32 32", f'<rect width="32" height="32" rx="7.5" fill="{BLUE}"/>' + paths(place(layers, 32, 3.6), on_blue, 2)),
+        "favicon.svg": svg("0 0 32 32", f'<rect width="32" height="32" rx="7.5" fill="{BLUE}"/>' + paths(place(small, 32, 3.2), on_blue, 2)),
         "icone-carre.svg": svg("0 0 100 100", f'<rect width="100" height="100" fill="{BLUE}"/>' + paths(place(layers, 100, 20), on_blue, 2)),
         "avatar-rond.svg": svg("0 0 100 100", f'<circle cx="50" cy="50" r="50" fill="{BLUE}"/>' + paths(place(layers, 100, 22), on_blue, 2)),
     }
@@ -162,4 +196,4 @@ def export(key):
     return {"W": W, "files": {k: len(v) for k, v in files.items()}}
 
 if __name__ == "__main__":
-    print(json.dumps(export(sys.argv[1] if len(sys.argv) > 1 else "waw")))
+    print(json.dumps(export(sys.argv[1] if len(sys.argv) > 1 else "ecoute")))

@@ -98,7 +98,7 @@ main > .page { padding-block: 48px 96px; }
 .nav { background: rgba(255,255,255,.92); backdrop-filter: saturate(1.4) blur(10px); position: sticky; top: 0; z-index: 10; transition: box-shadow .25s; }
 .nav.scrolled { box-shadow: 0 1px 0 var(--line-2), 0 8px 24px rgba(9, 30, 66, .06); }
 .nav .wrap { display: flex; align-items: center; gap: 8px; height: 72px; max-width: none; padding-inline: clamp(16px, 3vw, 40px); }
-/* Logo : symbole و + mot « wedicine » (public/brand). Sur très petit écran, le symbole seul. */
+/* Logo : la bulle qui écoute (stéthoscope en forme de و) + mot « wedicine » (public/brand). Sur très petit écran, le symbole seul. */
 .logo { display: flex; align-items: center; flex: none; }
 .logo:hover { text-decoration: none; }
 .logo img { display: block; }
