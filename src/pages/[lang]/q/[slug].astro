@@ -8,7 +8,8 @@ import { AGES, CITIES, DURATIONS, INTENTS } from "@/lib/content/options";
 import { countView, pageStats, publicAskers, type PageStats } from "@/lib/db";
 import { publicName } from "@/lib/auth";
 import { alternates, formatDate, qPath, SITE_URL, timeAgo } from "@/lib/site";
-import { Answer } from "@/components/Answer";
+import { Answer, answerOutline } from "@/components/Answer";
+import type { UIKey } from "@/lib/i18n";
 import { Icon } from "@/components/Icon";
 
 const lang = langParam(Astro.params);
@@ -33,6 +34,7 @@ const who = (p: { sex: string | null; who: string }) => p.who === "enfant" ? t(l
 const title = pageTitle(lang, th, sy, intent);
 const it = INTENTS.find((i) => i.id === intent)!;
 const path = qPath(lang, th, sy, intent);
+const toc = [...answerOutline(intent), { id: "stats", key: "statsTitle" }, { id: "ils-ont-demande", key: "othersAsked" }, { id: "sujets-proches", key: "related" }];
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -48,9 +50,14 @@ const jsonLd = {
 ---
 <Base lang={lang} title={title} description={f.summary[lang].slice(0, 160)} canonical={path} alternates={alternates(th, sy, intent)}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
-  <div class="narrow">
+  <div class="read-layout">
+    <nav class="toc" aria-label={t(lang, "tocTitle")}>
+      <p class="toc-title">{t(lang, "tocTitle")}</p>
+      <ol>{toc.map((x) => <li><a href={`#${x.id}`}>{t(lang, x.key as UIKey)}</a></li>)}</ol>
+    </nav>
+    <div class="read-main">
     <Answer lang={lang} fiche={f} th={th} sy={sy} intent={intent}>
-      <section class="card sec stats-sec" style="margin-top:16px">
+      <section class="card sec stats-sec" id="stats" style="margin-top:16px">
         <h2><Icon name="ChartColumn" size={22} />{t(lang, "statsTitle")}</h2>
         {stats.total === 0 ? <p class="muted">{t(lang, "statsEmpty")}</p> : (
           <div class="stats-grid">
@@ -67,7 +74,7 @@ const jsonLd = {
         )}
         <p class="muted small" style="margin:12px 0 0">{t(lang, "anonCountLine")}</p>
       </section>
-      <section class="card sec" style="margin-top:16px">
+      <section class="card sec" id="ils-ont-demande" style="margin-top:16px">
         <h2><Icon name="Users" size={22} />{t(lang, "othersAsked")}</h2>
         {askers.length === 0 ? <p class="muted">—</p> : (
           <div class="askers">
@@ -86,5 +93,18 @@ const jsonLd = {
         </p>
       </section>
     </Answer>
+    </div>
   </div>
 </Base>
+
+<script>
+  // Sommaire : surligne la rubrique en cours de lecture.
+  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>(".toc a")].map((a) => [a.hash.slice(1), a]));
+  const seen = new Set<string>();
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id);
+    const first = [...links.keys()].find((id) => seen.has(id));
+    if (first) links.forEach((a, id) => a.toggleAttribute("aria-current", id === first));
+  }, { rootMargin: "-90px 0px -65% 0px" });
+  links.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+</script>

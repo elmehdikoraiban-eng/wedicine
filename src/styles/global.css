@@ -760,3 +760,32 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .tab-empty { padding: 32px 0; text-align: center; }
 .tab-new { margin-inline-start: auto; color: var(--brand); }
 .tab-new:hover { color: var(--link); }
+
+/* ---- Page d'information (inspirée NHS / Mayo Clinic) ---- */
+.read-layout { display: grid; grid-template-columns: minmax(0, 860px); justify-content: center; gap: 48px; }
+@media (min-width: 1180px) { .read-layout { grid-template-columns: 220px minmax(0, 860px); } }
+.toc { display: none; }
+@media (min-width: 1180px) {
+  .toc { display: block; position: sticky; top: 96px; align-self: start; }
+  .toc-title { font-size: var(--fs-small); font-weight: 700; color: var(--muted); margin: 0 0 10px; }
+  .toc ol { list-style: none; margin: 0; padding: 0; border-inline-start: 2px solid var(--line-2); }
+  .toc a { display: block; padding: 7px 14px; margin-inline-start: -2px; border-inline-start: 2px solid transparent; color: var(--muted); font-size: var(--fs-small); font-weight: 500; line-height: 1.35; }
+  .toc a:hover { color: var(--ink); text-decoration: none; }
+  .toc a[aria-current] { color: var(--brand); border-color: var(--brand); font-weight: 700; }
+}
+[id] { scroll-margin-top: 96px; }
+.brief { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line-2); background: var(--canvas); }
+.brief-title { font-size: var(--fs-heading-sm); margin: 0; padding: 20px 24px 8px; }
+.brief ul { list-style: none; margin: 0; padding: 8px 12px 12px; display: grid; gap: 8px; }
+.brief li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-sm); border-inline-start: 5px solid var(--c); background: var(--bg); line-height: 1.45; }
+.brief li b { color: var(--c); }
+.brief-ico { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--canvas); color: var(--c); }
+.brief .lv-home { --c: #1f845a; --bg: #e9f8f0; }
+.brief .lv-soon { --c: #b65c02; --bg: #fff4e5; }
+.brief .lv-urgent { --c: #c9372c; --bg: #ffeceb; }
+.related h2 { display: flex; align-items: center; gap: 12px; font-size: var(--fs-heading-sm); }
+.related-sub { font-size: var(--fs-lead); margin: 28px 0 12px; }
+.topic-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.topic-chip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 8px; border-radius: var(--r-pill); background: var(--tint-2); color: var(--ink); font-weight: 600; transition: background var(--t); }
+.topic-chip:hover { background: var(--tint); text-decoration: none; }
+.chip-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--canvas); color: var(--brand); }

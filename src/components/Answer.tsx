@@ -3,7 +3,7 @@ import { t, type Lang } from "@/lib/i18n";
 import type { Fiche } from "@/lib/content/types";
 import type { Symptom, Theme } from "@/lib/content/themes";
 import { AGES, CITIES, DURATIONS, INTENSITIES, INTENTS, WHO } from "@/lib/content/options";
-import { pageTitle } from "@/lib/content/themes";
+import { pageTitle, THEMES } from "@/lib/content/themes";
 import { qPath } from "@/lib/site";
 import { Icon } from "./Icon";
 import type { Personal, Step } from "@/lib/personalize";
@@ -21,6 +21,12 @@ const SECTIONS: { key: Key; icon: string; intent: string; art: () => ReactNode }
 const VERDICT_ART = [ArtWatchHome, ArtAppointment, ArtSoon] as const;
 const LEVEL_ICON = ["House", "CalendarCheck", "Clock"] as const;
 const VISIBLE_QUESTIONS = 3;
+
+// Plan de la page (sommaire latéral) : mêmes ancres et même ordre que les sections rendues.
+export function answerOutline(intent: string): { id: string; key: string }[] {
+  const ordered = [...SECTIONS].sort((a, b) => Number(b.intent === intent) - Number(a.intent === intent));
+  return [{ id: "en-bref", key: "briefTitle" }, { id: "quand-consulter", key: "whenToSee" }, ...ordered.map((s) => ({ id: s.key, key: s.key }))];
+}
 
 // Choix du patient utilisés pour les illustrations « Dans votre cas ».
 export type CaseData = { who: string; duration: string | null; intensity: string | null; age: string | null; sex: string | null; city: string | null; signs: string[] };
@@ -82,8 +88,20 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
         {VerdictArt ? <div className="verdict-scene"><VerdictArt /></div> : <ThemeArt icon={th.icon} />}
       </header>
 
+      {/* En bref (pages publiques) : trois niveaux colorés, lisibles sans défiler, comme le NHS. */}
+      {!personal && (
+        <section className="brief" aria-label={t(lang, "briefTitle")} id="en-bref">
+          <h2 className="brief-title">{t(lang, "briefTitle")}</h2>
+          <ul>
+            <li className="lv-home"><span className="brief-ico"><Icon name="House" size={20} /></span><span><b>{t(lang, "briefHome")}</b> {steps[0]?.text}</span></li>
+            <li className="lv-soon"><span className="brief-ico"><Icon name="CalendarCheck" size={20} /></span><span><b>{t(lang, "briefSoon")}</b> {th.duration ? t(lang, "briefSoonText").replace("{d}", DURATIONS[th.consultAfter]?.label[lang].toLowerCase() ?? "") : t(lang, "briefSoonPlain")}</span></li>
+            <li className="lv-urgent"><span className="brief-ico"><Icon name="Siren" size={20} /></span><span><b>{t(lang, "briefUrgent")}</b> {fiche.warning[lang].split(/[,،;]\s*/).slice(0, 3).join(", ")}…</span></li>
+          </ul>
+        </section>
+      )}
+
       {/* Quand consulter : toujours deuxième, visible sans défiler. */}
-      <section className="card sec sec-danger">
+      <section className="card sec sec-danger" id="quand-consulter">
         <div className="sec-art"><ArtGrave /></div>
         <div>
           <h2><Icon name="Siren" size={22} />{t(lang, "whenToSee")}</h2>
@@ -222,14 +240,21 @@ export function Answer({ lang, fiche, th, sy, intent, personal, caseData, childr
 
       {children}
 
-      <section className="sec" style={{ marginTop: 24 }}>
-        <h3>{t(lang, "related")}</h3>
+      {/* Sujets proches : d'autres questions du même sujet, puis d'autres sujets (comme Doctissimo / Mayo Clinic). */}
+      <section className="sec related" id="sujets-proches">
+        <h2><Icon name="Sparkles" size={22} />{t(lang, "related")}</h2>
         <div className="list-links">
-          {INTENTS.filter((i) => i.id !== intent).map((i) => (
+          {INTENTS.filter((i) => i.id !== intent).slice(0, 2).map((i) => (
             <a key={i.id} href={qPath(lang, th, sy, i.id)}><Icon name={i.icon ?? "ChevronRight"} size={18} />{pageTitle(lang, th, sy, i.id)}</a>
           ))}
-          {th.symptoms.filter((s) => s.id !== sy.id).slice(0, 4).map((s) => (
+          {th.symptoms.filter((s) => s.id !== sy.id).slice(0, 2).map((s) => (
             <a key={s.id} href={qPath(lang, th, s, intent)}><Icon name={th.icon} size={18} />{pageTitle(lang, th, s, intent)}</a>
+          ))}
+        </div>
+        <h3 className="related-sub">{t(lang, "otherTopics")}</h3>
+        <div className="topic-chips">
+          {THEMES.filter((x) => x.id !== th.id).slice(0, 6).map((x) => (
+            <a key={x.id} href={qPath(lang, x, x.symptoms[0], intent)} className="topic-chip"><span className="chip-ico"><Icon name={x.icon} size={18} /></span>{x.label[lang]}</a>
           ))}
         </div>
       </section>
