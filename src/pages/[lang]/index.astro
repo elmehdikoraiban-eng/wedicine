@@ -27,7 +27,7 @@ const FAQ = [1, 2, 3, 4, 5, 6, 7] as const;
 const arrow = lang === "ar" ? "ArrowLeft" : "ArrowRight";
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 const brief = (x: string) => x.split(/(?<=[.!؟?])\s+/)[0];
-// Tunnel : 24 cartes (chaque sujet deux fois) réparties sur 360°, les doublons sont masqués aux lecteurs d'écran.
+// Bande d'icônes pleine largeur : la liste est doublée pour boucler sans couture (doublons masqués aux lecteurs d'écran).
 const ribbon = [...THEMES, ...THEMES];
 const city = visitorCity(Astro.request, Astro.url, lang);
 ---
@@ -45,9 +45,9 @@ const city = visitorCity(Astro.request, Astro.url, lang);
     <div class="ribbon" id="ribbon" aria-label={t(lang, "themesTitle")}>
       <div class="ribbon-track">
         {ribbon.map((th, i) => (
-          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" data-i={i} aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
+          <a href={`/${lang}/question?theme=${th.id}`} class="topic-card" aria-hidden={i >= THEMES.length ? "true" : undefined} tabindex={i >= THEMES.length ? -1 : undefined}>
             <TopicScene id={th.id} />
-            <span class="topic-name"><Icon name={th.icon} size={18} />{th.label[lang]}</span>
+            <span class="topic-name">{th.label[lang]}</span>
           </a>
         ))}
       </div>
@@ -125,48 +125,15 @@ const city = visitorCity(Astro.request, Astro.url, lang);
   </section>
 
   <script>
-    // Tunnel des sujets : les cartes sont posées sur un anneau vu de l'intérieur (comme un tunnel) qui tourne lentement.
-    // On peut le faire tourner à la main ; grille fixe si animations réduites, liste tactile sur mobile (CSS).
+    // Bande des sujets : glisse lentement en continu (CSS) ; on peut la tirer à la main, sans déclencher le lien.
     const r = document.getElementById("ribbon");
     const track = r?.querySelector<HTMLElement>(".ribbon-track");
-    const cards = Array.from(r?.querySelectorAll<HTMLElement>(".topic-card") ?? []);
-    const wide = window.matchMedia("(min-width: 761px)");
-    const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (r && track && cards.length) {
-      const n = cards.length, step = 360 / n, rtl = document.dir === "rtl";
-      let rot = 0, last = 0, down = false, startX = 0, moved = 0, raf = 0, on = false;
-      // Perspective, rayon de l'anneau et recul de la caméra par rapport à son centre (px).
-      const P = 340, R = 700, D = 40;
-      const place = () => {
-        for (let i = 0; i < n; i++) {
-          const a = ((i * step + rot) % 360 + 360) % 360;
-          const dist = D + R * Math.cos((a * Math.PI) / 180); // distance carte → caméra
-          const el = cards[i];
-          if (dist < 0.3 * P) { el.style.visibility = "hidden"; continue; }
-          el.style.visibility = "";
-          el.style.opacity = String(Math.min(1, (dist - 0.3 * P) / (0.3 * P)));
-          el.style.transform = `rotateY(${a}deg) translateZ(${-R}px)`;
-        }
-      };
-      const tick = (ts: number) => {
-        if (!down && !r.matches(":hover")) rot += ((ts - last) / 1000) * (rtl ? -4 : 4); // un tour en 90 s
-        last = ts; place(); raf = requestAnimationFrame(tick);
-      };
-      const start = () => {
-        if (on) return; on = true; r.classList.add("tunnel"); track.style.perspective = `${P}px`; track.style.transform = `translateZ(${P - D}px)`;
-        last = performance.now(); raf = requestAnimationFrame(tick);
-      };
-      const stop = () => {
-        if (!on) return; on = false; cancelAnimationFrame(raf); r.classList.remove("tunnel");
-        track.style.cssText = ""; cards.forEach((el) => { el.style.cssText = ""; });
-      };
-      const sync = () => (wide.matches && !calm.matches ? start() : stop());
-      sync(); wide.addEventListener("change", sync); calm.addEventListener("change", sync);
-      r.addEventListener("pointerdown", (e) => { if (!on) return; down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
-      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); rot -= (dx * 57.3) / P; startX = e.clientX; });
+    if (r && track && window.matchMedia("(min-width: 761px) and (prefers-reduced-motion: no-preference)").matches) {
+      let down = false, startX = 0, moved = 0, offset = 0;
+      r.addEventListener("pointerdown", (e) => { down = true; moved = 0; startX = e.clientX; r.classList.add("dragging"); r.setPointerCapture(e.pointerId); });
+      r.addEventListener("pointermove", (e) => { if (!down) return; const dx = e.clientX - startX; moved = Math.max(moved, Math.abs(dx)); offset += dx; startX = e.clientX; track.style.setProperty("--drag", `${offset}px`); });
       const up = () => { down = false; r.classList.remove("dragging"); };
       r.addEventListener("pointerup", up); r.addEventListener("pointercancel", up);
-      // Un glissement ne doit pas déclencher le lien.
       r.addEventListener("click", (e) => { if (moved > 8) { e.preventDefault(); e.stopPropagation(); } }, true);
     }
   </script>

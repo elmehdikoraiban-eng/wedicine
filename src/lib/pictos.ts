@@ -52,10 +52,10 @@ export const stepPicto = (fr: string): Picto => pick(STEP_RULES, fr, { icon: "Li
 export const examPicto = (fr: string): Picto => pick(EXAM_RULES, fr, { icon: "Microscope", tone: "teal" });
 
 export const TONES: Record<Picto["tone"], { bg: string; fg: string }> = {
-  blue: { bg: "#D7EEE8", fg: "#0B5F53" },
-  green: { bg: "#E3F4EA", fg: "#1E6B49" },
-  red: { bg: "#FCEBE6", fg: "#B5351F" },
-  purple: { bg: "#EDEAFA", fg: "#5A4BB5" },
-  teal: { bg: "#E4F0FB", fg: "#1F6FAE" },
-  yellow: { bg: "#FBF1DE", fg: "#9A5F0E" },
+  blue: { bg: "#DEEBFF", fg: "#0052CC" },
+  green: { bg: "#E3FCEF", fg: "#006644" },
+  red: { bg: "#FFEBE6", fg: "#BF2600" },
+  purple: { bg: "#EAE6FF", fg: "#5243AA" },
+  teal: { bg: "#E6FCFF", fg: "#008DA6" },
+  yellow: { bg: "#FFFAE6", fg: "#974F0C" },
 };
