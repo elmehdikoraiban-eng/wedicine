@@ -375,6 +375,21 @@ export const UI = {
   showPw: { fr: "Afficher", ar: "إظهار", en: "Show" },
   hidePw: { fr: "Masquer", ar: "إخفاء", en: "Hide" },
   notDoctor: { fr: "Wedicine ne remplace pas un médecin.", ar: "لا يعوّض Wedicine الطبيب.", en: "Wedicine does not replace a doctor." },
+  greetDay: { fr: "Bonjour {name}.", ar: "مرحباً {name}.", en: "Hello {name}." },
+  greetEvening: { fr: "Bonsoir {name}.", ar: "مساء الخير {name}.", en: "Good evening {name}." },
+  recentLabel: { fr: "Récentes", ar: "الأخيرة", en: "Recent" },
+  orResume: { fr: "Ou reprenez :", ar: "أو تابع:", en: "Or pick up:" },
+  privateAnswers: { fr: "Vos réponses restent privées", ar: "تبقى أجوبتك خاصة", en: "Your answers stay private" },
+  savePdf: { fr: "Enregistrer en PDF", ar: "حفظ بصيغة PDF", en: "Save as PDF" },
+  refineQ: { fr: "Précisez votre question", ar: "حدّد سؤالك", en: "Refine your question" },
+  tapAnswer: { fr: "Touchez une réponse", ar: "المس جواباً", en: "Tap an answer" },
+  redLineIntro: { fr: "Appelez le 141", ar: "اتصل بالرقم 141", en: "Call 141" },
+  redLineIf: { fr: "en cas de", ar: "في حالة:", en: "in case of" },
+  infoNotDiag: { fr: "Information générale, pas un diagnostic.", ar: "معلومة عامة، وليست تشخيصاً.", en: "General information, not a diagnosis." },
+  today: { fr: "Aujourd'hui", ar: "اليوم", en: "Today" },
+  menu: { fr: "Menu", ar: "القائمة", en: "Menu" },
+  close: { fr: "Fermer", ar: "إغلاق", en: "Close" },
+  youSince: { fr: "Vous, {d}", ar: "أنت، {d}", en: "You, {d}" },
 } satisfies Record<string, T>;
 
 export type UIKey = keyof typeof UI;

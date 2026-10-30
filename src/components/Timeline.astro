@@ -1,0 +1,25 @@
+---
+// Frise des durées : où en est le patient (rond bleu) et à partir de quand consulter (trait).
+// Lisible sans le texte ; miroir en arabe.
+interface Props { labels: string[]; current: number; threshold: number; you: string; consult: string; rtl?: boolean }
+const { labels, current, threshold, you, consult, rtl = false } = Astro.props;
+const W = 600, seg = W / labels.length;
+const fx = (x: number) => (rtl ? W - x : x);
+const cx = fx(current * seg + seg / 2);
+const tick = threshold < labels.length ? fx(threshold * seg) : null;
+// En écriture de droite à gauche, « start » et « end » s'inversent : on raisonne en côté visuel.
+const anc = (side: "left" | "right" | "middle") => (side === "middle" ? "middle" : (side === "right") === !rtl ? "start" : "end");
+const youSide = cx < 70 ? "right" : cx > W - 70 ? "left" : "middle";
+const youX = youSide === "right" ? 4 : youSide === "left" ? W - 4 : cx;
+const consultSide = tick != null && tick + 180 <= W ? "right" : "left";
+---
+<svg viewBox={`0 0 ${W} 100`} role="img" aria-label={`${you}. ${consult}.`}>
+  <rect x="0" y="44" width={W} height="10" rx="5" fill="#dce3ee" />
+  {tick != null && <rect x={rtl ? 0 : tick} y="44" width={rtl ? tick : W - tick} height="10" rx="5" fill="#b3d4ff" />}
+  <rect x={rtl ? cx : 0} y="44" width={rtl ? W - cx : cx} height="10" rx="5" fill="#0065ff" />
+  {tick != null && <line x1={tick} y1="36" x2={tick} y2="62" stroke="#091e42" stroke-width="2" />}
+  <circle cx={cx} cy="49" r="9" fill="#fff" stroke="#0065ff" stroke-width="4" />
+  <text class="tl-main" x={youX} y="22" text-anchor={anc(youSide)} font-size="13" font-weight="700" fill="#091e42">{you}</text>
+  {tick != null && <text x={consultSide === "right" ? tick + 6 : tick - 6} y="76" class="tl-main" text-anchor={anc(consultSide)} font-size="12" font-weight="700" fill="#091e42">{consult}</text>}
+  {labels.map((l, i) => <text class="tl-step" x={fx(i * seg + seg / 2)} y="94" text-anchor="middle" font-size="11.5" fill="#5b6b86">{l}</text>)}
+</svg>

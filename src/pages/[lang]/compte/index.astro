@@ -15,7 +15,7 @@ if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
 const tiles = ACCOUNT_PAGES.filter((p) => p.id);
 const DESC = { questions: "accQuestionsDesc", infos: "accIdentityDesc", sante: "accHealthDesc", confidentialite: "accPrivacyDesc" } as const;
 ---
-<Account lang={lang} active="" title={`${t(lang, "hello")} ${a.acc.first_name}`} name={`${a.acc.first_name} ${a.acc.last_name}`} avatar={a.avatar}>
+<Account lang={lang} active="" title={`${t(lang, "hello")} ${a.acc.first_name}`} name={a.shortName} avatar={a.avatar} recent={a.recent}>
   <p class="muted acc-lead">{t(lang, "memberSince")} {formatDate(a.acc.created_at, lang)}</p>
   <a href={`/${lang}/compte/questions`} class={`helped${a.nPub ? "" : " helped-empty"}`}>
     <span class="ico"><Icon name="HeartHandshake" size={28} /></span>

@@ -50,7 +50,7 @@ function cleared(a: Answers, step: Step, themeFirst: boolean): Answers {
   return out;
 }
 
-export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string }) {
+export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; initialTheme?: string; greeting?: string; recent?: { href: string; title: string }[] }) {
   const start = getTheme(initialTheme ?? "") ? initialTheme! : "";
   const [themeFirst, setThemeFirst] = useState(!!start);
   const [a, setA] = useState<Answers>({ ...EMPTY, theme: start });
@@ -193,7 +193,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
 
   const composer = (
     <div className="composer">
-      {intro && <p className="composer-q">{question(step)}</p>}
+      {intro && !greeting && <p className="composer-q">{question(step)}</p>}
       <div className="opts">
         {choices().map((c) => (
           <button key={c.id} type="button" className={`opt${c.alert ? " alert" : ""}`} disabled={busy}
@@ -208,7 +208,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
         {intro ? <span>{counter}</span> : <button type="button" className="link" onClick={back} disabled={busy}>{t(lang, "editPrev")}</button>}
         {step === "signs" && a.signs.length > 0
           ? <button type="button" className="btn btn-primary btn-xs" disabled={busy} onClick={() => advance(cleared(a, "signs", themeFirst))}>{t(lang, "next")}</button>
-          : <span>{intro ? t(lang, "freeNoAccount") : counter}</span>}
+          : <span>{intro ? t(lang, greeting ? "tapAnswer" : "freeNoAccount") : counter}</span>}
       </div>
     </div>
   );
@@ -239,7 +239,7 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
   const legal = (
     <div className="chat-legal">
       <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")}</span>
-      {intro && <nav>{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</nav>}
+      {intro && !greeting && <nav>{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</nav>}
     </div>
   );
 
@@ -249,13 +249,17 @@ export function Chat({ lang, initialTheme }: { lang: Lang; initialTheme?: string
         <div className="chat-main">
           <div className="chat-hero">
             <img src="/brand/symbole.svg" alt="" width={44} height={44} />
-            <h1>{t(lang, "chatTitle")}</h1>
-            <p>{t(lang, "chatSub")}</p>
+            <h1>{greeting ?? t(lang, "chatTitle")}</h1>
+            <p>{greeting ? question(step) : t(lang, "chatSub")}</p>
           </div>
           {composer}
-          <nav className="topics" aria-label={t(lang, "themesTitle")}>
-            {THEMES.map((x) => <a key={x.id} className="topic" href={`/${lang}?theme=${x.id}`} onClick={(e) => { e.preventDefault(); startWith(x.id); }}>{x.label[lang]}</a>)}
-          </nav>
+          {greeting
+            ? recent && recent.length > 0 && (
+              <p className="resume"><span>{t(lang, "orResume")}</span>{recent.map((r) => <a key={r.href} href={r.href}>{r.title}</a>)}</p>
+            )
+            : <nav className="topics" aria-label={t(lang, "themesTitle")}>
+              {THEMES.map((x) => <a key={x.id} className="topic" href={`/${lang}?theme=${x.id}`} onClick={(e) => { e.preventDefault(); startWith(x.id); }}>{x.label[lang]}</a>)}
+            </nav>}
         </div>
         {legal}
       </div>

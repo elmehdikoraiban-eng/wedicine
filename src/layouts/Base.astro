@@ -16,8 +16,9 @@ interface Props {
   alternates?: Record<string, string>;
   footer?: boolean;       // pied de page (masqué dans l'espace patient)
   wrap?: boolean;         // enveloppe le contenu dans .wrap (toutes les pages sauf l'accueil)
+  nav?: boolean;          // barre de navigation (absente dans l'espace patient, qui a sa barre latérale)
 }
-const { lang, title, description, noindex = false, canonical, alternates, wrap = true, footer = true } = Astro.props;
+const { lang, title, description, noindex = false, canonical, alternates, wrap = true, footer = true, nav = true } = Astro.props;
 const user = await currentUser(Astro.cookies);
 const fullTitle = title ? `${title} | Wedicine` : `Wedicine, ${t(lang, "tagline")}`;
 const desc = description ?? t(lang, "heroSub");
@@ -47,7 +48,7 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <slot name="head" />
   </head>
   <body>
-    <Nav lang={lang} user={user ? { firstName: user.first_name, lastName: user.last_name, avatar: avatarOf(user) } : null} />
+    {nav && <Nav lang={lang} user={user ? { firstName: user.first_name, lastName: user.last_name, avatar: avatarOf(user) } : null} />}
     <main>
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>

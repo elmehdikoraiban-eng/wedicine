@@ -11,7 +11,7 @@ if (!lang) return Astro.redirect("/fr", 302);
 const a = await loadAccount(Astro, lang);
 if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
 ---
-<Account lang={lang} active="sante" title={t(lang, "accHealth")} name={`${a.acc.first_name} ${a.acc.last_name}`} avatar={a.avatar}>
+<Account lang={lang} active="sante" title={t(lang, "accHealth")} name={a.shortName} avatar={a.avatar} recent={a.recent}>
   <section class="acc-card">
     {a.health.length
       ? <>

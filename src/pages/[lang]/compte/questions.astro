@@ -21,7 +21,7 @@ const asked = Astro.url.searchParams.get("tab");
 const tab = TABS.find((x) => x.id === asked)?.id ?? TABS.find((x) => by(x.id).length)?.id ?? "moi";
 const list = by(tab);
 ---
-<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={`${a.acc.first_name} ${a.acc.last_name}`} avatar={a.avatar}>
+<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={a.shortName} avatar={a.avatar} recent={a.recent}>
   {Astro.url.searchParams.get("deleted") === "1" && <p class="notice notice-ok" role="status"><Icon name="Check" size={18} /> {t(lang, "delQDone")}</p>}
   <nav class="acc-tabs" role="tablist" aria-label={t(lang, "myQuestions")}>
     {TABS.map((x) => (

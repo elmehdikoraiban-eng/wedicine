@@ -1,72 +1,154 @@
 ---
-import Base from "@/layouts/Base.astro";
+// La réponse, dans la conversation : la bulle du patient résume ses choix, puis Wedicine répond
+// (verdict, ligne rouge 141, frise des durées, quatre rubriques courtes, actions), et le composeur propose la suite.
+import Account from "@/layouts/Account.astro";
 import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
-import { currentUser } from "@/lib/auth";
-import { accountById, questionById } from "@/lib/db";
-import { AGES, CITIES } from "@/lib/content/options";
+import { loadAccount, shortTitle } from "@/lib/account";
+import { questionById } from "@/lib/db";
+import { AGES, CITIES, DURATIONS, INTENTS, WHO } from "@/lib/content/options";
 import { publicName } from "@/lib/auth";
 import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
 import { personalize } from "@/lib/personalize";
-import { qPath } from "@/lib/site";
-import { Answer } from "@/components/Answer";
-import AnswerTabs from "@/components/AnswerTabs.astro";
+import { stepPicto } from "@/lib/pictos";
+import { qPath, whenLabel } from "@/lib/site";
 import { PublishToggle } from "@/components/PublishToggle";
 import { Icon } from "@/components/Icon";
+import Timeline from "@/components/Timeline.astro";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const id = Number(Astro.params.id);
-const user = await currentUser(Astro.cookies);
-if (!user) return Astro.redirect(`/${lang}/connexion?next=/${lang}/compte/q/${id}`, 302);
+const a = await loadAccount(Astro, lang);
+if (!a) return Astro.redirect(`/${lang}/connexion?next=/${lang}/compte/q/${id}`, 302);
 const q = Number.isInteger(id) ? await questionById(id) : undefined;
-if (!q || q.user_id !== user.id) return new Response(null, { status: 404 });
+if (!q || q.user_id !== a.acc.id) return new Response(null, { status: 404 });
 const th = theme(q.theme); const sy = th && symptom(th, q.symptom); const f = th && sy && fiche(th.id, sy.id);
 if (!th || !sy || !f) return new Response(null, { status: 404 });
 const answers = { ...q, intensity: q.intensity == null ? null : String(q.intensity), signs: q.signs ?? [] };
-const personal = q.urgent ? undefined : personalize(answers, th, f, lang);
-// Aperçu exact de ce que les autres verront sur la page publique.
-const acc = await accountById(user.id);
-const tail = [AGES.find((x) => x.id === q.age)?.label[lang], q.city && q.city !== "autre" ? CITIES.find((x) => x.id === q.city)?.label[lang] : null].filter(Boolean).join(", ");
-const anonName = q.who === "enfant" ? t(lang, "aParent") : (q.sex ?? acc?.sex) === "f" ? t(lang, "aPatientF") : t(lang, "aPatientM");
-const previewNamed = [publicName(acc?.first_name ?? user.first_name, acc?.last_name ?? user.last_name), tail].filter(Boolean).join(", ");
+const personal = q.urgent ? null : personalize(answers, th, f, lang);
+const low = (x: string) => (lang === "ar" ? x : x.toLowerCase());
+const label = (list: { id: string; label: Record<string, string> }[], v: string | null | undefined) => list.find((o) => o.id === v)?.label[lang];
+
+// La bulle du patient : ses réponses, en une ligne.
+const signLabels = (q.signs ?? []).map((s) => th.signs.find((x) => x.id === s)?.label[lang]).filter((x) => !!x) as string[];
+const signsTxt = signLabels.length ? signLabels.map(low).join(", ") : th.signs.length ? low(t(lang, "noneSigns")) : null;
+const city = q.city && q.city !== "autre" ? label(CITIES, q.city) : null;
+const recap = [label(WHO, q.who), sy.label[lang], label(DURATIONS, q.duration), signsTxt, label(AGES, q.age), city, label(INTENTS, q.intent)].filter(Boolean).join(" · ");
+
+const dur = DURATIONS.findIndex((d) => d.id === q.duration);
+const hasTimeline = !!personal && th.duration && dur >= 0;
+const caption = hasTimeline ? personal!.know[0] : null; // la première phrase « pour vous » parle de la durée
+const know = personal ? (hasTimeline ? personal.know.slice(1) : personal.know) : [];
+const title = shortTitle(lang, q, th);
+
+// Aperçu exact de la signature publique, pour « Aider d'autres patients ».
+const tail = [label(AGES, q.age), city].filter(Boolean).join(", ");
+const anonName = q.who === "enfant" ? t(lang, "aParent") : (q.sex ?? a.acc.sex) === "f" ? t(lang, "aPatientF") : t(lang, "aPatientM");
+const previewNamed = [publicName(a.acc.first_name, a.acc.last_name), tail].filter(Boolean).join(", ");
 const previewAnon = [anonName, tail].filter(Boolean).join(", ");
 const mode = !q.is_public ? "private" : q.anonymous ? "anonymous" : "named";
+
+// Le composeur propose les autres angles de la même réponse (ancres) et une nouvelle question.
+const ANCHOR: Record<string, string> = { grave: "savoir", attente: "attendre", medecin: "medecin", examens: "examens", questions: "questions" };
+const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || f.exams.length > 0));
 ---
-<Base lang={lang} title={t(lang, "myQuestions")} noindex>
-  {q.urgent ? (
-    <div class="urgent">
-      <div class="big"><Icon name="Siren" size={44} /></div>
-      <h1>{t(lang, "urgentTitle")}</h1>
-      <p class="muted">{t(lang, "urgentText")}</p>
-      <div class="calls">
-        <a href="tel:141" class="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "callSamu")}</a>
-        <a href="tel:15" class="btn btn-danger btn-lg"><Icon name="Phone" size={22} /> {t(lang, "callCivil")}</a>
-      </div>
-    </div>
-  ) : (
-    <div class="narrow">
-      <p class="no-print"><a href={`/${lang}/compte`}>← {t(lang, "myQuestions")}</a></p>
-      <Answer lang={lang} fiche={f} th={th} sy={sy} intent={q.intent} personal={personal}
-        caseData={{ who: q.who, duration: q.duration, intensity: q.intensity == null ? null : String(q.intensity), age: q.age, sex: q.sex, city: q.city, signs: q.signs ?? [] }}>
-        <section class="card no-print" style="margin-top:16px">
-          <PublishToggle client:load lang={lang} id={q.id} mode={mode} previewNamed={previewNamed} previewAnon={previewAnon} />
-          <div class="row" style="margin-top:16px">
-            <a href={qPath(lang, th, sy, q.intent)} class="btn btn-ghost btn-sm"><Icon name="Globe" size={16} /> {t(lang, "publicPage")}</a>
-            <a href={`/${lang}`} class="btn btn-ghost btn-sm">{t(lang, "newQuestion")}</a>
+<Account lang={lang} active="q" currentId={q.id} title={title} meta={whenLabel(q.created_at, lang, t(lang, "today"))} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+  <div class="chat answer-chat">
+    <div class="chat-log">
+      <div class="msg-me">{recap}</div>
+      {q.urgent || !personal ? (
+        <div class="msg-wd urgent-msg" role="alert">
+          <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" />
+          <div>
+            <p class="u-title">{t(lang, "urgentTitle")}</p>
+            <p>{t(lang, "urgentText")}</p>
+            <div class="calls">
+              <a href="tel:141" class="btn btn-danger"><Icon name="Phone" size={16} /> {t(lang, "callSamu")}</a>
+              <a href="tel:15" class="btn btn-danger"><Icon name="Phone" size={16} /> {t(lang, "callCivil")}</a>
+            </div>
           </div>
-        </section>
-        <section class="no-print del-zone">
-          <button type="button" class="btn btn-text btn-del" id="del-q" data-id={q.id} data-lang={lang} data-confirm={t(lang, "delQConfirm")}><Icon name="Trash2" size={16} /> {t(lang, "delQ")}</button>
-        </section>
-      </Answer>
+        </div>
+      ) : (
+        <article class="ans">
+          <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" />
+          <div class="ans-body">
+            <p class={`ans-verdict lv${personal.level}`}><span class="dot" aria-hidden="true"></span>{personal.verdict}</p>
+            <p class="ans-red"><b>{t(lang, "redLineIntro")}</b> {t(lang, "redLineIf")} {f.warning[lang]}{personal.warning.length > 0 && ` ${t(lang, "alsoForYou")} ${personal.warning.join(" ; ")}.`}</p>
+            {hasTimeline && (
+              <figure class="ans-fig">
+                <Timeline labels={DURATIONS.map((d) => d.label[lang])} current={dur} threshold={th.consultAfter} rtl={lang === "ar"}
+                  you={t(lang, "youSince").replace("{d}", low(DURATIONS[dur].label[lang]))} consult={t(lang, "consultFrom")} />
+                {caption && <figcaption>{caption}</figcaption>}
+              </figure>
+            )}
+            <section class="ans-sec" id="savoir">
+              <h2>{t(lang, "whatToKnow")}</h2>
+              {know.map((p) => <p>{p}</p>)}
+              <p>{f.explanation[0][lang]}</p>
+              {f.explanation.length > 1 && (
+                <details class="ans-more">
+                  <summary>{t(lang, "readMore")}</summary>
+                  {f.explanation.slice(1).map((p) => <p>{p[lang]}</p>)}
+                </details>
+              )}
+            </section>
+            <section class="ans-sec" id="attendre">
+              <h2>{t(lang, "meanwhile")}</h2>
+              <ul class="ans-steps">
+                {personal.meanwhile.map((s) => (
+                  <li><span class="pic"><Icon name={(s.picto ?? stepPicto("")).icon} size={18} /></span><span>{s.personal && <span class="ans-you">{t(lang, "forYou")}</span>}{s.text}</span></li>
+                ))}
+              </ul>
+            </section>
+            <section class="ans-sec" id="medecin">
+              <h2>{t(lang, "whichDoctor")}</h2>
+              <p>{personal.doctor ? <><b>{personal.doctor.who}.</b> {personal.doctor.why}</> : f.whichDoctor[lang]}</p>
+            </section>
+            {f.exams.length > 0 && (
+              <section class="ans-sec" id="examens">
+                <h2>{t(lang, "exams")}</h2>
+                {personal.exams && <p>{personal.exams}</p>}
+                <ul>{f.exams.map((e) => <li>{e[lang]}</li>)}</ul>
+              </section>
+            )}
+            <section class="ans-sec" id="questions">
+              <h2>{t(lang, "askDoctor")}</h2>
+              <ul>{personal.questions.map((x) => <li>{x.text}</li>)}</ul>
+            </section>
+            <div class="ans-actions no-print">
+              <button type="button" class="ghost" id="save-pdf"><Icon name="Download" size={14} />{t(lang, "savePdf")}</button>
+              <details class="ans-help" open={mode !== "private"}>
+                <summary class="ghost"><Icon name="Heart" size={14} />{t(lang, "pubTitle")}</summary>
+                <PublishToggle client:load lang={lang} id={q.id} mode={mode} previewNamed={previewNamed} previewAnon={previewAnon} />
+              </details>
+              {q.is_public && <a href={qPath(lang, th, sy, q.intent)} class="ghost"><Icon name="Globe" size={14} />{t(lang, "publicPage")}</a>}
+              <span class="ans-note">{t(lang, "infoNotDiag")} {t(lang, "sources")} : {f.sources.map((s) => s.label).join(" · ")}.</span>
+            </div>
+          </div>
+        </article>
+      )}
     </div>
-  )}
-</Base>
-<AnswerTabs />
+    <div class="chat-foot no-print">
+      <div class="composer">
+        <div class="opts">
+          {personal && chips.map((i) => <a href={`#${ANCHOR[i.id]}`} class="opt">{i.icon && <Icon name={i.icon} size={16} />}{i.label[lang]}</a>)}
+          <a href={`/${lang}`} class="opt"><Icon name="Plus" size={16} />{t(lang, "newQuestion")}</a>
+        </div>
+        <div class="composer-foot">
+          <span>{personal ? t(lang, "refineQ") : ""}</span>
+          <button type="button" class="link ans-del" id="del-q" data-id={q.id} data-lang={lang} data-confirm={t(lang, "delQConfirm")}><Icon name="Trash2" size={14} /> {t(lang, "delQ")}</button>
+        </div>
+      </div>
+      <div class="chat-legal"><span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")}</span></div>
+    </div>
+  </div>
+</Account>
 
 <script>
+  // Enregistrer en PDF : la boîte d'impression du navigateur, la page est prévue pour (barre et composeur masqués).
+  document.getElementById("save-pdf")?.addEventListener("click", () => window.print());
   // Suppression : confirmation, puis retour à « Mes questions ».
   const b = document.getElementById("del-q");
   b?.addEventListener("click", async () => {

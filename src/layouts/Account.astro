@@ -1,29 +1,86 @@
 ---
-// Gabarit de l'espace patient (inspiré de doctolib.fr) : menu latéral à gauche, une rubrique par page.
-// Sur mobile, le menu devient une rangée d'onglets défilante en haut de page.
+// Gabarit de l'espace patient, façon Claude : une barre latérale à gauche (nouvelle question, mes questions,
+// questions récentes, puis le patient en bas avec son menu), et la conversation ou la rubrique à droite.
+// Sur mobile, la barre devient un tiroir ouvert par le bouton menu (sans JavaScript : une case à cocher).
 import Base from "@/layouts/Base.astro";
-import { t, type Lang, type UIKey } from "@/lib/i18n";
+import { LANG_NAMES, LANGS, t, type Lang, type UIKey } from "@/lib/i18n";
 import { ACCOUNT_PAGES, type AccountPage } from "@/lib/account";
 import { Icon } from "@/components/Icon";
 
-interface Props { lang: Lang; active: AccountPage; title: string; name: string; avatar: string }
-const { lang, active, title, name, avatar } = Astro.props;
+interface Props {
+  lang: Lang;
+  active: AccountPage | "new" | "q";
+  title: string;                           // barre du haut, à gauche (et titre de la rubrique)
+  meta?: string;                           // barre du haut, à droite (date, « Vos réponses restent privées »)
+  name: string;                            // « Mehdi K. »
+  avatar: string;                          // numéro d'avatar sur deux chiffres
+  recent: { id: number; title: string }[]; // dernières questions
+  currentId?: number;                      // question affichée, surlignée dans « Récentes »
+  plain?: boolean;                         // true : la page gère tout (conversation) ; false : rubrique avec son titre
+}
+const { lang, active, title, meta, name, avatar, recent, currentId, plain = false } = Astro.props;
+const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 ---
-<Base lang={lang} title={title} noindex wrap={false} footer={false}>
-  <div class="acc-shell">
-    <aside class="acc-side" aria-label={t(lang, "myAccount")}>
-      <nav class="acc-menu">
-        {ACCOUNT_PAGES.map((p) => (
-          <a href={`/${lang}/compte${p.id ? `/${p.id}` : ""}`} aria-current={p.id === active ? "page" : undefined}>
-            <Icon name={p.icon} size={20} /><span>{t(lang, p.key as UIKey)}</span>
-          </a>
-        ))}
-        <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={20} /><span>{t(lang, "logout")}</span></a>
+<Base lang={lang} title={title} noindex wrap={false} footer={false} nav={false}>
+  <div class="space">
+    <input type="checkbox" id="side-toggle" class="side-toggle" hidden />
+    <label for="side-toggle" class="side-backdrop" aria-hidden="true"></label>
+    <aside class="side" aria-label={t(lang, "myAccount")}>
+      <div class="side-head">
+        <a href={`/${lang}`} class="side-logo" aria-label="Wedicine"><img src="/brand/logo.svg" alt="" width="147" height="26" /></a>
+        <label for="side-toggle" class="side-close" aria-label={t(lang, "close")}><Icon name="X" size={18} /></label>
+      </div>
+      <nav class="side-menu">
+        <a href={`/${lang}`} class="side-new" aria-current={active === "new" ? "page" : undefined}><Icon name="Plus" size={18} strokeWidth={2.2} /><span>{t(lang, "newQuestion")}</span></a>
+        <a href={`/${lang}/compte/questions`} aria-current={active === "questions" ? "page" : undefined}><Icon name="MessageCircle" size={18} /><span>{t(lang, "myQuestions")}</span></a>
+        {recent.length > 0 && (
+          <>
+            <p class="side-label">{t(lang, "recentLabel")}</p>
+            {recent.map((r) => (
+              <a href={`/${lang}/compte/q/${r.id}`} class="side-recent" aria-current={r.id === currentId ? "page" : undefined}><span>{r.title}</span></a>
+            ))}
+          </>
+        )}
       </nav>
+      <details class="side-user">
+        <summary aria-label={t(lang, "myAccount")}>
+          <img src={`/avatars/${avatar}.svg`} alt="" width="28" height="28" />
+          <span>{name}</span>
+          <Icon name="ChevronDown" size={16} />
+        </summary>
+        <div class="side-pop">
+          {ACCOUNT_PAGES.filter((p) => p.id !== "questions").map((p) => (
+            <a href={`/${lang}/compte${p.id ? `/${p.id}` : ""}`} aria-current={p.id === active ? "page" : undefined}>
+              <Icon name={p.icon} size={18} /><span>{t(lang, (p.id ? p.key : "myAccount") as UIKey)}</span>
+            </a>
+          ))}
+          <div class="side-lang" aria-label={t(lang, "accLanguage")}>
+            {LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}
+          </div>
+          <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={18} /><span>{t(lang, "logout")}</span></a>
+        </div>
+      </details>
     </aside>
-    <div class="acc-main">
-      <h1 class="acc-title">{title}</h1>
-      <slot />
+    <div class="space-main">
+      <div class="space-top">
+        <label for="side-toggle" class="side-burger" aria-label={t(lang, "menu")}><Icon name="Menu" size={20} /></label>
+        <span class="space-title">{plain ? title : t(lang, "myAccount")}</span>
+        {meta && <span class="space-meta">{meta}</span>}
+        <a href={`/${lang}`} class="space-plus" aria-label={t(lang, "newQuestion")}><Icon name="Plus" size={20} strokeWidth={2.2} /></a>
+      </div>
+      {plain ? <slot /> : <div class="acc-main"><h1 class="acc-title">{title}</h1><slot /></div>}
     </div>
   </div>
 </Base>
+
+<script>
+  // Le menu du patient se ferme au clic à l'extérieur ou avec Échap ; le tiroir mobile se ferme avec Échap.
+  const m = document.querySelector<HTMLDetailsElement>(".side-user");
+  const toggle = document.querySelector<HTMLInputElement>("#side-toggle");
+  document.addEventListener("click", (e) => { if (m?.open && !m.contains(e.target as Node)) m.open = false; });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (m?.open) { m.open = false; m.querySelector("summary")?.focus(); }
+    if (toggle?.checked) toggle.checked = false;
+  });
+</script>

@@ -20,7 +20,7 @@ const sex = acc.sex ?? avatarSex(current);
 const all = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1);
 const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => avatarSex(n) !== sex)];
 ---
-<Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={[acc.first_name, acc.last_name].filter(Boolean).join(" ")} avatar={a.avatar}>
+<Account lang={lang} active="infos" title={t(lang, "accIdentity")} name={a.shortName} avatar={a.avatar} recent={a.recent}>
   <section class="acc-card">
     <div class="acc-avatar-row">
       <img src={`/avatars/${a.avatar}.svg`} alt="" width="88" height="88" class="acc-avatar" />

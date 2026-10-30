@@ -32,3 +32,19 @@ export function timeAgo(d: string | Date, l: Lang, now = Date.now()) {
   for (const [u, s] of steps) { if (Math.abs(sec) >= s) { unit = u; size = s; } }
   return rtf.format(Math.round(sec / size), unit);
 }
+
+const TZ = "Africa/Casablanca";
+// « Aujourd'hui, 20:52 » ou « 30 octobre 2026, 20:52 », à l'heure du Maroc.
+export function whenLabel(d: string | Date, l: Lang, today: string, now = new Date()) {
+  const day = (x: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(x);
+  const date = new Date(d);
+  const time = new Intl.DateTimeFormat(LOCALE[l], { timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+  const when = day(date) === day(now) ? today : new Intl.DateTimeFormat(LOCALE[l], { timeZone: TZ, day: "numeric", month: "long", year: "numeric" }).format(date);
+  return `${when}, ${time}`;
+}
+
+// Soir à partir de 18 h (pour « Bonsoir »).
+export function isEvening(now = new Date()) {
+  const h = Number(new Intl.DateTimeFormat("en", { timeZone: TZ, hour: "numeric", hour12: false }).format(now));
+  return h >= 18 || h < 5;
+}

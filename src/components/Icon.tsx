@@ -4,6 +4,7 @@ import {
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap, IdCard, ChevronDown, Pencil, HeartHandshake, ChartColumn, Timer, Trash2, Plus, ThumbsUp, ThumbsDown,
   Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
+  Menu, X, MessageCircle, Heart, Download,
   type LucideProps,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ export const ICONS = {
   Hourglass, Lock, LogOut, MapPin, Meh, MessageCircleQuestion, Microscope, Moon, PersonStanding, Phone, Printer,
   ShieldAlert, Siren, Smile, Soup, Sparkles, Speech, Stethoscope, TestTube, Thermometer, User, UserRound, Users, Wind, Zap, IdCard, ChevronDown, Pencil, HeartHandshake, ChartColumn, Timer, Trash2, Plus, ThumbsUp, ThumbsDown,
   Ban, Bed, Flame, GlassWater, ListChecks, NotebookPen, Pill, Scale, ScanLine, ShieldCheck, Shirt, Smartphone, Snowflake, Sun, Syringe, Utensils,
+  Menu, X, MessageCircle, Heart, Download,
 };
 export type IconName = keyof typeof ICONS;
 
