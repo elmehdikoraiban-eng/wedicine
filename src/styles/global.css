@@ -6,7 +6,7 @@
      fournie par El Mehdi : licence commerciale à acquérir avant le lancement). Fichiers dans public/fonts. */
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
-@font-face { font-family: "Ramis Arabic"; src: url("/fonts/ramis-arabic.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Ramis Arabic"; src: url("/fonts/ramis-arabic.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 :root {
   --brand: #0065ff;        /* bande bleue, accents, sélection */
   --brand-hover: #0747a6;
