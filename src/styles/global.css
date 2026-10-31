@@ -30,9 +30,9 @@
   /* Boutons et champs (asana.com) */
   --btn: #0065ff; --btn-hover: #0747a6; --btn-text: #ffffff;
   --btn-2: #ffffff; --btn-2-hover: #f4f5f7; --btn-2-border: #c1c7d0;
-  --field-border: #e1e1e1; --field-hover: #c6c6c6; --field-focus: #888888; --ring: #4075cf;
+  --field-border: #dfe3ea; --field-hover: #c1c7d0; --field-focus: #0065ff; --ring: #4075cf;
   /* Arrondis asana : panneaux 24, cartes 16, éléments 12, champs 6 */
-  --r-pill: 100px; --r-field: 6px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
+  --r-pill: 100px; --r-field: 10px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
   --shadow-hover: 0 12px 32px rgba(9, 30, 66, .10);
   --shadow-card: 0 2px 12px rgba(9, 30, 66, .06);
   --shadow-float: 0 24px 64px rgba(9, 30, 66, .12);
@@ -169,11 +169,14 @@ main > .page { padding-block: 48px 96px; }
 .chip[aria-pressed="true"] { border-color: var(--brand); background: var(--brand); color: #fff; }
 .field { margin-bottom: 22px; }
 .field > label, .field > .label { display: block; font-weight: 500; margin-bottom: 10px; }
-/* Champs (asana.com) : 1 px #E1E1E1, rayon 6 px, survol #C6C6C6, focus bord #888 + anneau bleu. */
-.input { width: 100%; border: 1px solid var(--field-border); border-radius: var(--r-field); padding: 12px 16px; background: var(--canvas); color: var(--ink); min-height: 50px; transition: border-color var(--t), box-shadow var(--t); }
-.input::placeholder { color: var(--muted-2); }
-.input:hover { border-color: var(--field-hover); }
-.input:focus { outline: none; border-color: var(--field-focus); box-shadow: 0 0 0 2px var(--ring); }
+/* Champs façon Claude : 40 px, rayon 10 px, bord fin gris clair, texte 14 px ; au focus, bord bleu
+   et halo bleu très léger (pas d'anneau épais). Même style pour .input, .cf input et les listes. */
+.input, .cf input, .set-form select { width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid var(--field-border); border-radius: var(--r-field); background: var(--canvas); color: var(--ink); font-size: 14px; box-shadow: 0 1px 2px rgba(9, 30, 66, .04); transition: border-color var(--t), box-shadow var(--t); }
+.input::placeholder, .cf input::placeholder { color: #8993a4; }
+.input:hover, .cf input:hover, .set-form select:hover { border-color: var(--field-hover); }
+.input:focus, .cf input:focus, .set-form select:focus { outline: none; border-color: var(--field-focus); box-shadow: 0 0 0 3px rgba(0, 101, 255, .14); }
+.set-form select { appearance: none; padding-inline-end: 34px; background: var(--canvas) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b778c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
+[dir="rtl"] .set-form select { background-position: left 12px center; }
 .input-wrap { position: relative; }
 .input-wrap .input { padding-inline-end: 48px; }
 .eye { position: absolute; inset-inline-end: 6px; top: 50%; transform: translateY(-50%); background: none; border: 0; border-radius: 50%; width: 38px; height: 38px; display: grid; place-items: center; color: var(--muted); cursor: pointer; transition: background var(--t); }
@@ -773,10 +776,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .composer.account { gap: 14px; padding: 18px; }
 .acc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .cf { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.cf label { font-size: 13px; font-weight: 600; }
-.cf input { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 10px; background: var(--canvas); color: var(--ink); font-size: 14px; transition: border-color var(--t), box-shadow var(--t); }
-.cf input:hover { border-color: #b8c1cf; }
-.cf input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 2px #b3d4ff; }
+.cf label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
 .pw { position: relative; }
 .pw input { padding-inline-end: 80px; }
 .pw .link { position: absolute; inset-inline-end: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 600; }
@@ -918,7 +918,6 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .set-ok { margin: 0; display: inline-flex; align-items: center; gap: 6px; color: #006644; font-size: 13px; }
 .set-err { margin: 0; color: #b42318; font-size: 13px; }
 .set-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 12px 0 16px; border-bottom: 1px solid #eef0f4; }
-.set-form select { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 10px; background: var(--canvas); color: var(--ink); font: inherit; font-size: 14px; }
 .set-form .set-err, .set-form .set-actions { grid-column: 1 / -1; }
 .set-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .set .btn-xs { min-height: 34px; padding: 0 14px; font-size: 13px; }
