@@ -4,7 +4,7 @@ import { ACCOUNT_PAGES } from "@/lib/account";
 import { Icon } from "./Icon";
 import ThemePick from "./ThemePick.astro";
 
-interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number } | null }
+interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number; admin?: boolean } | null }
 const { lang, user } = Astro.props;
 // Langue choisie automatiquement (navigateur) ; on peut la changer dans l'en-tête (bouton langue) ou le menu du compte, sur la même page.
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
@@ -34,6 +34,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
               {ACCOUNT_PAGES.filter((p) => p.id).map((p) => (
                 <a href={`/${lang}/compte/${p.id}`}><Icon name={p.icon} size={18} />{t(lang, p.key as UIKey)}</a>
               ))}
+              {user.admin && <a href="/admin"><Icon name="ChartColumn" size={18} />Admin</a>}
               <div class="me-lang">
                 <span class="muted small"><Icon name="Globe" size={16} /> {t(lang, "accLanguage")}</span>
                 <div>{LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}</div>

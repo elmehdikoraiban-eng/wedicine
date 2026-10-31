@@ -18,7 +18,7 @@ const who = WHO.find((w) => w.id === asked)?.id ?? null;
 const list = who ? a.qs.filter(({ q }) => q.who === who) : a.qs;
 const filters = [{ id: null, label: t(lang, "filterAll"), n: a.qs.length }, ...WHO.map((w) => ({ id: w.id, label: w.label[lang], n: a.qs.filter(({ q }) => q.who === w.id).length }))];
 ---
-<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={a.shortName} avatar={a.avatar} recent={a.recent} acc={a} plain>
   <div class="set">
     <div class="set-title">
       <h1>{t(lang, "myQuestions")}</h1>

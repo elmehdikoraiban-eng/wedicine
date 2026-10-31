@@ -1,0 +1,38 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, allFiches, reviewedKeys } from "@/lib/admin";
+import { messages, countTodo, SUBJECT_FR } from "@/lib/contact";
+
+// Messages reçus par « Nous contacter ». « Traité » les range ; rien n'est effacé d'ici.
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/messages"), 302);
+const f = (["todo", "done", "all"] as const).find((x) => x === Astro.url.searchParams.get("f")) ?? "todo";
+const rows = await messages(f);
+const todo = await countTodo();
+const toReview = allFiches().length - (await reviewedKeys()).size;
+const when = (x: string | Date) => new Date(x).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Casablanca" });
+---
+<Admin user={user} active="messages" title="Messages" counts={{ toReview, messages: todo }}>
+  <div class="adm-top"><h1>Messages</h1><span class="adm-note">Reçus par la page « Nous contacter ».</span></div>
+  <div class="adm-filters">
+    {[["todo", `À traiter (${todo})`], ["done", "Traités"], ["all", "Tous"]].map(([id, l]) => <a class="filter" href={`/admin/messages${id === "todo" ? "" : `?f=${id}`}`} aria-current={f === id ? "true" : undefined}>{l}</a>)}
+  </div>
+  {rows.length ? (
+    <div class="adm-msgs">
+      {rows.map((m) => (
+        <article class={`adm-msg${m.handled ? " done" : ""}`}>
+          <div class="adm-msg-head"><b>{m.name}</b><span class="adm-tag no">{SUBJECT_FR[m.subject] ?? m.subject}</span>{m.user_id && <span class="adm-tag pub">A un compte</span>}<span class="adm-note">{when(m.at)} · {m.lang.toUpperCase()}</span></div>
+          <p>{m.message}</p>
+          <div class="adm-msg-foot"><span class="adm-contact" dir="ltr">{m.contact}</span><button type="button" class="adm-link" data-msg={m.id} data-handled={m.handled ? "1" : "0"}>{m.handled ? "Remettre à traiter" : "Marquer traité"}</button></div>
+        </article>
+      ))}
+    </div>
+  ) : <p class="adm-empty">{f === "todo" ? "Aucun message à traiter." : "Aucun message."}</p>}
+</Admin>
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-msg]").forEach((b) => b.addEventListener("click", async () => {
+    b.disabled = true;
+    const r = await fetch("/api/admin/message", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.msg), handled: b.dataset.handled !== "1" }) }).catch(() => null);
+    if (r?.ok) location.reload(); else b.disabled = false;
+  }));
+</script>

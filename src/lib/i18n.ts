@@ -418,6 +418,21 @@ export const UI = {
   deleteAccountYes: { fr: "Oui, tout supprimer", ar: "نعم، احذف كل شيء", en: "Yes, delete everything" },
   listNote: { fr: "Vos réponses restent privées. « Publiée » : la question apparaît sur la page publique du sujet, avec votre accord.", ar: "تبقى أجوبتك خاصة. « منشور »: يظهر السؤال في الصفحة العامة للموضوع، بموافقتك.", en: "Your answers stay private. “Published”: the question appears on the topic's public page, with your consent." },
   urgentTag: { fr: "Urgence", ar: "طارئ", en: "Emergency" },
+  contactTitle: { fr: "Nous contacter", ar: "اتصل بنا", en: "Contact us" },
+  contactSub: { fr: "Une question sur Wedicine, votre compte ou vos données ? On vous répond par e-mail ou par téléphone.", ar: "سؤال حول Wedicine أو حسابك أو بياناتك؟ نجيبك عبر البريد الإلكتروني أو الهاتف.", en: "A question about Wedicine, your account or your data? We reply by email or phone." },
+  contactNoHealth: { fr: "Ne décrivez pas vos symptômes ici : ce formulaire ne remplace pas un médecin. En cas d'urgence, appelez le 141 (SAMU) ou le 15.", ar: "لا تصف أعراضك هنا: هذا النموذج لا يعوض الطبيب. في حالة الطوارئ، اتصل بـ 141 (الإسعاف) أو 15.", en: "Don't describe symptoms here: this form does not replace a doctor. In an emergency, call 141 (SAMU) or 15." },
+  contactName: { fr: "Votre prénom", ar: "اسمك", en: "Your first name" },
+  contactSubject: { fr: "Sujet", ar: "الموضوع", en: "Subject" },
+  contactMessage: { fr: "Votre message", ar: "رسالتك", en: "Your message" },
+  contactSend: { fr: "Envoyer", ar: "إرسال", en: "Send" },
+  contactSent: { fr: "Message envoyé. Merci, on vous répond rapidement.", ar: "تم إرسال الرسالة. شكراً، سنجيبك قريباً.", en: "Message sent. Thank you, we'll reply soon." },
+  contactConsent: { fr: "J'accepte que Wedicine garde ce message pour me répondre (loi 09-08).", ar: "أوافق على احتفاظ Wedicine بهذه الرسالة للرد علي (القانون 09-08).", en: "I agree that Wedicine keeps this message to reply to me (law 09-08)." },
+  subjSite: { fr: "Question sur le site", ar: "سؤال حول الموقع", en: "Question about the site" },
+  subjAccount: { fr: "Mon compte", ar: "حسابي", en: "My account" },
+  subjData: { fr: "Mes données personnelles", ar: "بياناتي الشخصية", en: "My personal data" },
+  subjDoctor: { fr: "Je suis médecin", ar: "أنا طبيب", en: "I am a doctor" },
+  subjPartner: { fr: "Partenariat ou presse", ar: "شراكة أو صحافة", en: "Partnership or press" },
+  subjOther: { fr: "Autre", ar: "أخرى", en: "Other" },
 } satisfies Record<string, T>;
 
 export type UIKey = keyof typeof UI;

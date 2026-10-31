@@ -53,7 +53,7 @@ const mode = !q.is_public ? "private" : q.anonymous ? "anonymous" : "named";
 const ANCHOR: Record<string, string> = { grave: "savoir", attente: "attendre", medecin: "medecin", examens: "examens", questions: "questions" };
 const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || f.exams.length > 0));
 ---
-<Account lang={lang} active="q" currentId={q.id} title={title} meta={whenLabel(q.created_at, lang, t(lang, "today"))} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+<Account lang={lang} active="q" currentId={q.id} title={title} meta={whenLabel(q.created_at, lang, t(lang, "today"))} name={a.shortName} avatar={a.avatar} recent={a.recent} acc={a} plain>
   <div class="chat answer-chat">
     <div class="chat-log">
       {talk.map((x, k) => (

@@ -1,0 +1,51 @@
+---
+import Base from "@/layouts/Base.astro";
+import { t } from "@/lib/i18n";
+import { langParam } from "@/lib/lang";
+import { currentUser } from "@/lib/auth";
+import { SUBJECTS } from "@/lib/contact";
+import { Icon } from "@/components/Icon";
+
+// Nous contacter, façon Claude comme la connexion : le symbole, un titre, un formulaire court.
+// Les messages arrivent dans l'admin (/admin/messages). Pas de symptômes ici : rappel de l'urgence.
+const lang = langParam(Astro.params);
+if (!lang) return Astro.redirect("/fr", 302);
+const user = await currentUser(Astro.cookies);
+---
+<Base lang={lang} title={t(lang, "contactTitle")}>
+  <div class="authx contact">
+    <img src="/brand/symbole.svg" alt="" width="40" height="40" class="authx-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width="40" height="40" class="authx-sym logo-dark" />
+    <h1>{t(lang, "contactTitle")}</h1>
+    <p class="authx-sub">{t(lang, "contactSub")}</p>
+    <form class="auth-form" id="contact-form" data-lang={lang} data-err={t(lang, "error")}>
+      <div class="field"><label for="c-name">{t(lang, "contactName")}</label><input id="c-name" class="input" name="name" required maxlength="40" autocomplete="given-name" value={user?.first_name ?? ""} /></div>
+      <div class="field"><label for="c-contact">{t(lang, "contact")}</label><input id="c-contact" class="input" name="contact" required minlength="5" maxlength="80" dir="ltr" autocomplete="email" placeholder="nom@exemple.com" value={user?.contact ?? ""} /></div>
+      <div class="field"><label for="c-subject">{t(lang, "contactSubject")}</label>
+        <select id="c-subject" class="input select" name="subject" required>
+          <option value="" disabled selected hidden>—</option>
+          {SUBJECTS.map((s) => <option value={s.id}>{t(lang, s.key)}</option>)}
+        </select>
+      </div>
+      <div class="field"><label for="c-message">{t(lang, "contactMessage")}</label><textarea id="c-message" class="input textarea" name="message" required minlength="5" maxlength="2000" rows="5"></textarea></div>
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <p class="contact-warn"><Icon name="ShieldAlert" size={16} /><span>{t(lang, "contactNoHealth")}</span></p>
+      <label class="contact-consent"><input type="checkbox" name="consent" required /> <span>{t(lang, "contactConsent")}</span></label>
+      <p class="set-err" id="c-error" hidden></p>
+      <button type="submit" class="btn btn-primary auth-submit">{t(lang, "contactSend")}</button>
+    </form>
+    <p class="contact-done" id="c-done" role="status" hidden><Icon name="Check" size={18} /> {t(lang, "contactSent")}</p>
+  </div>
+</Base>
+<script>
+  const f = document.getElementById("contact-form") as HTMLFormElement;
+  const err = document.getElementById("c-error")!, done = document.getElementById("c-done")!;
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const b = f.querySelector<HTMLButtonElement>('[type="submit"]')!; b.disabled = true; err.hidden = true;
+    const data = Object.fromEntries(new FormData(f)) as Record<string, unknown>;
+    data.consent = (f.elements.namedItem("consent") as HTMLInputElement).checked; data.lang = f.dataset.lang;
+    const r = await fetch("/api/contact", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) }).catch(() => null);
+    if (r?.ok) { f.hidden = true; done.hidden = false; return; }
+    err.textContent = f.dataset.err!; err.hidden = false; b.disabled = false;
+  });
+</script>

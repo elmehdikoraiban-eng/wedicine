@@ -25,6 +25,7 @@ const desc = description ?? t(lang, "heroSub");
 const canon = `${SITE_URL}${canonical ?? Astro.url.pathname}`;
 // Tant qu'un médecin n'a pas relu le contenu, rien n'est indexé.
 const robots = noindex || !(CONTENT_REVIEWED || reviewed) ? "noindex, follow" : "index, follow";
+import { isAdmin } from "@/lib/admin";
 ---
 <!doctype html>
 <html lang={lang} dir={dir(lang)}>
@@ -52,14 +53,14 @@ const robots = noindex || !(CONTENT_REVIEWED || reviewed) ? "noindex, follow" : 
     <slot name="head" />
   </head>
   <body>
-    {nav && <Nav lang={lang} user={user ? { firstName: user.first_name, lastName: user.last_name, avatar: avatarOf(user) } : null} />}
+    {nav && <Nav lang={lang} user={user ? { firstName: user.first_name, lastName: user.last_name, avatar: avatarOf(user), admin: isAdmin(user) } : null} />}
     <main>
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>
     {footer && (
     <div class="mini-foot" role="contentinfo">
       <div class="wrap chat-legal">
-        <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")} · {t(lang, "footerLegal")}</span>
+        <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")} · {t(lang, "footerLegal")} · <a href={`/${lang}/contact`}>{t(lang, "contactUs")}</a></span>
       </div>
     </div>
     )}

@@ -4,7 +4,9 @@
 // Sur mobile, la barre devient un tiroir ouvert par le bouton menu (sans JavaScript : une case à cocher).
 import Base from "@/layouts/Base.astro";
 import { LANG_NAMES, LANGS, t, type Lang, type UIKey } from "@/lib/i18n";
-import { ACCOUNT_PAGES, type AccountPage } from "@/lib/account";
+import { ACCOUNT_PAGES, type AccountPage, type loadAccount } from "@/lib/account";
+import AccountModal from "@/components/AccountModal.astro";
+import { isAdmin } from "@/lib/admin";
 import { Icon } from "@/components/Icon";
 
 interface Props {
@@ -17,8 +19,10 @@ interface Props {
   recent: { id: number; title: string }[]; // dernières questions
   currentId?: number;                      // question affichée, surlignée dans « Récentes »
   plain?: boolean;                         // true : la page gère tout (conversation) ; false : rubrique avec son titre
+  acc?: NonNullable<Awaited<ReturnType<typeof loadAccount>>>; // données de la fenêtre « Mon compte »
 }
-const { lang, active, title, meta, name, avatar, recent, currentId, plain = false } = Astro.props;
+const { lang, active, title, meta, name, avatar, recent, currentId, plain = false, acc } = Astro.props;
+const admin = isAdmin(acc?.acc);
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 import ThemePick from "@/components/ThemePick.astro";
 ---
@@ -51,10 +55,11 @@ import ThemePick from "@/components/ThemePick.astro";
         </summary>
         <div class="side-pop">
           {ACCOUNT_PAGES.map((p) => (
-            <a href={`/${lang}/compte${p.id ? `/${p.id}` : ""}`} aria-current={p.id === active ? "page" : undefined}>
+            <a href={`/${lang}/compte${p.id ? `/${p.id}` : ""}`} aria-current={p.id && p.id === active ? "page" : undefined} data-open-account={!p.id && acc ? "" : undefined}>
               <Icon name={p.icon} size={18} /><span>{t(lang, (p.id ? p.key : "myAccount") as UIKey)}</span>
             </a>
           ))}
+          {admin && <a href="/admin" class="side-admin"><Icon name="ChartColumn" size={18} /><span>Admin</span></a>}
           <div class="side-lang" aria-label={t(lang, "accLanguage")}>
             {LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}
           </div>
@@ -73,6 +78,7 @@ import ThemePick from "@/components/ThemePick.astro";
       {plain ? <slot /> : <div class="acc-main"><h1 class="acc-title">{title}</h1><slot /></div>}
     </div>
   </div>
+  {acc && <AccountModal lang={lang} a={acc} />}
 </Base>
 
 <script>

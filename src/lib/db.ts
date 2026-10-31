@@ -77,6 +77,11 @@ CREATE TABLE IF NOT EXISTS wedicine.admin_log (
   id SERIAL PRIMARY KEY, at TIMESTAMPTZ NOT NULL DEFAULT now(),
   user_id INTEGER, who TEXT NOT NULL, action TEXT NOT NULL, target TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS wedicine.contact_messages (
+  id SERIAL PRIMARY KEY, at TIMESTAMPTZ NOT NULL DEFAULT now(), user_id INTEGER, lang TEXT NOT NULL,
+  name TEXT NOT NULL, contact TEXT NOT NULL, subject TEXT NOT NULL, message TEXT NOT NULL,
+  handled BOOLEAN NOT NULL DEFAULT false
+);
 CREATE INDEX IF NOT EXISTS questions_page ON wedicine.questions (theme, symptom, intent) WHERE is_public;
 `;
 

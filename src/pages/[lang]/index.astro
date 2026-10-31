@@ -20,7 +20,7 @@ const a = await loadAccount(Astro, lang);
 const greeting = a ? t(lang, isEvening() ? "greetEvening" : "greetDay").replace("{name}", a.acc.first_name) : undefined;
 ---
 {a ? (
-  <Account lang={lang} active="new" title={t(lang, "newQuestion")} meta={t(lang, "privateAnswers")} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+  <Account lang={lang} active="new" title={t(lang, "newQuestion")} meta={t(lang, "privateAnswers")} name={a.shortName} avatar={a.avatar} recent={a.recent} acc={a} plain>
     <Chat client:load lang={lang} initialTheme={initialTheme} greeting={greeting} recent={a.recent.slice(0, 3).map((r) => ({ href: `/${lang}/compte/q/${r.id}`, title: r.title }))} />
   </Account>
 ) : (

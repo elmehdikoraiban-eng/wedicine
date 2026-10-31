@@ -2,5 +2,5 @@
 // Réuni dans la page « Mon compte » (une seule page de réglages, façon Claude).
 import { langParam } from "@/lib/lang";
 const lang = langParam(Astro.params) ?? "fr";
-return Astro.redirect(`/${lang}/compte#infos`, 301);
+return Astro.redirect(`/${lang}#infos`, 301);
 ---

@@ -240,8 +240,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
 
   const legal = (
     <div className="chat-legal">
-      <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")}</span>
-      {/* Langue : bouton dans l'en-tête. « Nous contacter » viendra ici quand El Mehdi aura donné l'adresse. */}
+      <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")} · <a href={`/${lang}/contact`}>{t(lang, "contactUs")}</a></span>
     </div>
   );
 
