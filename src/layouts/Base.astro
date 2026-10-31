@@ -3,9 +3,9 @@ import "@/styles/global.css";
 import { dir, isLang, LANG_NAMES, LANGS, t, type Lang } from "@/lib/i18n";
 import { currentUser } from "@/lib/auth";
 import { avatarOf } from "@/lib/db";
-import { THEMES } from "@/lib/content/themes";
 import { SITE_URL, CONTENT_REVIEWED } from "@/lib/site";
 import Nav from "@/components/Nav.astro";
+import { Icon } from "@/components/Icon";
 
 interface Props {
   lang: Lang;
@@ -53,34 +53,17 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
       {wrap ? <div class="wrap page"><slot /></div> : <slot />}
     </main>
     {footer && (
-    <footer>
-      <div class="wrap">
-        <div class="foot-cols">
-          <div>
-            <img class="foot-logo" src="/brand/logo-sombre.svg" alt="Wedicine" width="170" height="30" loading="lazy" />
-            <p style="margin:0">{t(lang, "footer")}</p>
-          </div>
-          <div>
-            <h4>{t(lang, "footerTopics")}</h4>
-            {THEMES.slice(0, 6).map((th) => <a href={`/${lang}?theme=${th.id}`}>{th.label[lang]}</a>)}
-          </div>
-          <div>
-            <h4>{t(lang, "footerAbout")}</h4>
-            <a href={`/${lang}`}>{t(lang, "start")}</a>
-            <a href={`/${lang}/connexion`}>{t(lang, "login")}</a>
-            <a href={`/${lang}/compte`}>{t(lang, "myAccount")}</a>
-          </div>
-          <div>
-            <h4>{t(lang, "footerLang")}</h4>
-            {LANGS.filter(isLang).map((l) => <a href={`/${l}`} lang={l}>{LANG_NAMES[l]}</a>)}
-          </div>
-        </div>
-        <div class="foot-legal">
-          <span>{t(lang, "footerLegal")}</span>
-          <span>© {new Date().getFullYear()} Wedicine</span>
-        </div>
+    <div class="mini-foot" role="contentinfo">
+      <div class="wrap chat-legal">
+        <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")} · {t(lang, "footerLegal")}</span>
+        <nav>
+          <details class="lang-pick">
+            <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={14} />{LANG_NAMES[lang]}<Icon name="ChevronDown" size={14} /></summary>
+            <div class="lang-pop">{LANGS.filter(isLang).map((l) => <a href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
+          </details>
+        </nav>
       </div>
-    </footer>
+    </div>
     )}
     <script>
       // Ombre de la barre de navigation dès que la page défile.

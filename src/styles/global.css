@@ -1002,3 +1002,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
   .set-nav .set-nav-out { margin-top: 0; }
   .set-modal .set { padding: 16px 16px 40px; }
 }
+
+/* Pied de page minimal, le même que sur l'accueil : urgence, mentions, un bouton de langue. */
+.mini-foot { border-top: 1px solid #eef0f4; margin-top: 48px; }
+.mini-foot .chat-legal { align-items: center; }
