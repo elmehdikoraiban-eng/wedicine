@@ -1,56 +1,123 @@
 ---
 import Admin from "@/layouts/Admin.astro";
-import { adminUser, notAdminUrl, dashboard, allFiches, reviewedKeys } from "@/lib/admin";
+import { adminUser, notAdminUrl, dashboard, analytics, allFiches, reviewedKeys } from "@/lib/admin";
+import { CHANNELS } from "@/lib/track";
 import { THEMES } from "@/lib/content/themes";
 import { CITIES } from "@/lib/content/options";
 
+// Tableau de bord : audience (d'où viennent les visiteurs, temps passé) et parcours (questionnaire → compte → réponse).
 const user = await adminUser(Astro.cookies);
 if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin"), 302);
-const days = [1, 7, 30].includes(Number(Astro.url.searchParams.get("p"))) ? Number(Astro.url.searchParams.get("p")) : 7;
-const s = await dashboard(days);
+const PERIODS = [[1, "Aujourd'hui"], [7, "7 jours"], [30, "30 jours"], [90, "90 jours"], [0, "Tout"]] as const;
+const raw = Astro.url.searchParams.get("p");
+const days = PERIODS.some(([d]) => String(d) === raw) ? Number(raw) : 30;
+const a = await analytics(days);
+const s = await dashboard(days || 3650);
 const toReview = allFiches().length - (await reviewedKeys()).size;
-const pct = (a: number, b: number) => (b ? Math.round((100 * a) / b) : 0);
-const evo = s.prev ? Math.round((100 * (s.questions - s.prev)) / s.prev) : null;
 const fmt = (n: number) => n.toLocaleString("fr-FR");
-// Une barre par jour de la période, même les jours sans question.
-const daysList = Array.from({ length: days }, (_, i) => { const d = new Date(Date.now() - (days - 1 - i) * 864e5); return d.toISOString().slice(0, 10); });
-const byDay = new Map(s.perDay.map((x) => [x.day, x]));
-const max = Math.max(1, ...s.perDay.map((x) => x.n));
+const pc = (x: number | null) => (x == null ? "—" : `${x.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`);
+const dur = (sec: number | null) => (sec == null ? "—" : sec < 60 ? `${Math.round(sec)} s` : `${Math.round(sec / 60)} min`);
+const plural = (n: number, one: string, many: string) => `${fmt(n)} ${n > 1 ? many : one}`;
+
+// Courbe « Évolution dans le temps » : un point par jour, même les jours vides.
+// La courbe commence au début de la période, ou au début des mesures s'il est plus récent (pas de longue ligne à zéro).
+const measured = Math.max(1, Math.ceil((Date.now() - new Date(a.since ?? Date.now()).getTime()) / 864e5) + 1);
+const firstDay = Math.max(days > 0 ? Math.min(days, measured) : measured, 7);
+const daysList = Array.from({ length: Math.min(firstDay, 365) }, (_, i) => new Date(Date.now() - (Math.min(firstDay, 365) - 1 - i) * 864e5).toLocaleDateString("en-CA", { timeZone: "Africa/Casablanca" }));
+const SERIES = [
+  { id: "done", label: "Questionnaires terminés", color: "var(--green)" },
+  { id: "result", label: "Résultats générés", color: "var(--yellow)" },
+  { id: "signup", label: "Inscriptions", color: "var(--brand)" },
+  { id: "start", label: "Questionnaires commencés", color: "var(--red)" },
+];
+const val = (day: string, id: string) => a.series.find((r) => r.day === day && r.name === id)?.n ?? 0;
+const yMax = Math.max(4, ...a.series.map((r) => r.n));
+const step = Math.pow(10, Math.floor(Math.log10(yMax))) / 2;
+const top = Math.ceil(yMax / 4 / step) * step * 4;
+const W = 1000, H = 260, L = 40, R = 10, T = 10, B = 28;
+const x = (i: number) => L + (daysList.length > 1 ? (i * (W - L - R)) / (daysList.length - 1) : (W - L - R) / 2);
+const y = (v: number) => T + (H - T - B) * (1 - v / top);
+const smooth = (pts: [number, number][]) => pts.length < 2 ? "" : pts.reduce((acc, p, i, arr) => {
+  if (i === 0) return `M${p[0]},${p[1]}`;
+  const p0 = arr[i - 2] ?? arr[i - 1], p1 = arr[i - 1], p3 = arr[i + 1] ?? p;
+  const c1: [number, number] = [p1[0] + (p[0] - p0[0]) / 6, p1[1] + (p[1] - p0[1]) / 6], c2: [number, number] = [p[0] - (p3[0] - p1[0]) / 6, p[1] - (p3[1] - p1[1]) / 6];
+  const clamp = (v: number) => Math.min(H - B, Math.max(T, v));
+  return `${acc} C${c1[0]},${clamp(c1[1])} ${c2[0]},${clamp(c2[1])} ${p[0]},${p[1]}`;
+}, "");
+const every = Math.max(1, Math.ceil(daysList.length / 14));
+const dlabel = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+const gridLines = [0, 1, 2, 3, 4].map((k) => ({ v: (top * k) / 4, yy: y((top * k) / 4) }));
+const lines = SERIES.map((se) => {
+  const pts = daysList.map((d, i) => ({ cx: x(i), cy: y(val(d, se.id)), tip: `${dlabel(d)} · ${se.label} : ${val(d, se.id)}` }));
+  return { ...se, d: smooth(pts.map((p) => [p.cx, p.cy] as [number, number])), pts };
+});
+const xLabels = daysList.map((d, i) => ({ d: dlabel(d), xx: x(i), show: i % every === 0 })).filter((l) => l.show);
+
+// Sources
+const totalVisits = a.visits;
+const byChannel = CHANNELS.map((c) => ({ ...c, n: a.sources.filter((r) => r.channel === c.id).reduce((t, r) => t + r.n, 0) })).filter((c) => c.n > 0);
+const sMax = Math.max(1, ...a.sources.map((r) => r.n));
+
 const themeLabel = (id: string) => THEMES.find((t) => t.id === id)?.label.fr ?? id;
 const cityLabel = (id: string) => CITIES.find((c) => c.id === id)?.label.fr ?? id;
 const tMax = Math.max(1, ...s.themes.map((x) => x.n)), cMax = Math.max(1, ...s.cities.map((x) => x.n));
-const wd = (d: string) => new Date(d + "T12:00:00Z").toLocaleDateString("fr-FR", { weekday: "short", day: days > 7 ? "numeric" : undefined });
+const sinceTxt = a.since ? new Date(a.since).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }) : null;
 ---
 <Admin user={user} active="dash" title="Tableau de bord" counts={{ questions: s.totalQuestions, toReview }}>
   <div class="adm-top">
     <h1>Tableau de bord</h1>
-    <div class="adm-seg">{[[1, "Aujourd'hui"], [7, "7 jours"], [30, "30 jours"]].map(([d, l]) => <a href={`/admin?p=${d}`} aria-current={d === days ? "true" : undefined}>{l}</a>)}</div>
+    <div class="adm-seg">{PERIODS.map(([d, l]) => <a href={`/admin?p=${d}`} aria-current={d === days ? "true" : undefined}>{l}</a>)}</div>
   </div>
+
   <div class="adm-kpis">
-    <div class="adm-kpi"><span>Questions</span><b>{fmt(s.questions)}</b><small class={evo != null && evo < 0 ? "down" : ""}>{evo == null ? "—" : `${evo > 0 ? "+" : ""}${evo} % vs période d'avant`}</small></div>
-    <div class="adm-kpi"><span>Nouveaux comptes</span><b>{fmt(s.users)}</b><small>{pct(s.withAccount, s.questions)} % des questions finissent en compte</small></div>
-    <div class="adm-kpi"><span>Urgences déclenchées</span><b>{fmt(s.urgent)}</b><small class="red">{pct(s.urgent, s.questions)} % des questions</small></div>
-    <div class="adm-kpi"><span>Pages publiques vues (total)</span><b>{fmt(s.views)}</b><small>{s.helpful == null ? "Pas encore d'avis" : `« Utile » : ${s.helpful} %`}</small></div>
+    <div class="adm-kpi"><span>Visiteurs</span><b>{fmt(a.visitors)}</b><small class="mute">{plural(a.visits, "visite", "visites")}</small></div>
+    <div class="adm-kpi"><span>Temps moyen par personne</span><b>{dur(a.perPerson)}</b><small class="mute">{plural(a.measured, "personne mesurée", "personnes mesurées")} · {dur(a.perDay)} par jour de visite</small></div>
+    <div class="adm-kpi"><span>Temps moyen par inscrit</span><b>{dur(a.perMember)}</b><small class="mute">{plural(a.members, "compte connecté", "comptes connectés")} sur la période</small></div>
+    <div class="adm-kpi"><span>Nouveaux inscrits</span><b>{fmt(a.usersNew)}</b><small class="mute">{fmt(a.usersTotal)} inscrits au total</small></div>
+    <div class="adm-kpi"><span>Questionnaires commencés</span><b>{fmt(a.started)}</b></div>
+    <div class="adm-kpi"><span>Questionnaires terminés</span><b>{fmt(a.done)}</b></div>
+    <div class="adm-kpi"><span>Résultats générés</span><b>{fmt(a.results)}</b></div>
+    <div class="adm-kpi"><span>Taux de complétion</span><b>{pc(a.completion)}</b><small class="mute">Terminés / commencés</small></div>
+    <div class="adm-kpi"><span>Conversion en inscription</span><b>{pc(a.conversion)}</b><small class="mute">Inscriptions issues du questionnaire / arrivés à l'inscription</small></div>
+    <div class="adm-kpi"><span>Taux d'obtention de la réponse</span><b>{pc(a.resultRate)}</b><small class="mute">Réponses / terminés</small></div>
+    <div class="adm-kpi"><span>Réponses jugées utiles</span><b>{pc(a.helpful)}</b><small class="mute">{plural(a.votes, "avis", "avis")} (depuis le lancement)</small></div>
+    <div class="adm-kpi"><span>Urgences déclenchées</span><b>{fmt(a.urgent)}</b><small class="mute">Écran 141 / 15 affiché</small></div>
   </div>
+  <p class="adm-note">Abandonnés (inactifs depuis plus de 24 h) : {fmt(a.abandoned)} · En cours : {fmt(a.ongoing)} · Arrivés à l'étape d'inscription : {fmt(a.signupStep)}{sinceTxt && ` · Mesures depuis le ${sinceTxt}`}</p>
+
+  <section class="adm-card">
+    <h2>Évolution dans le temps</h2>
+    <svg class="adm-line" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Évolution dans le temps">
+      {gridLines.map((g) => <line x1={L} x2={W - R} y1={g.yy} y2={g.yy} class="grid" />)}
+      {gridLines.map((g) => <text x={L - 8} y={g.yy + 4} class="ax" text-anchor="end">{fmt(g.v)}</text>)}
+      {xLabels.map((l) => <text x={l.xx} y={H - 6} class="ax" text-anchor="middle">{l.d}</text>)}
+      {lines.map((se) => <path d={se.d} class="ln" style={`--c:${se.color}`} />)}
+      {lines.map((se) => se.pts.map((p) => <circle cx={p.cx} cy={p.cy} r="7" class="hit" style={`--c:${se.color}`}><title>{p.tip}</title></circle>))}
+    </svg>
+    <p class="adm-legend adm-legend-line">{SERIES.map((se) => <span style={`--c:${se.color}`}><i></i>{se.label}</span>)}</p>
+  </section>
+
+  <section class="adm-card">
+    <h2>D'où viennent les visiteurs</h2>
+    {byChannel.length ? (
+      <>
+        <div class="adm-chips">{byChannel.map((c) => <span><span>{c.label} :</span> <b>{fmt(c.n)}</b> <em>({pc(Math.round((1000 * c.n) / totalVisits) / 10)})</em></span>)}</div>
+        <div class="adm-hbars">
+          {a.sources.map((r) => <div title={`${r.source} : ${r.n}`}><span>{r.source}</span><i><s style={`width:${(100 * r.n) / sMax}%`}></s><b>{fmt(r.n)}</b></i></div>)}
+        </div>
+      </>
+    ) : <p class="adm-empty">Aucune visite mesurée sur la période.</p>}
+    <p class="adm-note">« (pub) » = clic sur une publicité (paramètres utm des pubs Meta ou Google). « Direct ou inconnu » regroupe les adresses tapées et les applications qui ne disent pas d'où vient le clic (WhatsApp, applis mobiles). Google n'est compté que pour les visites venues de ses résultats. Les IA (ChatGPT, Perplexity, Gemini, Claude…) apparaissent dès la première visite. Une visite = 30 min d'activité ; aucune adresse IP n'est gardée.</p>
+  </section>
+
   <div class="adm-row">
-    <section class="adm-card">
-      <h2>Questions par jour</h2>
-      <div class="adm-bars" role="img" aria-label="Questions par jour">
-        {daysList.map((d) => { const x = byDay.get(d); const n = x?.n ?? 0; return (
-          <div class="b" title={`${d} : ${n} question(s), dont ${x?.u ?? 0} urgence(s)`}><i style={`height:${(100 * n) / max}%`}><s style={`height:${n ? (100 * (x?.u ?? 0)) / n : 0}%`}></s></i></div>
-        ); })}
-      </div>
-      {days <= 7 && <div class="adm-axis">{daysList.map((d) => <span>{wd(d)}</span>)}</div>}
-      <p class="adm-legend"><i></i>Questions <i class="u"></i>dont urgences</p>
-    </section>
     <section class="adm-card">
       <h2>Sujets les plus demandés</h2>
       {s.themes.length ? <div class="adm-rank">{s.themes.map((x) => <div><span>{themeLabel(x.id)}</span><b>{x.n}</b><s style={`--w:${(100 * x.n) / tMax}%`}></s></div>)}</div> : <p class="adm-empty">Aucune question sur la période.</p>}
     </section>
+    <section class="adm-card">
+      <h2>Villes</h2>
+      {s.cities.length ? <div class="adm-rank">{s.cities.map((x) => <div><span>{cityLabel(x.id)}</span><b>{x.n}</b><s style={`--w:${(100 * x.n) / cMax}%`}></s></div>)}</div> : <p class="adm-empty">Aucune ville sur la période.</p>}
+    </section>
   </div>
-  <section class="adm-card">
-    <h2>Villes</h2>
-    {s.cities.length ? <div class="adm-rank adm-rank-3">{s.cities.map((x) => <div><span>{cityLabel(x.id)}</span><b>{x.n}</b><s style={`--w:${(100 * x.n) / cMax}%`}></s></div>)}</div> : <p class="adm-empty">Aucune ville sur la période.</p>}
-  </section>
-  <p class="adm-note">Au total : {fmt(s.totalQuestions)} questions et {fmt(s.totalUsers)} comptes depuis le lancement.</p>
 </Admin>

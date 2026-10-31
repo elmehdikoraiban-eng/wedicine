@@ -6,6 +6,7 @@ import { fiche } from "@/lib/content/fiches";
 import { symptom, theme } from "@/lib/content/themes";
 import { isUrgent, validate } from "@/lib/triage";
 import { json, readJson } from "@/lib/api";
+import { logEvent } from "@/lib/track";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const body = await readJson(request);
@@ -28,6 +29,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // Urgence : écran d'urgence, jamais de compte. Connecté : la réponse directement.
   // Sinon : pas d'adresse, la conversation affiche le formulaire de compte qui débloque la réponse.
   if (user) await matchAvatarToSex(user.id).catch(() => {});
+  await logEvent(cookies, "done");
+  if (!urgent) await logEvent(cookies, user ? "result" : "signup_step");
   const next = urgent || !user ? null : `/${lang}/compte/q/${id}`;
   return json({ id, urgent, next });
 };

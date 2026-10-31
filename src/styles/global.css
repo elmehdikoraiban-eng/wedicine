@@ -1153,6 +1153,29 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
 .adm-msg-foot { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; font-size: 13px; }
 .adm-msg-foot .adm-contact { color: var(--muted-2); user-select: all; }
 
+/* Admin : statistiques */
+.adm-kpi small.mute { color: var(--muted-2); font-weight: 400; line-height: 1.45; }
+.adm-line { width: 100%; height: auto; display: block; overflow: visible; }
+.adm-line .grid { stroke: var(--l2); stroke-width: 1; }
+.adm-line .ax { fill: var(--muted-2); font-size: 12px; font-family: var(--font); }
+.adm-line .ln { fill: none; stroke: var(--c); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.adm-line .hit { fill: var(--c); opacity: 0; }
+.adm-line .hit:hover { opacity: 1; r: 4; }
+.adm-legend-line { justify-content: center; flex-wrap: wrap; gap: 16px; }
+.adm-legend-line span { display: inline-flex; align-items: center; gap: 6px; color: var(--c); }
+.adm-legend-line i { width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.adm-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.adm-chips > span { padding: 6px 12px; border-radius: 100px; background: var(--neutral); font-size: 13px; }
+.adm-chips em { font-style: normal; color: var(--muted-2); }
+.adm-hbars { display: grid; gap: 8px; margin-bottom: 14px; }
+.adm-hbars > div { display: grid; grid-template-columns: minmax(90px, 200px) 1fr; gap: 12px; align-items: center; font-size: 13px; }
+.adm-hbars > div > span { text-align: end; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-hbars i { font-style: normal; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.adm-hbars s { display: block; height: 22px; min-width: 3px; border-radius: 0 6px 6px 0; background: var(--brand); }
+[dir="rtl"] .adm-hbars s { border-radius: 6px 0 0 6px; }
+.adm-hbars b { font-weight: 500; font-size: 13px; }
+@media (max-width: 600px) { .adm-hbars > div { grid-template-columns: 100px 1fr; } }
+
 /* Thème sombre (bouton soleil / lune ; choix gardé dans le navigateur). Seuls les jetons changent. */
 :root[data-theme="dark"] {
   color-scheme: dark;

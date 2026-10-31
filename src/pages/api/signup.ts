@@ -3,6 +3,7 @@ import { isLang } from "@/lib/i18n";
 import { hashPassword, startSession } from "@/lib/auth";
 import { claimQuestion, matchAvatarToSex, createUser, userByContact } from "@/lib/db";
 import { json, readJson, safePath } from "@/lib/api";
+import { logEvent } from "@/lib/track";
 
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -22,10 +23,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const userId = await createUser({ firstName, lastName, contact, passwordHash: hashPassword(password), lang });
   await startSession(cookies, userId);
+  await logEvent(cookies, "signup");
 
   const qid = Number(b.questionId);
   if (Number.isInteger(qid) && qid > 0) {
     await claimQuestion(qid, userId, !!b.consentPublish);
+    await logEvent(cookies, "signup_flow"); await logEvent(cookies, "result");
     await matchAvatarToSex(userId);
     return json({ url: `/${lang}/compte/q/${qid}` });
   }

@@ -149,3 +149,45 @@ export async function ficheStats() {
 export async function notAdminUrl(cookies: AstroCookies, next: string) {
   return (await currentUser(cookies)) ? "/fr" : `/fr/connexion?next=${encodeURIComponent(next)}`;
 }
+
+// ---- Statistiques d'audience et de parcours (mesurées depuis le 31/10/2026, voir src/lib/track.ts) ----
+export async function analytics(days: number) {
+  const d = await db();
+  const P = [days];
+  const since = days > 0 ? "now() - make_interval(days => $1::int)" : "'-infinity'::timestamptz";
+  const q = async <T = Record<string, unknown>>(sql: string) => (await d.query(sql, P)).rows as T[];
+  const n = (x: unknown) => Number(x ?? 0);
+  const t = (await q(`SELECT
+      count(DISTINCT vid)::int AS visitors, count(*)::int AS visits,
+      count(DISTINCT vid) FILTER (WHERE seconds > 0)::int AS measured,
+      COALESCE(sum(seconds), 0)::int AS secs,
+      count(DISTINCT user_id)::int AS members, COALESCE(sum(seconds) FILTER (WHERE user_id IS NOT NULL), 0)::int AS member_secs
+    FROM wedicine.visits WHERE at >= ${since}`))[0];
+  const days_v = n((await q(`SELECT count(*)::int AS n FROM (SELECT vid, date_trunc('day', at) FROM wedicine.visits WHERE at >= ${since} AND seconds > 0 GROUP BY 1, 2) x`))[0].n);
+  const ev = Object.fromEntries((await q<{ name: string; n: number }>(`SELECT name, count(*)::int AS n FROM wedicine.events WHERE at >= ${since} GROUP BY 1`)).map((r) => [r.name, n(r.n)]));
+  const e = (k: string) => ev[k] ?? 0;
+  const flow = (await q(`SELECT
+      count(*) FILTER (WHERE s AND NOT f AND last < now() - interval '24 hours')::int AS abandoned,
+      count(*) FILTER (WHERE s AND NOT f AND last >= now() - interval '24 hours')::int AS ongoing
+    FROM (SELECT sid, bool_or(name = 'start') AS s, bool_or(name = 'done') AS f, max(at) AS last FROM wedicine.events WHERE at >= ${since} AND sid IS NOT NULL GROUP BY sid) x`))[0];
+  const users = (await q(`SELECT (SELECT count(*)::int FROM wedicine.users) AS total, (SELECT count(*)::int FROM wedicine.users WHERE created_at >= ${since}) AS fresh`))[0];
+  const urgent = n((await q(`SELECT count(*)::int AS n FROM wedicine.questions WHERE urgent AND created_at >= ${since}`))[0].n);
+  const fb = (await d.query("SELECT COALESCE(sum(yes), 0)::int AS y, COALESCE(sum(no), 0)::int AS n FROM wedicine.page_feedback")).rows[0];
+  const series = await q<{ day: string; name: string; n: number }>(`SELECT to_char(date_trunc('day', at AT TIME ZONE 'Africa/Casablanca'), 'YYYY-MM-DD') AS day, name, count(*)::int AS n
+    FROM wedicine.events WHERE at >= ${since} AND name IN ('start', 'done', 'result', 'signup') GROUP BY 1, 2 ORDER BY 1`);
+  const sources = await q<{ source: string; channel: string; n: number }>(`SELECT source, channel, count(*)::int AS n FROM wedicine.visits WHERE at >= ${since} GROUP BY 1, 2 ORDER BY n DESC, source LIMIT 20`);
+  const first = (await d.query("SELECT min(at) AS at FROM wedicine.visits")).rows[0].at as string | Date | null;
+  const pct = (a: number, b: number) => (b ? Math.round((1000 * a) / b) / 10 : null);
+  const fy = n(fb.y), fn = n(fb.n);
+  return {
+    visitors: n(t.visitors), visits: n(t.visits), measured: n(t.measured),
+    perPerson: n(t.measured) ? n(t.secs) / n(t.measured) : null, perDay: days_v ? n(t.secs) / days_v : null,
+    members: n(t.members), perMember: n(t.members) ? n(t.member_secs) / n(t.members) : null,
+    usersTotal: n(users.total), usersNew: n(users.fresh), urgent,
+    started: e("start"), done: e("done"), results: e("result"), signupStep: e("signup_step"), signupFlow: e("signup_flow"),
+    completion: pct(e("done"), e("start")), conversion: pct(e("signup_flow"), e("signup_step")), resultRate: pct(e("result"), e("done")),
+    helpful: pct(fy, fy + fn), votes: fy + fn,
+    abandoned: n(flow.abandoned), ongoing: n(flow.ongoing),
+    series, sources, since: first,
+  };
+}

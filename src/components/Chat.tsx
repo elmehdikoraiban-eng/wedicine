@@ -60,6 +60,9 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
   const [error, setError] = useState<string | null>(null);
   const [qid, setQid] = useState<number | null>(null);  // question enregistrée, en attente d'un compte
   const [showPw, setShowPw] = useState(false);
+  // Mesure : « questionnaire commencé » à la première réponse (une fois par questionnaire).
+  const started = useRef(false);
+  const markStart = () => { if (started.current) return; started.current = true; void fetch("/api/ev", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: "start" }), keepalive: true }).catch(() => {}); };
   const footRef = useRef<HTMLDivElement>(null);
 
   const th = getTheme(a.theme);
@@ -122,6 +125,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
       });
       if (!r.ok) throw new Error(String(r.status));
       const data: Result = await r.json();
+      started.current = false;
       if (data.urgent) { setUrgent(true); setBusy(false); return; }
       if (follow) {
         if (data.next) { window.location.assign(data.next); return; }  // connecté : la réponse tout de suite, on reste « occupé » jusqu'à la nouvelle page
@@ -144,6 +148,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
 
   function pick(id: string) {
     if (busy) return;
+    markStart();
     if (step === "signs") { setA({ ...a, signs: a.signs.includes(id) ? a.signs.filter((x) => x !== id) : [...a.signs, id] }); return; }
     const value: Partial<Answers> = step === "pregnant" ? { pregnant: id === "yes" } : { [step]: id };
     advance({ ...cleared(a, step, themeFirst), ...value });
@@ -182,6 +187,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
   }
 
   function startWith(themeId: string) {
+    markStart();
     setThemeFirst(true);
     setA({ ...EMPTY, theme: themeId });
     setI(1);

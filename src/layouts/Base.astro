@@ -64,6 +64,12 @@ import { isAdmin } from "@/lib/admin";
       </div>
     </div>
     )}
+    {!Astro.url.pathname.startsWith("/admin") && (
+      <script is:inline>
+        // Temps passé (mesure d'audience sans donnée personnelle) : un signal toutes les 15 s quand la page est visible.
+        setInterval(function () { if (document.visibilityState === "visible") { try { navigator.sendBeacon("/api/t"); } catch (e) {} } }, 15000);
+      </script>
+    )}
     <script>
       // Ombre de la barre de navigation dès que la page défile.
       const nav = document.querySelector(".nav");
