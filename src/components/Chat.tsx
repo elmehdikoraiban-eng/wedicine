@@ -241,7 +241,15 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
   const legal = (
     <div className="chat-legal">
       <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")}</span>
-      {intro && !greeting && <nav>{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</nav>}
+      {intro && !greeting && (
+        <nav>
+          <details className="lang-pick">
+            <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={14} />{LANG_NAMES[lang]}<Icon name="ChevronDown" size={14} /></summary>
+            <div className="lang-pop">{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
+          </details>
+          <a href={`/${lang}/contact`}>{t(lang, "contactUs")}</a>
+        </nav>
+      )}
     </div>
   );
 
@@ -252,7 +260,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
           <div className="chat-hero">
             <img src="/brand/symbole.svg" alt="" width={44} height={44} />
             <h1>{greeting ?? t(lang, "chatTitle")}</h1>
-            <p>{greeting ? question(step) : t(lang, "chatSub")}</p>
+            {greeting && <p>{question(step)}</p>}
           </div>
           {composer}
           {greeting

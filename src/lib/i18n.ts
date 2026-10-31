@@ -338,7 +338,8 @@ export const UI = {
   ctaText: { fr: "Une minute, rien à écrire, et une réponse à garder pour la consultation.", ar: "دقيقة واحدة، بدون كتابة، وجواب تحتفظ به للاستشارة.", en: "One minute, nothing to type, and an answer to keep for the visit." },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
   // Conversation (accueil et questions)
-  chatTitle: { fr: "Que se passe-t-il ?", ar: "ما الذي يحدث؟", en: "What's going on?" },
+  contactUs: { fr: "Nous contacter", ar: "اتصل بنا", en: "Contact us" },
+  chatTitle: { fr: "Pré-consultation en ligne", ar: "استشارة أولية عبر الإنترنت", en: "Online pre-consultation" },
   chatSub: { fr: "Répondez en quelques choix, sans rien écrire. La réponse arrive tout de suite.", ar: "أجب ببعض الاختيارات، دون كتابة أي شيء. الجواب يصل فوراً.", en: "Answer with a few taps, nothing to type. The answer comes right away." },
   cWho: { fr: "Pour qui est cette question ?", ar: "لمن هذا السؤال؟", en: "Who is this question for?" },
   cTheme: { fr: "De quoi s'agit-il ?", ar: "ما هو الموضوع؟", en: "What is it about?" },
