@@ -12,6 +12,7 @@ import { Answer, anchor, answerFaq } from "@/components/Answer";
 import AnswerTabs from "@/components/AnswerTabs.astro";
 import type { UIKey } from "@/lib/i18n";
 import { Icon } from "@/components/Icon";
+import { isReviewed } from "@/lib/admin";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
@@ -21,6 +22,7 @@ const { theme: th, symptom: sy, intent } = page;
 const f = fiche(th.id, sy.id);
 if (!f) return new Response(null, { status: 404 });
 
+const reviewed = await isReviewed(th.id, sy.id).catch(() => false);
 // La liste des patients change : page rendue à la demande.
 const askers = await publicAskers(th.id, sy.id, intent).catch((e) => { console.error("publicAskers", e); return []; });
 const empty: PageStats = { total: 0, lastAt: null, durations: [], ages: [], cities: [] };
@@ -56,7 +58,7 @@ const faqLd = {
   mainEntity: answerFaq(lang, f, th, sy).map((x) => ({ "@type": "Question", name: x.q, acceptedAnswer: { "@type": "Answer", text: x.a } })),
 };
 ---
-<Base lang={lang} title={title} description={f.summary[lang].slice(0, 160)} canonical={path} alternates={alternates(th, sy, intent)}>
+<Base lang={lang} reviewed={reviewed} title={title} description={f.summary[lang].slice(0, 160)} canonical={path} alternates={alternates(th, sy, intent)}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqLd)} />
   <div class="narrow">

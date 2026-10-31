@@ -1,0 +1,51 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, adminQuestions, allFiches, reviewedKeys, countHidden } from "@/lib/admin";
+import { THEMES, symptom, theme } from "@/lib/content/themes";
+import { AGES, CITIES, DURATIONS } from "@/lib/content/options";
+import { dayLabel } from "@/lib/site";
+
+// Liste des questions, sans nom : on voit le profil, jamais l'identité (le nom n'est pas lu ici).
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/questions"), 302);
+const sp = Astro.url.searchParams;
+const f = { filter: sp.get("f") ?? "", theme: sp.get("theme") ?? "", city: sp.get("ville") ?? "" };
+const rows = await adminQuestions(f);
+const all = await adminQuestions({});
+const toReview = allFiches().length - (await reviewedKeys()).size;
+const hidden = await countHidden();
+const lbl = (list: { id: string; label: { fr: string } }[], id: string | null) => list.find((o) => o.id === id)?.label.fr ?? "";
+const title = (q: (typeof rows)[number]) => {
+  const th = theme(q.theme); const sy = th && symptom(th, q.symptom);
+  return [sy?.label.fr ?? q.symptom, q.duration ? lbl(DURATIONS, q.duration).toLowerCase() : null].filter(Boolean).join(", ");
+};
+const profile = (q: (typeof rows)[number]) => [q.who === "enfant" ? "Enfant" : q.who === "proche" ? "Un proche" : q.sex === "f" ? "Femme" : q.sex === "m" ? "Homme" : "Moi", q.who !== "enfant" ? lbl(AGES, q.age) : lbl(AGES, q.age)].filter(Boolean).join(", ");
+const status = (q: (typeof rows)[number]) =>
+  q.urgent ? ["urg", "Urgence"] : q.hidden ? ["no", "Retirée"] : !q.user_id ? ["no", "Sans compte"] : q.is_public && !q.anonymous ? ["pub", "Publiée avec prénom"] : q.is_public ? ["pub", "Publiée sans prénom"] : ["no", "Compteurs seulement"];
+const link = (o: Record<string, string>) => { const p = new URLSearchParams({ ...(f.filter && { f: f.filter }), ...(f.theme && { theme: f.theme }), ...(f.city && { ville: f.city }), ...o }); [...p.entries()].forEach(([k, v]) => !v && p.delete(k)); return `/admin/questions${p.size ? `?${p}` : ""}`; };
+const usedThemes = THEMES.filter((t) => all.some((q) => q.theme === t.id));
+const usedCities = CITIES.filter((c) => all.some((q) => q.city === c.id));
+---
+<Admin user={user} active="questions" title="Questions" counts={{ questions: all.length, toReview }}>
+  <div class="adm-top"><h1>Questions</h1><span class="adm-note">Sans nom : on voit le profil, jamais l'identité.</span></div>
+  <div class="adm-filters">
+    {[["", "Toutes"], ["urgent", "Urgences"], ["named", "Publiées avec prénom"], ["hidden", `Retirées (${hidden})`]].map(([id, l]) => <a class="filter" href={link({ f: id })} aria-current={f.filter === id ? "true" : undefined}>{l}</a>)}
+    <form class="adm-selects" method="get">
+      {f.filter && <input type="hidden" name="f" value={f.filter} />}
+      <select name="theme" onchange="this.form.submit()" aria-label="Sujet"><option value="">Tous les sujets</option>{usedThemes.map((t) => <option value={t.id} selected={f.theme === t.id}>{t.label.fr}</option>)}</select>
+      <select name="ville" onchange="this.form.submit()" aria-label="Ville"><option value="">Toutes les villes</option>{usedCities.map((c) => <option value={c.id} selected={f.city === c.id}>{c.label.fr}</option>)}</select>
+    </form>
+  </div>
+  <div class="adm-table">
+    <table>
+      <thead><tr><th>Date</th><th>Question</th><th>Profil</th><th>Ville</th><th>Statut</th><th></th></tr></thead>
+      <tbody>
+        {rows.map((q) => { const [cls, txt] = status(q); return (
+          <tr><td>{dayLabel(q.created_at, "fr", "Auj.", "Hier")}</td><td class="w"><a href={`/admin/questions/${q.id}`}>{title(q)}</a></td><td>{profile(q)}</td><td>{lbl(CITIES, q.city) || "—"}</td><td><span class={`adm-tag ${cls}`}>{txt}</span></td><td><a class="act" href={`/admin/questions/${q.id}`}>Voir</a></td></tr>
+        ); })}
+      </tbody>
+    </table>
+    {rows.length === 0 && <p class="adm-empty">Aucune question avec ces filtres.</p>}
+  </div>
+  {rows.length === 150 && <p class="adm-note">Les 150 plus récentes sont affichées.</p>}
+</Admin>

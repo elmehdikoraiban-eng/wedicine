@@ -3,7 +3,7 @@ import { isLang } from "./lib/i18n";
 import { pickLang } from "./lib/lang";
 
 // Toute adresse sans préfixe de langue est redirigée vers la langue du navigateur (FR par défaut).
-const PASS = /^\/(api\/|_astro\/|_image|robots\.txt$|sitemap\.xml$|favicon)/;
+const PASS = /^\/(api\/|admin(\/|$)|_astro\/|_image|robots\.txt$|sitemap\.xml$|favicon)/;
 
 export const onRequest = defineMiddleware(async ({ request, url, cookies, redirect }, next) => {
   const { pathname } = url;

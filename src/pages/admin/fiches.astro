@@ -1,0 +1,76 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, allFiches, reviews, ficheStats } from "@/lib/admin";
+import { INTENTS } from "@/lib/content/options";
+import { qPath } from "@/lib/site";
+
+// Fiches et relecture médecin : une fiche validée (et inchangée depuis) sort du noindex.
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/fiches"), 302);
+const fiches = allFiches();
+const rv = await reviews();
+const stats = await ficheStats();
+const rows = fiches.map(({ th, sy }) => {
+  const k = `${th.id}/${sy.id}`;
+  return { th, sy, k, r: rv.get(k), s: stats.get(k) };
+}).sort((a, b) => (b.s?.views ?? 0) - (a.s?.views ?? 0));
+const ok = rows.filter((x) => x.r?.valid).length;
+const global = process.env.CONTENT_REVIEWED === "1";
+const d = (x: string | Date) => new Date(x).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+const intent = INTENTS[0].id;
+---
+<Admin user={user} active="fiches" title="Fiches" counts={{ toReview: fiches.length - ok }}>
+  <div class="adm-top"><h1>Fiches</h1></div>
+  <section class="adm-card adm-progress-card">
+    <div class="adm-progress-head"><b>Relecture médecin</b><span class="adm-note">{ok} fiche{ok > 1 ? "s" : ""} validée{ok > 1 ? "s" : ""} sur {fiches.length}</span></div>
+    <div class="adm-progress"><i style={`width:${fiches.length ? (100 * ok) / fiches.length : 0}%`}></i></div>
+    <p class="adm-note">{global ? "CONTENT_REVIEWED=1 est actif : toutes les fiches sont indexables." : "Une fiche validée sort du « noindex » : Google peut l'indexer. Les autres restent invisibles pour Google."}</p>
+  </section>
+  <div class="adm-table">
+    <table>
+      <thead><tr><th>Sujet</th><th>Symptôme</th><th>Vues</th><th>Utile</th><th>Relecture</th><th>Google</th><th></th></tr></thead>
+      <tbody>
+        {rows.map(({ th, sy, r, s }) => (
+          <tr>
+            <td>{th.label.fr}</td>
+            <td><a href={qPath("fr", th, sy, intent)} target="_blank" rel="noopener">{sy.label.fr}</a></td>
+            <td>{(s?.views ?? 0).toLocaleString("fr-FR")}</td>
+            <td>{s?.helpful == null ? "—" : `${s.helpful} %`}</td>
+            <td>{r?.valid ? <span class="adm-tag pub">Validée · {r.doctor} le {d(r.reviewed_at)}</span> : r ? <span class="adm-tag urg">À revalider (texte modifié)</span> : <span class="adm-tag no">À relire</span>}</td>
+            <td>{global || r?.valid ? "Indexée" : "noindex"}</td>
+            <td class="adm-act">
+              {r?.valid
+                ? <button type="button" class="adm-link" data-cancel data-theme-id={th.id} data-symptom={sy.id}>Annuler</button>
+                : (
+                  <details class="adm-val">
+                    <summary>Valider</summary>
+                    <form data-theme-id={th.id} data-symptom={sy.id}>
+                      <input class="input" name="doctor" required maxlength="80" placeholder="Nom du médecin (Dr …)" aria-label="Nom du médecin" />
+                      <button class="btn btn-primary btn-sm">Valider la fiche</button>
+                    </form>
+                  </details>
+                )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="adm-note">« Valider » demande le nom du médecin et garde la date : c'est la preuve à montrer en cas de contrôle. La validation s'annule toute seule si le texte de la fiche change.</p>
+</Admin>
+<script>
+  const send = async (theme: string, symptom: string, doctor: string | null) => {
+    const r = await fetch("/api/admin/review", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ theme, symptom, doctor }) }).catch(() => null);
+    if (r?.ok) location.reload();
+    return !!r?.ok;
+  };
+  document.querySelectorAll<HTMLFormElement>(".adm-val form").forEach((f) => f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const b = f.querySelector("button")!; b.disabled = true;
+    if (!(await send(f.dataset.themeId!, f.dataset.symptom!, (f.elements.namedItem("doctor") as HTMLInputElement).value))) b.disabled = false;
+  }));
+  document.querySelectorAll<HTMLButtonElement>("[data-cancel]").forEach((b) => b.addEventListener("click", async () => {
+    b.disabled = true;
+    if (!(await send(b.dataset.themeId!, b.dataset.symptom!, null))) b.disabled = false;
+  }));
+</script>

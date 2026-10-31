@@ -15,15 +15,16 @@ interface Props {
   alternates?: Record<string, string>;
   footer?: boolean;       // pied de page (masqué dans l'espace patient)
   wrap?: boolean;         // enveloppe le contenu dans .wrap (toutes les pages sauf l'accueil)
-  nav?: boolean;          // barre de navigation (absente dans l'espace patient, qui a sa barre latérale)
+  nav?: boolean;
+  reviewed?: boolean;     // fiche relue par un médecin (admin) : indexable même sans CONTENT_REVIEWED          // barre de navigation (absente dans l'espace patient, qui a sa barre latérale)
 }
-const { lang, title, description, noindex = false, canonical, alternates, wrap = true, footer = true, nav = true } = Astro.props;
+const { lang, title, description, noindex = false, canonical, alternates, wrap = true, footer = true, nav = true, reviewed = false } = Astro.props;
 const user = await currentUser(Astro.cookies);
 const fullTitle = title ? `${title} | Wedicine` : `Wedicine, ${t(lang, "tagline")}`;
 const desc = description ?? t(lang, "heroSub");
 const canon = `${SITE_URL}${canonical ?? Astro.url.pathname}`;
 // Tant qu'un médecin n'a pas relu le contenu, rien n'est indexé.
-const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow";
+const robots = noindex || !(CONTENT_REVIEWED || reviewed) ? "noindex, follow" : "index, follow";
 ---
 <!doctype html>
 <html lang={lang} dir={dir(lang)}>

@@ -1,0 +1,56 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, allFiches, reviewedKeys, logAction } from "@/lib/admin";
+import { questionById } from "@/lib/db";
+import { theme, pageTitle } from "@/lib/content/themes";
+import { exchange } from "@/lib/conversation";
+import { qPath, formatDate } from "@/lib/site";
+import { INTENTS } from "@/lib/content/options";
+
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/questions"), 302);
+const id = Number(Astro.params.id);
+const q = Number.isInteger(id) ? await questionById(id) : undefined;
+if (!q) return Astro.redirect("/admin/questions", 302);
+const th = theme(q.theme)!;
+const sy = th.symptoms.find((s) => s.id === q.symptom);
+const hidden = Boolean((q as { hidden?: boolean }).hidden);
+await logAction(user, "A ouvert le détail", `Question n° ${id}`);
+const toReview = allFiches().length - (await reviewedKeys()).size;
+const pairs = exchange("fr", q, th);
+const intent = INTENTS.find((i) => i.id === q.intent);
+const signature = q.urgent ? "Jamais publiée (urgence)" : hidden ? "Retirée par l'admin" : !q.user_id ? "Sans compte" : q.is_public && !q.anonymous ? "Avec prénom" : q.is_public ? "Sans prénom" : "Compteurs anonymes seulement";
+---
+<Admin user={user} active="questions" title={`Question n° ${id}`} counts={{ toReview }}>
+  <div class="adm-top"><h1><a href="/admin/questions" class="adm-back">Questions</a> / n° {id}</h1><span class="adm-note">{formatDate(q.created_at, "fr")}</span></div>
+  <div class="adm-detail">
+    <section class="adm-card">
+      <h2>La conversation</h2>
+      <div class="adm-qa">{pairs.map((x) => <><span class="q">{x.q}</span><span class="a">{x.a}</span></>)}</div>
+    </section>
+    <section class="adm-card">
+      <h2>Statut</h2>
+      <div class="adm-kv">
+        <div><span>Urgence</span>{q.urgent ? "Oui" : "Non"}</div>
+        <div><span>Page publique</span>{sy ? <a href={qPath("fr", th, sy, q.intent)} target="_blank" rel="noopener">{pageTitle("fr", th, sy, q.intent)}</a> : "—"}</div>
+        <div><span>Signature</span>{signature}</div>
+        <div><span>Langue</span>{q.lang.toUpperCase()}</div>
+        <div><span>Intention</span>{intent?.label.fr ?? q.intent}</div>
+      </div>
+      {!q.urgent && (
+        <>
+          <p class="adm-note">{hidden ? "La question est retirée des pages publiques et de leurs compteurs." : "Retirer la question des pages publiques, compteurs compris. Le patient garde sa réponse."}</p>
+          <button type="button" class="btn btn-ghost btn-sm" id="hide" data-id={id} data-hidden={hidden ? "1" : "0"}>{hidden ? "Remettre sur la page publique" : "Retirer de la page publique"}</button>
+        </>
+      )}
+    </section>
+  </div>
+</Admin>
+<script>
+  const b = document.getElementById("hide") as HTMLButtonElement | null;
+  b?.addEventListener("click", async () => {
+    b.disabled = true;
+    const r = await fetch("/api/admin/hide", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: Number(b.dataset.id), hidden: b.dataset.hidden !== "1" }) }).catch(() => null);
+    if (r?.ok) location.reload(); else b.disabled = false;
+  });
+</script>

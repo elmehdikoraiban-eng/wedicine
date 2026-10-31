@@ -66,6 +66,17 @@ FROM (SELECT DISTINCT ON (user_id) user_id, sex FROM wedicine.questions WHERE wh
 WHERE s.user_id = u.id AND u.sex IS NULL;
 UPDATE wedicine.users u SET avatar = CASE u.sex WHEN 'f' THEN 1 + 2 * (u.id % 25) ELSE 2 + 2 * (u.id % 25) END
 WHERE u.sex IN ('f','m') AND NOT u.avatar_chosen AND (u.avatar IS NULL OR (u.sex = 'f') <> (u.avatar % 2 = 1));
+-- Admin : question retirée des pages publiques (compteurs compris), relecture médecin par fiche, journal.
+ALTER TABLE wedicine.questions ADD COLUMN IF NOT EXISTS hidden BOOLEAN NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS wedicine.fiche_reviews (
+  theme TEXT NOT NULL, symptom TEXT NOT NULL, doctor TEXT NOT NULL,
+  reviewed_at TIMESTAMPTZ NOT NULL DEFAULT now(), content_hash TEXT NOT NULL,
+  PRIMARY KEY (theme, symptom)
+);
+CREATE TABLE IF NOT EXISTS wedicine.admin_log (
+  id SERIAL PRIMARY KEY, at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  user_id INTEGER, who TEXT NOT NULL, action TEXT NOT NULL, target TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS questions_page ON wedicine.questions (theme, symptom, intent) WHERE is_public;
 `;
 
@@ -163,7 +174,7 @@ export async function publicAskers(theme: string, symptom: string, intent: strin
   const r = await d.query(
     `SELECT q.id, q.created_at, q.age, q.city, q.sex, q.who, q.anonymous, u.first_name, u.last_name
      FROM wedicine.questions q JOIN wedicine.users u ON u.id = q.user_id
-     WHERE q.theme = $1 AND q.symptom = $2 AND q.intent = $3 AND q.is_public
+     WHERE q.theme = $1 AND q.symptom = $2 AND q.intent = $3 AND q.is_public AND NOT q.hidden
      ORDER BY q.id DESC LIMIT 20`,
     [theme, symptom, intent]
   );
@@ -287,7 +298,7 @@ export type PageStats = {
 };
 export async function pageStats(theme: string, symptom: string): Promise<PageStats> {
   const d = await db();
-  const base = "FROM wedicine.questions WHERE theme = $1 AND symptom = $2 AND NOT urgent";
+  const base = "FROM wedicine.questions WHERE theme = $1 AND symptom = $2 AND NOT urgent AND NOT hidden";
   const t = await d.query(`SELECT count(*)::int AS n, max(created_at) AS last ${base}`, [theme, symptom]);
   const group = async (col: string) => {
     const r = await d.query(

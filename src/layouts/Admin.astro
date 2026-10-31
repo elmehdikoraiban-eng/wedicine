@@ -1,0 +1,33 @@
+---
+// Gabarit de l'admin (réservé, voir src/lib/admin.ts) : barre à gauche comme l'espace patient, contenu à droite. En français.
+import Base from "@/layouts/Base.astro";
+import { Icon } from "@/components/Icon";
+import ThemePick from "@/components/ThemePick.astro";
+import type { UserRow } from "@/lib/db";
+import { publicName } from "@/lib/auth";
+interface Props { user: UserRow; active: string; title: string; counts?: { questions?: number; toReview?: number } }
+const { user, active, title, counts = {} } = Astro.props;
+const items = [
+  { id: "dash", href: "/admin", icon: "ChartColumn", label: "Tableau de bord" },
+  { id: "questions", href: "/admin/questions", icon: "MessageCircle", label: "Questions", n: counts.questions },
+  { id: "fiches", href: "/admin/fiches", icon: "FileText", label: "Fiches", n: counts.toReview != null ? `${counts.toReview} à relire` : undefined },
+  { id: "journal", href: "/admin/journal", icon: "Clock", label: "Journal" },
+] as const;
+---
+<Base lang="fr" title={`${title} · Admin`} noindex nav={false} footer={false} wrap={false}>
+  <div class="space adm">
+    <aside class="side">
+      <div class="side-head"><a href="/admin" class="side-logo adm-brand"><img src="/brand/logo.svg" alt="Wedicine" width="147" height="26" class="logo-light" /><img src="/brand/logo-sombre.svg" alt="Wedicine" width="147" height="26" class="logo-dark" /><small>ADMIN</small></a></div>
+      <nav class="side-menu">
+        {items.map((it) => (
+          <a href={it.href} aria-current={it.id === active ? "page" : undefined}><Icon name={it.icon} size={18} /><span>{it.label}</span>{"n" in it && it.n != null && <em class="adm-n">{it.n}</em>}</a>
+        ))}
+      </nav>
+      <div class="adm-foot">
+        <div class="side-theme"><span>Thème</span><ThemePick lang="fr" /></div>
+        <a href="/fr">{publicName(user.first_name, user.last_name)} · retour au site</a>
+      </div>
+    </aside>
+    <main class="space-main adm-main"><slot /></main>
+  </div>
+</Base>

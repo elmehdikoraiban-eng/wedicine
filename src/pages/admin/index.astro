@@ -1,0 +1,56 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, dashboard, allFiches, reviewedKeys } from "@/lib/admin";
+import { THEMES } from "@/lib/content/themes";
+import { CITIES } from "@/lib/content/options";
+
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin"), 302);
+const days = [1, 7, 30].includes(Number(Astro.url.searchParams.get("p"))) ? Number(Astro.url.searchParams.get("p")) : 7;
+const s = await dashboard(days);
+const toReview = allFiches().length - (await reviewedKeys()).size;
+const pct = (a: number, b: number) => (b ? Math.round((100 * a) / b) : 0);
+const evo = s.prev ? Math.round((100 * (s.questions - s.prev)) / s.prev) : null;
+const fmt = (n: number) => n.toLocaleString("fr-FR");
+// Une barre par jour de la période, même les jours sans question.
+const daysList = Array.from({ length: days }, (_, i) => { const d = new Date(Date.now() - (days - 1 - i) * 864e5); return d.toISOString().slice(0, 10); });
+const byDay = new Map(s.perDay.map((x) => [x.day, x]));
+const max = Math.max(1, ...s.perDay.map((x) => x.n));
+const themeLabel = (id: string) => THEMES.find((t) => t.id === id)?.label.fr ?? id;
+const cityLabel = (id: string) => CITIES.find((c) => c.id === id)?.label.fr ?? id;
+const tMax = Math.max(1, ...s.themes.map((x) => x.n)), cMax = Math.max(1, ...s.cities.map((x) => x.n));
+const wd = (d: string) => new Date(d + "T12:00:00Z").toLocaleDateString("fr-FR", { weekday: "short", day: days > 7 ? "numeric" : undefined });
+---
+<Admin user={user} active="dash" title="Tableau de bord" counts={{ questions: s.totalQuestions, toReview }}>
+  <div class="adm-top">
+    <h1>Tableau de bord</h1>
+    <div class="adm-seg">{[[1, "Aujourd'hui"], [7, "7 jours"], [30, "30 jours"]].map(([d, l]) => <a href={`/admin?p=${d}`} aria-current={d === days ? "true" : undefined}>{l}</a>)}</div>
+  </div>
+  <div class="adm-kpis">
+    <div class="adm-kpi"><span>Questions</span><b>{fmt(s.questions)}</b><small class={evo != null && evo < 0 ? "down" : ""}>{evo == null ? "—" : `${evo > 0 ? "+" : ""}${evo} % vs période d'avant`}</small></div>
+    <div class="adm-kpi"><span>Nouveaux comptes</span><b>{fmt(s.users)}</b><small>{pct(s.withAccount, s.questions)} % des questions finissent en compte</small></div>
+    <div class="adm-kpi"><span>Urgences déclenchées</span><b>{fmt(s.urgent)}</b><small class="red">{pct(s.urgent, s.questions)} % des questions</small></div>
+    <div class="adm-kpi"><span>Pages publiques vues (total)</span><b>{fmt(s.views)}</b><small>{s.helpful == null ? "Pas encore d'avis" : `« Utile » : ${s.helpful} %`}</small></div>
+  </div>
+  <div class="adm-row">
+    <section class="adm-card">
+      <h2>Questions par jour</h2>
+      <div class="adm-bars" role="img" aria-label="Questions par jour">
+        {daysList.map((d) => { const x = byDay.get(d); const n = x?.n ?? 0; return (
+          <div class="b" title={`${d} : ${n} question(s), dont ${x?.u ?? 0} urgence(s)`}><i style={`height:${(100 * n) / max}%`}><s style={`height:${n ? (100 * (x?.u ?? 0)) / n : 0}%`}></s></i></div>
+        ); })}
+      </div>
+      {days <= 7 && <div class="adm-axis">{daysList.map((d) => <span>{wd(d)}</span>)}</div>}
+      <p class="adm-legend"><i></i>Questions <i class="u"></i>dont urgences</p>
+    </section>
+    <section class="adm-card">
+      <h2>Sujets les plus demandés</h2>
+      {s.themes.length ? <div class="adm-rank">{s.themes.map((x) => <div><span>{themeLabel(x.id)}</span><b>{x.n}</b><s style={`--w:${(100 * x.n) / tMax}%`}></s></div>)}</div> : <p class="adm-empty">Aucune question sur la période.</p>}
+    </section>
+  </div>
+  <section class="adm-card">
+    <h2>Villes</h2>
+    {s.cities.length ? <div class="adm-rank adm-rank-3">{s.cities.map((x) => <div><span>{cityLabel(x.id)}</span><b>{x.n}</b><s style={`--w:${(100 * x.n) / cMax}%`}></s></div>)}</div> : <p class="adm-empty">Aucune ville sur la période.</p>}
+  </section>
+  <p class="adm-note">Au total : {fmt(s.totalQuestions)} questions et {fmt(s.totalUsers)} comptes depuis le lancement.</p>
+</Admin>
