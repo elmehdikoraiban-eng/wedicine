@@ -30,7 +30,7 @@
   /* Boutons et champs (asana.com) */
   --btn: #0065ff; --btn-hover: #0747a6; --btn-text: #ffffff;
   --btn-2: #ffffff; --btn-2-hover: #f4f5f7; --btn-2-border: #c1c7d0;
-  --field-border: #dfe3ea; --field-hover: #c1c7d0; --field-focus: #0065ff; --ring: #4075cf;
+  --field-border: #eceef2; --field-bg: #f4f5f7; --field-hover: #eceef2; --field-focus: #0065ff; --ring: #4075cf;
   /* Arrondis asana : panneaux 24, cartes 16, éléments 12, champs 6 */
   --r-pill: 100px; --r-field: 10px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
   --shadow-hover: 0 12px 32px rgba(9, 30, 66, .10);
@@ -110,7 +110,7 @@ main > .page { padding-block: 48px 96px; }
 .nav-links > a.plain { color: var(--ink); white-space: nowrap; padding: 9px 14px; font-weight: 500; font-size: var(--fs-nav); border-radius: var(--r-pill); transition: background var(--t); }
 .nav-links > a.plain:hover { background: var(--neutral); text-decoration: none; }
 .nav .btn-sm { min-height: 40px; padding: 0 18px; font-size: var(--fs-nav); }
-.lang { display: flex; border: 1px solid var(--field-border); border-radius: var(--r-pill); overflow: hidden; margin-inline-end: 8px; padding: 2px; gap: 2px; }
+.lang { display: flex; border: 1px solid #dfe3ea; border-radius: var(--r-pill); overflow: hidden; margin-inline-end: 8px; padding: 2px; gap: 2px; }
 .lang a { padding: 6px 11px; font-size: .875rem; font-weight: 500; color: var(--muted); border-radius: var(--r-pill); transition: background var(--t), color var(--t); }
 .lang a[aria-current="true"] { background: var(--ink); color: #fff; }
 .lang a:hover { text-decoration: none; background: var(--neutral); }
@@ -163,19 +163,19 @@ main > .page { padding-block: 48px 96px; }
 .list-links svg { color: var(--link); flex: none; }
 
 .row { display: flex; gap: 10px; flex-wrap: wrap; }
-.chip { border: 1px solid var(--field-border); background: var(--canvas); border-radius: var(--r-chip); padding: 11px 20px; font-weight: 500; cursor: pointer; color: var(--ink); transition: background var(--t), border-color var(--t), color var(--t), transform var(--t); }
-.chip:hover { border-color: var(--field-hover); background: var(--btn-2); }
+.chip { border: 1px solid #dfe3ea; background: var(--canvas); border-radius: var(--r-chip); padding: 11px 20px; font-weight: 500; cursor: pointer; color: var(--ink); transition: background var(--t), border-color var(--t), color var(--t), transform var(--t); }
+.chip:hover { border-color: #c1c7d0; background: var(--btn-2); }
 .chip:active { transform: scale(.96); }
 .chip[aria-pressed="true"] { border-color: var(--brand); background: var(--brand); color: #fff; }
 .field { margin-bottom: 22px; }
 .field > label, .field > .label { display: block; font-weight: 500; margin-bottom: 10px; }
-/* Champs façon Claude : 40 px, rayon 10 px, bord fin gris clair, texte 14 px ; au focus, bord bleu
-   et halo bleu très léger (pas d'anneau épais). Même style pour .input, .cf input et les listes. */
-.input, .cf input, .set-form select { width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid var(--field-border); border-radius: var(--r-field); background: var(--canvas); color: var(--ink); font-size: 14px; box-shadow: 0 1px 2px rgba(9, 30, 66, .04); transition: border-color var(--t), box-shadow var(--t); }
+/* Champs façon Claude (fil de discussion) : fond gris doux, bord presque invisible, rayon 10 px,
+   44 px, texte 14 px. Au survol le fond fonce un peu ; au focus le champ devient blanc avec un bord bleu fin. */
+.input, .cf input, .set-form select { width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid var(--field-border); border-radius: var(--r-field); background-color: var(--field-bg); color: var(--ink); font-size: 14px; transition: border-color var(--t), background-color var(--t), box-shadow var(--t); }
 .input::placeholder, .cf input::placeholder { color: #8993a4; }
-.input:hover, .cf input:hover, .set-form select:hover { border-color: var(--field-hover); }
-.input:focus, .cf input:focus, .set-form select:focus { outline: none; border-color: var(--field-focus); box-shadow: 0 0 0 3px rgba(0, 101, 255, .14); }
-.set-form select { appearance: none; padding-inline-end: 34px; background: var(--canvas) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b778c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
+.input:hover, .cf input:hover, .set-form select:hover { background-color: var(--field-hover); }
+.input:focus, .cf input:focus, .set-form select:focus { outline: none; background-color: var(--canvas); border-color: var(--field-focus); box-shadow: 0 0 0 3px rgba(0, 101, 255, .12); }
+.set-form select { appearance: none; padding-inline-end: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b778c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
 [dir="rtl"] .set-form select { background-position: left 12px center; }
 .input-wrap { position: relative; }
 .input-wrap .input { padding-inline-end: 48px; }
@@ -570,7 +570,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .help-head p { margin: 0; }
 .pub-options { display: grid; gap: 10px; }
 .pub-option { display: flex; align-items: center; gap: 14px; width: 100%; text-align: start; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: var(--r-card); background: var(--canvas); color: var(--ink); cursor: pointer; font: inherit; transition: border-color var(--t), background var(--t); }
-.pub-option:hover { border-color: var(--field-hover); }
+.pub-option:hover { border-color: #c1c7d0; }
 .pub-option[aria-checked="true"] { border-color: var(--brand); background: var(--tint-2); }
 .pub-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--neutral); color: var(--muted); display: grid; place-items: center; }
 .pub-option[aria-checked="true"] .pub-ico { background: var(--brand); color: #fff; }
