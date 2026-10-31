@@ -247,7 +247,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
             <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={14} />{LANG_NAMES[lang]}<Icon name="ChevronDown" size={14} /></summary>
             <div className="lang-pop">{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
           </details>
-          <a href={`/${lang}/contact`}>{t(lang, "contactUs")}</a>
+          {/* « Nous contacter » : à réafficher quand El Mehdi aura donné l'e-mail ou le WhatsApp. */}
         </nav>
       )}
     </div>
