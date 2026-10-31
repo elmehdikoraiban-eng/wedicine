@@ -7,8 +7,8 @@
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
 @font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-500.woff2") format("woff2"); font-weight: 500 600; font-style: normal; font-display: swap; }
-@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-700.woff2") format("woff2"); font-weight: 700 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-700.woff2") format("woff2"); font-weight: 600 900; font-style: normal; font-display: swap; }
 :root {
   --brand: #0065ff;        /* bande bleue, accents, sélection */
   --brand-hover: #0747a6;
