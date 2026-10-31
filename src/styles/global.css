@@ -2,11 +2,13 @@
    - Système visuel : asana.com (typographie large et serrée, sections très aérées, grands arrondis,
      ombres douces, panneaux pastel, boutons « pill », champs 1 px). Structure de parcours : himynona.
    - Couleurs : bleu #0065FF, encre #091E42, bandes neutres (palette verte essayée puis refusée le 2026-10-30).
-   - Polices : Nunito Sans (FR/EN, variable, OFL) et Ramis Arabic (AR, licence Kutype, version d'essai
-     fournie par El Mehdi : licence commerciale à acquérir avant le lancement). Fichiers dans public/fonts. */
+   - Polices : Nunito Sans (FR/EN, variable, OFL) et Tajawal (AR, OFL, Regular/Medium/Bold,
+     choisie par El Mehdi le 2026-10-31 à la place de Ramis). Fichiers dans public/fonts. */
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
-@font-face { font-family: "Ramis Arabic"; src: url("/fonts/ramis-arabic.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-500.woff2") format("woff2"); font-weight: 500 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-700.woff2") format("woff2"); font-weight: 700 900; font-style: normal; font-display: swap; }
 :root {
   --brand: #0065ff;        /* bande bleue, accents, sélection */
   --brand-hover: #0747a6;
@@ -40,7 +42,7 @@
   --max: 1200px;
   --nav-h: 64px;
   --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-ar: "Ramis Arabic", "Nunito Sans", system-ui, sans-serif;
+  --font-ar: "Tajawal", "Nunito Sans", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .7, .2, 1);
   --t: .18s;
   --sec: clamp(64px, 9vw, 120px);   /* hauteur des sections */
