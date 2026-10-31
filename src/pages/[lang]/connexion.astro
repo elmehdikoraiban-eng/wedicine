@@ -3,61 +3,26 @@ import Base from "@/layouts/Base.astro";
 import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { currentUser } from "@/lib/auth";
-import { questionById } from "@/lib/db";
-import { symptom, theme } from "@/lib/content/themes";
 import { AuthForm } from "@/components/AuthForm";
 import { Icon } from "@/components/Icon";
-import { Account } from "@/components/Illustrations";
+import { authContext } from "@/lib/authpage";
 
-// Page d'authentification à part entière. Avec ?q=ID (question qui vient d'être posée),
-// elle est l'étape obligatoire avant d'afficher la réponse : rien de la réponse n'apparaît ici.
+// Connexion, façon Claude : le symbole, un titre, deux champs, un bouton. Rien d'autre.
+// ?q=ID : la question vient d'être posée, la connexion ouvre sa réponse.
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
-
 const sp = Astro.url.searchParams;
-const qid = Number(sp.get("q"));
-const hasQ = Number.isInteger(qid) && qid > 0;
-const next = sp.get("next");
-const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : undefined;
-
+// Ancien lien « ?mode=inscription » : la création de compte a maintenant sa propre page.
+if (sp.get("mode") === "inscription") { sp.delete("mode"); return Astro.redirect(`/${lang}/inscription${sp.size ? `?${sp}` : ""}`, 302); }
 const user = await currentUser(Astro.cookies);
-if (user) return Astro.redirect(hasQ ? `/${lang}/compte/q/${qid}` : safeNext ?? `/${lang}`, 302);
-
-// La question doit exister et ne pas être déjà rattachée à un compte ; sinon simple connexion.
-let q = hasQ ? await questionById(qid).catch(() => undefined) : undefined;
-if (q && (q.user_id != null || q.urgent)) q = undefined;
-const th = q && theme(q.theme);
-const sy = th && q && symptom(th, q.symptom);
-const unlock = !!(q && th && sy);
+const c = await authContext(sp);
+if (user) return Astro.redirect(c.unlock ? `/${lang}/compte/q/${c.qid}` : c.next ?? `/${lang}`, 302);
 ---
-<Base lang={lang} title={unlock ? t(lang, "previewReady") : t(lang, "login")} noindex>
-  <div class={`auth${unlock ? " auth-unlock" : ""}`}>
-    <aside class="auth-side">
-      {unlock ? (
-        <>
-          <span class="badge badge-ok"><Icon name="Check" size={14} /> {t(lang, "previewReady")}</span>
-          <h1>{t(lang, "previewLocked")}</h1>
-          <p class="lead">{t(lang, "previewText")}</p>
-          <div class="auth-topic">
-            <span class="ico"><Icon name={th!.icon} size={22} /></span>
-            <span><b>{th!.label[lang]}</b><br /><span class="muted">{sy!.label[lang]}</span></span>
-            <Icon name="Lock" size={18} className="lock-ico" />
-          </div>
-          <ul class="auth-points">
-            <li><Icon name="Check" size={18} />{t(lang, "step2Text")}</li>
-            <li><Icon name="Check" size={18} />{t(lang, "step3Text")}</li>
-          </ul>
-        </>
-      ) : (
-        <>
-          <h1>{t(lang, "login")}</h1>
-          <p class="lead">{t(lang, "noQuestions")}</p>
-          <Account />
-        </>
-      )}
-    </aside>
-    <div class="card auth-card">
-      <AuthForm client:load lang={lang} questionId={unlock ? qid : undefined} initialMode={sp.get("mode") === "connexion" ? "login" : unlock || sp.get("mode") === "inscription" ? "signup" : "login"} redirectTo={safeNext} />
-    </div>
+<Base lang={lang} title={t(lang, "login")} noindex>
+  <div class="authx">
+    <img src="/brand/symbole.svg" alt="" width="40" height="40" class="authx-sym" />
+    {c.unlock && <p class="authx-badge"><Icon name="Check" size={14} /> {t(lang, "previewReady")}</p>}
+    <h1>{t(lang, "loginTitle")}</h1>
+    <AuthForm client:load lang={lang} mode="login" questionId={c.unlock ? c.qid : undefined} redirectTo={c.next} switchHref={`/${lang}/inscription${c.query}`} />
   </div>
 </Base>

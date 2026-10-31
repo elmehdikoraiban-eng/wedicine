@@ -338,6 +338,11 @@ export const UI = {
   ctaText: { fr: "Une minute, rien à écrire, et une réponse à garder pour la consultation.", ar: "دقيقة واحدة، بدون كتابة، وجواب تحتفظ به للاستشارة.", en: "One minute, nothing to type, and an answer to keep for the visit." },
   error: { fr: "Une erreur est survenue, réessayez.", ar: "حدث خطأ، حاول مرة أخرى.", en: "Something went wrong, please try again." },
   // Conversation (accueil et questions)
+  noAccountYet: { fr: "Pas encore de compte ?", ar: "ليس لديك حساب بعد؟", en: "No account yet?" },
+  loginTitle: { fr: "Bon retour parmi nous", ar: "مرحباً بعودتك", en: "Welcome back" },
+  signupTitle: { fr: "Créer votre compte", ar: "أنشئ حسابك", en: "Create your account" },
+  signupSub: { fr: "Pour lire vos réponses et les retrouver quand vous voulez.", ar: "لقراءة أجوبتك والعودة إليها متى شئت.", en: "To read your answers and find them whenever you want." },
+  signupHow: { fr: "Comment ça marche", ar: "كيف يعمل", en: "How it works" },
   contactUs: { fr: "Nous contacter", ar: "اتصل بنا", en: "Contact us" },
   chatTitle: { fr: "Pré-consultation en ligne", ar: "استشارة أولية عبر الإنترنت", en: "Online pre-consultation" },
   chatSub: { fr: "Répondez en quelques choix, sans rien écrire. La réponse arrive tout de suite.", ar: "أجب ببعض الاختيارات، دون كتابة أي شيء. الجواب يصل فوراً.", en: "Answer with a few taps, nothing to type. The answer comes right away." },

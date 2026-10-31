@@ -1006,3 +1006,25 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 /* Pied de page minimal, le même que sur l'accueil : urgence, mentions, un bouton de langue. */
 .mini-foot { border-top: 1px solid #eef0f4; margin-top: 48px; }
 .mini-foot .chat-legal { align-items: center; }
+
+/* Connexion et inscription, façon Claude : une colonne étroite centrée, sans carte. */
+.authx { max-width: 400px; margin: 0 auto; padding: 48px 0 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.authx-sym { margin-bottom: 16px; }
+.authx h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.authx-sub { margin: 8px 0 0; color: var(--muted-2); font-size: 14px; }
+.authx-badge { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 10px; padding: 4px 10px; border-radius: 100px; background: #e3fcef; color: #006644; font-size: 12.5px; font-weight: 600; }
+.authx .auth-form { width: 100%; margin-top: 28px; text-align: start; }
+.authx .field { margin-bottom: 14px; }
+.authx .field > label { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--ink-2); }
+.authx .row { display: flex; flex-wrap: wrap; }
+.authx .check { font-size: 13px; color: var(--muted-2); }
+.auth-submit { width: 100%; margin-top: 8px; min-height: 44px; border-radius: 10px; font-size: 14px; }
+.auth-switch { margin: 18px 0 0; text-align: center; font-size: 13.5px; color: var(--muted-2); }
+.authx-how { max-width: 960px; margin: 40px auto 0; padding: 40px 0 8px; border-top: 1px solid #eef0f4; text-align: center; }
+.authx-how h2 { margin: 0 0 28px; font-size: 18px; font-weight: 600; }
+.authx-how ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.authx-how li { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.authx-art { width: 100%; max-width: 220px; height: auto; margin-bottom: 8px; }
+.authx-how h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.authx-how p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted-2); max-width: 30ch; }
+@media (max-width: 720px) { .authx { padding-top: 24px; } .authx-how ol { grid-template-columns: 1fr; gap: 32px; } }

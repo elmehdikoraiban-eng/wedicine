@@ -1,0 +1,306 @@
+10:15:13 [types] Generated 1ms
+10:15:13 [content] Syncing content
+10:15:13 [content] Synced content
+
+ astro  v5.18.2 ready in 368 ms
+
+┃ Local    http://127.0.0.1:3111/
+
+10:15:13 watching for file changes...
+10:15:21 [200] /fr 333ms
+10:15:30 [200] POST /api/questions 1766ms
+10:15:30 [200] /fr 14ms
+10:15:30 [200] /fr 20ms
+10:15:31 [302] /fr/question 5ms
+10:15:31 [200] /fr 13ms
+10:15:31 [200] /ar 15ms
+10:15:34 [200] POST /api/questions 4ms
+10:15:34 [200] /fr 20ms
+10:15:36 [200] POST /api/questions 3ms
+10:15:37 [200] /en 19ms
+10:15:38 [200] /fr 15ms
+10:15:42 [200] POST /api/questions 4ms
+10:15:44 [200] POST /api/signup 83ms
+10:15:44 [200] /fr/compte/q/664 46ms
+10:15:48 [200] POST /api/publish 4ms
+10:15:48 [200] /fr/compte/q/664 37ms
+10:15:49 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 26ms
+10:15:51 [200] /fr/compte/q/664 33ms
+10:15:53 [200] POST /api/publish 4ms
+10:15:53 [200] /fr/compte/q/664 35ms
+10:15:55 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 27ms
+10:15:56 [200] /fr/compte 26ms
+10:15:56 [301] /fr/compte/infos 3ms
+10:15:56 [200] /fr/compte 19ms
+10:15:56 [301] /fr/compte/sante 3ms
+10:15:56 [200] /fr/compte 19ms
+10:15:57 [301] /fr/compte/confidentialite 2ms
+10:15:57 [200] /fr/compte 21ms
+10:15:57 [200] /fr/compte 22ms
+10:15:57 [200] POST /api/profile 7ms
+10:15:57 [200] /fr/compte 21ms
+10:15:57 [200] POST /api/profile 7ms
+10:15:57 [200] /fr/compte 24ms
+10:15:58 [200] POST /api/profile 6ms
+10:15:58 [200] /fr/compte 20ms
+10:15:58 [200] /api/export 6ms
+10:15:58 [200] /ar/compte 32ms
+10:15:59 [200] /ar/compte/questions 29ms
+10:16:00 [200] /fr 39ms
+10:16:00 [200] /fr/compte/questions 22ms
+10:16:01 [200] /fr/compte/questions 21ms
+10:16:01 [200] /fr/compte/questions 22ms
+10:16:01 [200] /fr/compte/q/664 27ms
+10:16:02 [200] POST /api/question-delete 3ms
+10:16:02 [200] /fr/compte/questions 12ms
+10:16:02 [303] /api/logout 2ms
+10:16:02 [200] /fr 14ms
+10:16:02 [302] /fr/compte 4ms
+10:16:02 [200] /fr/connexion 12ms
+10:16:03 [401] POST /api/login 95ms
+10:16:03 [200] POST /api/login 51ms
+10:16:03 [200] /fr 17ms
+10:16:03 [302] /fr/question 6ms
+10:16:03 [200] /fr 23ms
+10:16:06 [200] POST /api/questions 5ms
+10:16:06 [200] /fr/compte/q/665 30ms
+10:16:06 [200] /ar 14ms
+10:16:09 [200] POST /api/questions 2ms
+10:16:09 [200] /fr 9ms
+10:16:12 [200] POST /api/questions 2ms
+10:16:13 [200] /en/q/fever-with-no-other-symptom-is-it-serious 22ms
+10:16:13 [200] /robots.txt 1ms
+10:16:13 [200] /sitemap.xml 1ms
+10:16:13 [404] /fr/q/nexiste-pas 5ms
+10:16:14 [302] /fr/compte/q/999999 5ms
+10:16:14 [200] /fr/connexion 8ms
+10:16:14 [302] / 1ms
+10:16:14 [200] /en 18ms
+10:16:14 [200] /fr 13ms
+10:16:18 [200] POST /api/questions 3ms
+10:16:18 [200] POST /api/signup 55ms
+10:16:18 [200] /fr/compte/q/668 37ms
+10:16:19 [200] POST /api/publish 4ms
+10:16:19 [200] /fr/compte/q/668 37ms
+10:16:20 [200] /fr 17ms
+10:16:21 [200] /fr/compte 17ms
+10:16:21 [200] /fr/connexion 9ms
+10:16:23 [200] POST /api/login 50ms
+10:16:23 [200] /fr 17ms
+10:16:23 [200] /fr/compte/q/668 27ms
+10:16:25 [200] /ar/compte/q/668 40ms
+10:16:25 [200] /en/connexion 7ms
+10:16:26 [200] POST /api/login 61ms
+10:16:26 [200] /en 19ms
+10:16:26 [200] /en 25ms
+10:16:27 [200] /ar 18ms
+10:16:52 [watch] /src/components/Chat.tsx
+10:16:52 [watch] src/components/Chat.tsx
+10:16:52 [watch] /src/components/Chat.tsx, /src/components/PublishToggle.tsx, /src/components/AuthForm.tsx
+10:16:52 [watch] src/lib/i18n.ts
+10:16:52 [watch] /src/styles/global.css
+10:17:07 [200] /fr 70ms
+10:17:12 [200] POST /api/questions 4ms
+10:17:13 [200] /fr 16ms
+10:17:13 [200] /fr 15ms
+10:17:14 [302] /fr/question 4ms
+10:17:14 [200] /fr 8ms
+10:17:14 [200] /ar 15ms
+10:17:16 [200] POST /api/questions 3ms
+10:17:17 [200] /fr 20ms
+10:17:19 [200] POST /api/questions 2ms
+10:17:20 [200] /en 17ms
+10:17:21 [200] /fr 15ms
+10:20:25 [watch] /src/components/Chat.tsx
+10:20:25 [watch] src/components/Chat.tsx
+10:23:05 [watch] /src/styles/global.css
+10:23:05 [watch] src/layouts/Base.astro
+10:23:17 [200] /fr 80ms
+10:23:18 [200] /fr 17ms
+10:23:23 [200] POST /api/questions 3ms
+10:23:24 [200] POST /api/signup 55ms
+10:23:24 [200] /fr/compte/q/672 30ms
+10:23:28 [200] POST /api/publish 4ms
+10:23:28 [200] /fr/compte/q/672 28ms
+10:23:29 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 25ms
+10:23:30 [200] /fr/compte/q/672 35ms
+10:23:32 [200] POST /api/publish 4ms
+10:23:32 [200] /fr/compte/q/672 35ms
+10:23:34 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 18ms
+10:23:35 [200] /fr/compte 24ms
+10:23:35 [301] /fr/compte/infos 4ms
+10:23:35 [200] /fr/compte 26ms
+10:23:35 [301] /fr/compte/sante 4ms
+10:23:35 [200] /fr/compte 30ms
+10:23:36 [301] /fr/compte/confidentialite 4ms
+10:23:36 [200] /fr/compte 20ms
+10:23:36 [200] /fr/compte 17ms
+10:23:36 [200] POST /api/profile 5ms
+10:23:36 [200] /fr/compte 20ms
+10:23:36 [200] POST /api/profile 3ms
+10:23:36 [200] /fr/compte 19ms
+10:23:37 [200] POST /api/profile 3ms
+10:23:37 [200] /fr/compte 17ms
+10:23:37 [200] /api/export 4ms
+10:23:37 [200] /ar/compte 16ms
+10:23:38 [200] /ar/compte/questions 15ms
+10:23:39 [200] /fr 25ms
+10:23:39 [200] /fr/compte/questions 14ms
+10:23:40 [200] /fr/compte/questions 16ms
+10:23:40 [200] /fr/compte/questions 16ms
+10:23:40 [200] /fr/compte/q/672 29ms
+10:23:40 [200] POST /api/question-delete 6ms
+10:23:40 [200] /fr/compte/questions 14ms
+10:23:41 [303] /api/logout 3ms
+10:23:41 [200] /fr 18ms
+10:23:41 [302] /fr/compte 3ms
+10:23:41 [200] /fr/connexion 13ms
+10:23:41 [401] POST /api/login 65ms
+10:23:42 [200] POST /api/login 54ms
+10:23:42 [200] /fr 15ms
+10:23:42 [302] /fr/question 3ms
+10:23:42 [200] /fr 19ms
+10:23:44 [200] POST /api/questions 6ms
+10:23:44 [200] /fr/compte/q/673 29ms
+10:23:45 [200] /ar 20ms
+10:23:47 [200] POST /api/questions 3ms
+10:23:47 [200] /fr 14ms
+10:23:50 [200] POST /api/questions 2ms
+10:23:51 [200] /en/q/fever-with-no-other-symptom-is-it-serious 19ms
+10:23:52 [200] /robots.txt 0ms
+10:23:52 [200] /sitemap.xml 1ms
+10:23:52 [404] /fr/q/nexiste-pas 4ms
+10:23:52 [302] /fr/compte/q/999999 7ms
+10:23:52 [200] /fr/connexion 7ms
+10:23:52 [302] / 1ms
+10:23:52 [200] /en 20ms
+10:23:53 [200] /fr 21ms
+10:23:58 [200] POST /api/questions 2ms
+10:23:59 [200] /fr 12ms
+10:23:59 [200] /fr 14ms
+10:23:59 [302] /fr/question 3ms
+10:23:59 [200] /fr 12ms
+10:23:59 [200] /ar 22ms
+10:24:02 [200] POST /api/questions 2ms
+10:24:03 [200] /fr 16ms
+10:24:05 [200] POST /api/questions 2ms
+10:24:05 [200] /en 16ms
+10:24:06 [200] /fr 16ms
+10:24:10 [200] POST /api/questions 2ms
+10:24:10 [200] POST /api/signup 77ms
+10:24:10 [200] /fr/compte/q/679 32ms
+10:24:11 [200] POST /api/publish 4ms
+10:24:12 [200] /fr/compte/q/679 39ms
+10:24:12 [200] /fr 19ms
+10:24:13 [200] /fr/compte 22ms
+10:24:14 [200] /fr/connexion 12ms
+10:24:15 [200] POST /api/login 65ms
+10:24:15 [200] /fr 19ms
+10:24:15 [200] /fr/compte/q/679 39ms
+10:24:17 [200] /ar/compte/q/679 37ms
+10:24:18 [200] /en/connexion 7ms
+10:24:18 [200] POST /api/login 50ms
+10:24:18 [200] /en 18ms
+10:24:18 [200] /en 27ms
+10:24:19 [200] /ar 18ms
+10:24:54 [watch] /src/components/AuthForm.tsx
+10:24:54 [watch] src/components/AuthForm.tsx
+10:24:54 [watch] /src/components/Chat.tsx, /src/components/PublishToggle.tsx, /src/components/AuthForm.tsx
+10:24:54 [watch] src/lib/i18n.ts
+10:25:21 [watch] /src/components/Chat.tsx
+10:25:21 [watch] src/components/Chat.tsx
+10:25:21 [watch] /src/styles/global.css
+10:25:21 [watch] src/components/Nav.astro
+10:25:45 [200] /fr 89ms
+10:25:50 [200] POST /api/questions 4ms
+10:25:51 [200] POST /api/signup 64ms
+10:25:51 [200] /fr/compte/q/680 38ms
+10:25:55 [200] POST /api/publish 4ms
+10:25:55 [200] /fr/compte/q/680 30ms
+10:25:56 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 27ms
+10:25:57 [200] /fr/compte/q/680 65ms
+10:25:59 [200] POST /api/publish 3ms
+10:25:59 [200] /fr/compte/q/680 32ms
+10:26:00 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 25ms
+10:26:01 [200] /fr/compte 33ms
+10:26:01 [301] /fr/compte/infos 2ms
+10:26:01 [200] /fr/compte 18ms
+10:26:01 [301] /fr/compte/sante 3ms
+10:26:01 [200] /fr/compte 31ms
+10:26:01 [301] /fr/compte/confidentialite 4ms
+10:26:01 [200] /fr/compte 19ms
+10:26:02 [200] /fr/compte 20ms
+10:26:02 [200] POST /api/profile 7ms
+10:26:02 [200] /fr/compte 26ms
+10:26:02 [200] POST /api/profile 4ms
+10:26:02 [200] /fr/compte 28ms
+10:26:03 [200] POST /api/profile 3ms
+10:26:03 [200] /fr/compte 21ms
+10:26:03 [200] /api/export 4ms
+10:26:03 [200] /ar/compte 24ms
+10:26:04 [200] /ar/compte/questions 17ms
+10:26:05 [200] /fr 23ms
+10:26:05 [200] /fr/compte/questions 14ms
+10:26:05 [200] /fr/compte/questions 18ms
+10:26:06 [200] /fr/compte/questions 17ms
+10:26:06 [200] /fr/compte/q/680 42ms
+10:26:06 [200] POST /api/question-delete 5ms
+10:26:06 [200] /fr/compte/questions 16ms
+10:26:07 [303] /api/logout 2ms
+10:26:07 [200] /fr 23ms
+10:26:07 [302] /fr/compte 4ms
+10:26:07 [200] /fr/connexion 15ms
+10:26:07 [401] POST /api/login 59ms
+10:26:08 [200] POST /api/login 59ms
+10:26:08 [200] /fr 26ms
+10:26:08 [302] /fr/connexion 5ms
+10:26:08 [200] /fr/inscription 13ms
+10:26:09 [200] /fr/connexion 8ms
+10:26:09 [200] /fr/inscription 17ms
+10:26:10 [200] POST /api/signup 54ms
+10:26:10 [200] /fr 23ms
+10:26:10 [302] /fr/question 3ms
+10:26:10 [200] /fr 18ms
+10:26:13 [200] POST /api/questions 6ms
+10:26:13 [200] /fr/compte/q/681 30ms
+10:26:13 [200] /ar 16ms
+10:26:16 [200] POST /api/questions 3ms
+10:26:16 [200] /fr 8ms
+10:26:19 [200] POST /api/questions 3ms
+10:26:20 [200] /en/q/fever-with-no-other-symptom-is-it-serious 16ms
+10:26:20 [200] /robots.txt 1ms
+10:26:20 [200] /sitemap.xml 1ms
+10:26:21 [404] /fr/q/nexiste-pas 5ms
+10:26:21 [302] /fr/compte/q/999999 4ms
+10:26:21 [200] /fr/connexion 34ms
+10:26:21 [302] / 1ms
+10:26:21 [200] /en 17ms
+10:26:21 [200] /fr 22ms
+10:26:25 [200] POST /api/questions 3ms
+10:26:25 [200] POST /api/signup 65ms
+10:26:25 [200] /fr/compte/q/684 25ms
+10:26:27 [200] POST /api/publish 3ms
+10:26:27 [200] /fr/compte/q/684 25ms
+10:26:27 [200] /fr 16ms
+10:26:28 [200] /fr/compte 19ms
+10:26:29 [200] /fr/connexion 6ms
+10:26:29 [200] POST /api/login 52ms
+10:26:29 [200] /fr 21ms
+10:26:30 [200] /fr/compte/q/684 24ms
+10:26:31 [200] /ar/compte/q/684 36ms
+10:26:32 [200] /en/connexion 8ms
+10:26:32 [200] POST /api/login 67ms
+10:26:32 [200] /en 18ms
+10:26:33 [200] /en 19ms
+10:26:33 [200] /ar 18ms
+10:26:34 [200] /fr 14ms
+10:26:39 [200] POST /api/questions 3ms
+10:26:40 [200] /fr 9ms
+10:26:40 [200] /fr 15ms
+10:26:40 [302] /fr/question 3ms
+10:26:40 [200] /fr 8ms
+10:26:41 [200] /ar 19ms
+10:26:43 [200] POST /api/questions 3ms
+10:26:44 [200] /fr 15ms
+10:26:46 [200] POST /api/questions 2ms
+10:26:46 [200] /en 14ms

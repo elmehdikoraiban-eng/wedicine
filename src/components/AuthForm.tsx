@@ -4,9 +4,9 @@ import { Icon } from "./Icon";
 
 type Mode = "signup" | "login";
 
-// Formulaire de compte. Avec questionId, il débloque la réponse après inscription ou connexion.
-export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo }: { lang: Lang; questionId?: number; initialMode?: Mode; redirectTo?: string }) {
-  const [mode, setMode] = useState<Mode>(initialMode);
+// Formulaire de compte, un par page (inscription ou connexion). Avec questionId, il débloque la réponse.
+// switchHref : lien vers l'autre page (« Déjà un compte ? » / « Pas encore de compte ? »).
+export function AuthForm({ lang, questionId, mode, redirectTo, switchHref }: { lang: Lang; questionId?: number; mode: Mode; redirectTo?: string; switchHref: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPw, setShowPw] = useState(false);
@@ -35,10 +35,6 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
 
   return (
     <form onSubmit={onSubmit} autoComplete="on" className="auth-form">
-      <div className="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={mode === "signup"} onClick={() => { setMode("signup"); setError(null); }}>{t(lang, "noAccount")}</button>
-        <button type="button" role="tab" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(null); }}>{t(lang, "login")}</button>
-      </div>
       {mode === "signup" && (
         <div className="row" style={{ gap: 12 }}>
           <div className="field" style={{ flex: 1, minWidth: 140 }}>
@@ -75,9 +71,12 @@ export function AuthForm({ lang, questionId, initialMode = "signup", redirectTo 
         <p className="muted small public-note"><Icon name="ChartColumn" size={16} /> <span>{t(lang, "signupPublicNote")}</span></p>
       )}
       {error && <p className="error" role="alert">{error}</p>}
-      <button type="submit" className="btn btn-primary" disabled={busy} style={{ width: "100%", marginTop: 8 }}>
+      <button type="submit" className="btn btn-primary auth-submit" disabled={busy}>
         {busy ? "…" : mode === "signup" ? (questionId != null ? t(lang, "createAccount") : t(lang, "noAccount")) : (questionId != null ? t(lang, "loginAndRead") : t(lang, "login"))}
       </button>
+      <p className="auth-switch">
+        {mode === "signup" ? t(lang, "alreadyAccount") : t(lang, "noAccountYet")} <a href={switchHref}>{mode === "signup" ? t(lang, "login") : t(lang, "noAccount")}</a>
+      </p>
     </form>
   );
 }

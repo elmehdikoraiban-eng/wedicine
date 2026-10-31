@@ -233,7 +233,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
       {error && <p className="error" role="alert" style={{ margin: 0, fontSize: 14 }}>{error}</p>}
       <div className="acc-foot">
         <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? "…" : t(lang, "createAccount")}</button>
-        <span>{t(lang, "alreadyAccount")} <a href={`/${lang}/connexion?q=${qid}&mode=connexion`}>{t(lang, "login")}</a></span>
+        <span>{t(lang, "alreadyAccount")} <a href={`/${lang}/connexion?q=${qid}`}>{t(lang, "login")}</a></span>
       </div>
     </form>
   );
