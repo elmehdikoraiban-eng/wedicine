@@ -34,7 +34,7 @@
   --btn-2: #ffffff; --btn-2-hover: #f4f5f7; --btn-2-border: #c1c7d0;
   --field-border: #eceef2; --field-bg: #f4f5f7; --field-hover: #eceef2; --field-focus: #0065ff; --ring: #4075cf;
   /* Arrondis asana : panneaux 24, cartes 16, éléments 12, champs 6 */
-  --r-pill: 100px; --r-field: 10px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
+  --r-pill: 10px; --r-field: 10px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
   --shadow-hover: 0 12px 32px rgba(9, 30, 66, .10);
   --shadow-card: 0 2px 12px rgba(9, 30, 66, .06);
   --shadow-float: 0 24px 64px rgba(9, 30, 66, .12);
@@ -937,7 +937,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .set-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .set .btn-xs { min-height: 34px; padding: 0 14px; font-size: 13px; }
 .set .btn-danger { font-size: 13px; }
-.seg { min-height: 30px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 999px; background: var(--canvas); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.seg { min-height: 30px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 8px; background: var(--canvas); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .seg + .seg { margin-inline-start: 6px; }
 .seg[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .sex-pick { display: flex; }
@@ -953,7 +953,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .set-confirm p { margin: 0; }
 .set-title { display: flex; flex-direction: column; gap: 14px; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.filter { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.filter { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border: 1px solid #d9dee7; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
 .filter span { color: var(--muted-2); font-weight: 400; }
 .filter:hover { border-color: var(--brand); color: var(--brand); text-decoration: none; }
 .filter[aria-current="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
@@ -1021,7 +1021,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .authx .field > label { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--ink-2); }
 .authx .row { display: flex; flex-wrap: wrap; }
 .authx .check { font-size: 13px; color: var(--muted-2); }
-.auth-submit { width: 100%; margin-top: 8px; min-height: 44px; border-radius: 10px; font-size: 14px; }
+.auth-submit { width: 100%; margin-top: 8px; min-height: 44px; font-size: 14px; }
 .auth-switch { margin: 18px 0 0; text-align: center; font-size: 13.5px; color: var(--muted-2); }
 .authx-how { max-width: 960px; margin: 40px auto 0; padding: 40px 0 8px; border-top: 1px solid #eef0f4; text-align: center; }
 .authx-how h2 { margin: 0 0 28px; font-size: 18px; font-weight: 600; }
