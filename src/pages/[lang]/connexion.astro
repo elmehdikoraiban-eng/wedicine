@@ -20,7 +20,7 @@ if (user) return Astro.redirect(c.unlock ? `/${lang}/compte/q/${c.qid}` : c.next
 ---
 <Base lang={lang} title={t(lang, "login")} noindex>
   <div class="authx">
-    <img src="/brand/symbole.svg" alt="" width="40" height="40" class="authx-sym" />
+    <img src="/brand/symbole.svg" alt="" width="40" height="40" class="authx-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width="40" height="40" class="authx-sym logo-dark" />
     {c.unlock && <p class="authx-badge"><Icon name="Check" size={14} /> {t(lang, "previewReady")}</p>}
     <h1>{t(lang, "loginTitle")}</h1>
     <AuthForm client:load lang={lang} mode="login" questionId={c.unlock ? c.qid : undefined} redirectTo={c.next} switchHref={`/${lang}/inscription${c.query}`} />

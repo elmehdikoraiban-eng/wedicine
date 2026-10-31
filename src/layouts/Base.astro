@@ -40,6 +40,10 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canon} />
     <meta name="theme-color" content="#ffffff" />
+    <script is:inline>
+      // Thème avant l'affichage (pas de flash) : choix gardé, sinon réglage du système.
+      try { var th = localStorage.getItem("wd-theme"); if (!th) th = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; document.documentElement.dataset.theme = th; } catch (e) {}
+    </script>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

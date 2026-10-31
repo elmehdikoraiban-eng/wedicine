@@ -1,0 +1,25 @@
+---
+// Bouton de thème façon Claude, juste soleil (clair) et lune (sombre). Le choix est gardé dans le navigateur ;
+// sans choix, le site suit le réglage du téléphone ou de l'ordinateur (script en tête de Base.astro).
+import { t, type Lang } from "@/lib/i18n";
+import { Icon } from "./Icon";
+const { lang } = Astro.props as { lang: Lang };
+---
+<div class="theme-pick" role="group" aria-label={t(lang, "theme")}>
+  <button type="button" data-theme-set="light" aria-label={t(lang, "themeLight")} aria-pressed="false"><Icon name="Sun" size={15} /></button>
+  <button type="button" data-theme-set="dark" aria-label={t(lang, "themeDark")} aria-pressed="false"><Icon name="Moon" size={15} /></button>
+</div>
+<script>
+  const sync = () => {
+    const cur = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    document.querySelectorAll<HTMLButtonElement>("[data-theme-set]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.themeSet === cur)));
+  };
+  document.querySelectorAll<HTMLButtonElement>("[data-theme-set]").forEach((b) => b.addEventListener("click", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const v = b.dataset.themeSet!;
+    document.documentElement.dataset.theme = v;
+    try { localStorage.setItem("wd-theme", v); } catch {}
+    sync();
+  }));
+  sync();
+</script>

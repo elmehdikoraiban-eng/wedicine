@@ -187,7 +187,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
     setI(1);
   }
 
-  const sym = <img src="/brand/symbole.svg" alt="" width={22} height={22} className="wd-sym" />;
+  const sym = <><img src="/brand/symbole.svg" alt="" width={22} height={22} className="wd-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width={22} height={22} className="wd-sym logo-dark" /></>;
   const counter = t(lang, "questionN").replace("{n}", String(i + 1)).replace("{total}", String(steps.length));
   const finishing = busy && step === "intent";
 
@@ -250,7 +250,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
       <div className="chat intro">
         <div className="chat-main">
           <div className="chat-hero">
-            <img src="/brand/symbole.svg" alt="" width={44} height={44} />
+            <><img src="/brand/symbole.svg" alt="" width={44} height={44} className="logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width={44} height={44} className="logo-dark" /></>
             <h1>{greeting ?? t(lang, "chatTitle")}</h1>
             {greeting && <p>{question(step)}</p>}
           </div>

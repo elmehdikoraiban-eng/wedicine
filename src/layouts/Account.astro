@@ -20,6 +20,7 @@ interface Props {
 }
 const { lang, active, title, meta, name, avatar, recent, currentId, plain = false } = Astro.props;
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
+import ThemePick from "@/components/ThemePick.astro";
 ---
 <Base lang={lang} title={title} noindex wrap={false} footer={false} nav={false}>
   <div class="space">
@@ -27,7 +28,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
     <label for="side-toggle" class="side-backdrop" aria-hidden="true"></label>
     <aside class="side" aria-label={t(lang, "myAccount")}>
       <div class="side-head">
-        <a href={`/${lang}`} class="side-logo" aria-label="Wedicine"><img src="/brand/logo.svg" alt="" width="147" height="26" /></a>
+        <a href={`/${lang}`} class="side-logo" aria-label="Wedicine"><img src="/brand/logo.svg" alt="" width="147" height="26" class="logo-light" /><img src="/brand/logo-sombre.svg" alt="" width="147" height="26" class="logo-dark" /></a>
         <label for="side-toggle" class="side-close" aria-label={t(lang, "close")}><Icon name="X" size={18} /></label>
       </div>
       <nav class="side-menu">
@@ -57,6 +58,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
           <div class="side-lang" aria-label={t(lang, "accLanguage")}>
             {LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}
           </div>
+          <div class="side-theme"><span>{t(lang, "theme")}</span><ThemePick lang={lang} /></div>
           <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={18} /><span>{t(lang, "logout")}</span></a>
         </div>
       </details>

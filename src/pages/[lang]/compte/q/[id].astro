@@ -58,13 +58,13 @@ const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || 
     <div class="chat-log">
       {talk.map((x, k) => (
         <>
-          <div class="msg-wd">{k === 0 ? <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" /> : <span class="wd-sp" aria-hidden="true"></span>}<p>{x.q}</p></div>
+          <div class="msg-wd">{k === 0 ? <><img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width="22" height="22" class="wd-sym logo-dark" /></> : <span class="wd-sp" aria-hidden="true"></span>}<p>{x.q}</p></div>
           <div class="msg-me">{x.a}</div>
         </>
       ))}
       {q.urgent || !personal ? (
         <div class="msg-wd urgent-msg" role="alert">
-          <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" />
+          <><img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width="22" height="22" class="wd-sym logo-dark" /></>
           <div>
             <p class="u-title">{t(lang, "urgentTitle")}</p>
             <p>{t(lang, "urgentText")}</p>
@@ -76,7 +76,7 @@ const chips = INTENTS.filter((i) => i.id !== q.intent && (i.id !== "examens" || 
         </div>
       ) : (
         <article class="ans">
-          <img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym" />
+          <><img src="/brand/symbole.svg" alt="" width="22" height="22" class="wd-sym logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width="22" height="22" class="wd-sym logo-dark" /></>
           <div class="ans-body">
             <p class={`ans-verdict lv${personal.level}`}><span class="dot" aria-hidden="true"></span>{personal.verdict}</p>
             <p class="ans-red"><b>{t(lang, "redLineIntro")}</b> {t(lang, "redLineIf")} {f.warning[lang]}{personal.warning.length > 0 && ` ${t(lang, "alsoForYou")} ${personal.warning.join(" ; ")}.`}</p>

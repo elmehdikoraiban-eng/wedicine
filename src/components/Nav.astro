@@ -2,6 +2,7 @@
 import { LANG_NAMES, LANGS, t, type Lang, type UIKey } from "@/lib/i18n";
 import { ACCOUNT_PAGES } from "@/lib/account";
 import { Icon } from "./Icon";
+import ThemePick from "./ThemePick.astro";
 
 interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number } | null }
 const { lang, user } = Astro.props;
@@ -11,8 +12,10 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 <header class="nav">
   <div class="wrap">
     <a href={`/${lang}`} class="logo" aria-label="Wedicine">
-      <img class="logo-full" src="/brand/logo.svg" alt="" width="204" height="36" />
-      <img class="logo-mark" src="/brand/symbole.svg" alt="" width="40" height="40" />
+      <img class="logo-full logo-light" src="/brand/logo.svg" alt="" width="204" height="36" />
+      <img class="logo-full logo-dark" src="/brand/logo-sombre.svg" alt="" width="204" height="36" />
+      <img class="logo-mark logo-light" src="/brand/symbole.svg" alt="" width="40" height="40" />
+      <img class="logo-mark logo-dark" src="/brand/symbole-sombre.svg" alt="" width="40" height="40" />
     </a>
     <nav class="nav-links" aria-label="Navigation">
       {user
@@ -35,6 +38,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
                 <span class="muted small"><Icon name="Globe" size={16} /> {t(lang, "accLanguage")}</span>
                 <div>{LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}</div>
               </div>
+              <div class="me-theme"><ThemePick lang={lang} /></div>
               <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={18} />{t(lang, "logout")}</a>
             </div>
           </details>
@@ -44,6 +48,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
             <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={15} /><span class="hide-sm">{LANG_NAMES[lang]}</span><Icon name="ChevronDown" size={14} /></summary>
             <div class="lang-pop">{LANGS.map((l) => <a href={`/${l}${rest}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
           </details>
+          <ThemePick lang={lang} />
           <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>
           <a href={`/${lang}/inscription`} class="btn btn-primary btn-sm">{t(lang, "signup")}</a>
         </>}
