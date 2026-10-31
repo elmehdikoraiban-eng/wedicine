@@ -768,12 +768,15 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .lang-pick summary::-webkit-details-marker { display: none; }
 .lang-pick summary:hover { color: var(--brand); }
 .lang-pop { position: absolute; bottom: calc(100% + 6px); inset-inline-end: 0; min-width: 130px; display: flex; flex-direction: column; padding: 4px; background: var(--canvas); border: 1px solid #e6e9ef; border-radius: 10px; box-shadow: 0 8px 24px rgba(9, 30, 66, .12); z-index: 20; }
+.nav .lang-pick summary { font-size: 14px; color: var(--ink); padding: 6px 8px; border-radius: 8px; }
+.nav .lang-pick summary:hover { background: #f1f4f9; color: var(--ink); }
+.lang-pick.down .lang-pop { bottom: auto; top: calc(100% + 6px); }
 .lang-pop a { padding: 7px 10px; border-radius: 6px; font-size: 13px; }
 .lang-pop a:hover { background: #f1f4f9; }
 .chat-legal a { color: var(--muted-2); }
 .chat-legal a:hover { color: var(--brand); text-decoration: none; }
 .chat-legal a[aria-current="true"] { color: var(--ink); }
-.chat.conv .chat-legal, .space .chat-legal { justify-content: center; text-align: center; }
+.chat.conv .chat-legal, .space .chat-legal, .chat.intro .chat-legal, .mini-foot .chat-legal { justify-content: center; text-align: center; }
 .urgent-msg .u-title { font-weight: 700; color: var(--red); }
 .urgent-msg .calls { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .chat .btn-danger { min-height: 40px; font-size: 14px; padding: 0 16px; }

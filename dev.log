@@ -305,3 +305,104 @@
 10:26:46 [200] POST /api/questions 2ms
 10:26:46 [200] /en 14ms
 10:27:21 [watch] /src/styles/global.css
+10:28:01 [watch] /src/components/Chat.tsx
+10:28:01 [watch] src/components/Chat.tsx
+10:28:01 [watch] /src/styles/global.css
+10:28:01 [watch] src/components/Nav.astro
+10:28:01 [watch] src/layouts/Base.astro
+10:28:12 [watch] src/layouts/Base.astro
+10:28:21 [200] /fr 84ms
+10:28:26 [200] POST /api/questions 2ms
+10:28:26 [200] /fr 14ms
+10:28:27 [200] /fr 21ms
+10:28:27 [302] /fr/question 3ms
+10:28:27 [200] /fr 11ms
+10:28:27 [200] /ar 22ms
+10:28:30 [200] POST /api/questions 3ms
+10:28:30 [200] /fr 15ms
+10:28:33 [200] POST /api/questions 2ms
+10:28:33 [200] /en 16ms
+10:28:34 [200] /fr 16ms
+10:28:39 [200] POST /api/questions 3ms
+10:28:40 [200] POST /api/signup 69ms
+10:28:40 [200] /fr/compte/q/691 40ms
+10:28:43 [200] POST /api/publish 5ms
+10:28:43 [200] /fr/compte/q/691 45ms
+10:28:45 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 24ms
+10:28:46 [200] /fr/compte/q/691 42ms
+10:28:48 [200] POST /api/publish 3ms
+10:28:48 [200] /fr/compte/q/691 27ms
+10:28:49 [200] /fr/q/mal-de-tete-d-un-cote-qui-tape-quel-medecin-consulter 20ms
+10:28:50 [200] /fr/compte 29ms
+10:28:50 [301] /fr/compte/infos 3ms
+10:28:50 [200] /fr/compte 18ms
+10:28:50 [301] /fr/compte/sante 4ms
+10:28:50 [200] /fr/compte 25ms
+10:28:50 [301] /fr/compte/confidentialite 3ms
+10:28:50 [200] /fr/compte 25ms
+10:28:51 [200] /fr/compte 22ms
+10:28:51 [200] POST /api/profile 6ms
+10:28:51 [200] /fr/compte 23ms
+10:28:51 [200] POST /api/profile 3ms
+10:28:51 [200] /fr/compte 18ms
+10:28:52 [200] POST /api/profile 4ms
+10:28:52 [200] /fr/compte 18ms
+10:28:52 [200] /api/export 3ms
+10:28:52 [200] /ar/compte 18ms
+10:28:53 [200] /ar/compte/questions 14ms
+10:28:54 [200] /fr 24ms
+10:28:54 [200] /fr/compte/questions 19ms
+10:28:54 [200] /fr/compte/questions 21ms
+10:28:54 [200] /fr/compte/questions 14ms
+10:28:55 [200] /fr/compte/q/691 32ms
+10:28:55 [200] POST /api/question-delete 4ms
+10:28:55 [200] /fr/compte/questions 13ms
+10:28:55 [303] /api/logout 2ms
+10:28:55 [200] /fr 15ms
+10:28:55 [302] /fr/compte 6ms
+10:28:55 [200] /fr/connexion 6ms
+10:28:56 [401] POST /api/login 59ms
+10:28:56 [200] POST /api/login 52ms
+10:28:56 [200] /fr 19ms
+10:28:56 [302] /fr/connexion 4ms
+10:28:57 [200] /fr/inscription 15ms
+10:28:57 [200] /fr/connexion 9ms
+10:28:57 [200] /fr/inscription 19ms
+10:28:58 [200] POST /api/signup 58ms
+10:28:58 [200] /fr 21ms
+10:28:58 [302] /fr/question 4ms
+10:28:58 [200] /fr 19ms
+10:29:01 [200] POST /api/questions 4ms
+10:29:01 [200] /fr/compte/q/692 28ms
+10:29:01 [200] /ar 14ms
+10:29:04 [200] POST /api/questions 3ms
+10:29:04 [200] /fr 11ms
+10:29:07 [200] POST /api/questions 3ms
+10:29:08 [200] /en/q/fever-with-no-other-symptom-is-it-serious 23ms
+10:29:08 [200] /robots.txt 1ms
+10:29:08 [200] /sitemap.xml 1ms
+10:29:08 [404] /fr/q/nexiste-pas 4ms
+10:29:08 [302] /fr/compte/q/999999 5ms
+10:29:08 [200] /fr/connexion 10ms
+10:29:09 [302] / 1ms
+10:29:09 [200] /en 13ms
+10:29:09 [200] /fr 14ms
+10:29:13 [200] POST /api/questions 3ms
+10:29:13 [200] POST /api/signup 53ms
+10:29:13 [200] /fr/compte/q/695 24ms
+10:29:14 [200] POST /api/publish 3ms
+10:29:14 [200] /fr/compte/q/695 24ms
+10:29:15 [200] /fr 21ms
+10:29:16 [200] /fr/compte 18ms
+10:29:16 [200] /fr/connexion 6ms
+10:29:17 [200] POST /api/login 47ms
+10:29:17 [200] /fr 18ms
+10:29:17 [200] /fr/compte/q/695 24ms
+10:29:19 [200] /ar/compte/q/695 23ms
+10:29:20 [200] /en/connexion 6ms
+10:29:20 [200] POST /api/login 47ms
+10:29:20 [200] /en 16ms
+10:29:20 [200] /en 19ms
+10:29:21 [200] /ar 17ms
+10:29:22 [200] /fr 13ms
+10:29:35 [watch] /src/styles/global.css

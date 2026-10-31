@@ -241,15 +241,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
   const legal = (
     <div className="chat-legal">
       <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")}</span>
-      {intro && !greeting && (
-        <nav>
-          <details className="lang-pick">
-            <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={14} />{LANG_NAMES[lang]}<Icon name="ChevronDown" size={14} /></summary>
-            <div className="lang-pop">{LANGS.map((l) => <a key={l} href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
-          </details>
-          {/* « Nous contacter » : à réafficher quand El Mehdi aura donné l'e-mail ou le WhatsApp. */}
-        </nav>
-      )}
+      {/* Langue : bouton dans l'en-tête. « Nous contacter » viendra ici quand El Mehdi aura donné l'adresse. */}
     </div>
   );
 

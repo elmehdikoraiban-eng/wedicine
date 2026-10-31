@@ -5,7 +5,7 @@ import { Icon } from "./Icon";
 
 interface Props { lang: Lang; user: { firstName: string; lastName: string; avatar: number } | null }
 const { lang, user } = Astro.props;
-// Langue choisie automatiquement (navigateur) ; on peut la changer dans le menu du compte ou le pied de page, sur la même page.
+// Langue choisie automatiquement (navigateur) ; on peut la changer dans l'en-tête (bouton langue) ou le menu du compte, sur la même page.
 const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 ---
 <header class="nav">
@@ -40,6 +40,10 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
           </details>
         )
         : <>
+          <details class="lang-pick down">
+            <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={15} /><span class="hide-sm">{LANG_NAMES[lang]}</span><Icon name="ChevronDown" size={14} /></summary>
+            <div class="lang-pop">{LANGS.map((l) => <a href={`/${l}${rest}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
+          </details>
           <a href={`/${lang}/connexion`} class="plain">{t(lang, "login")}</a>
           <a href={`/${lang}/inscription`} class="btn btn-primary btn-sm">{t(lang, "signup")}</a>
         </>}
@@ -48,6 +52,9 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
 </header>
 
 <script>
+  // Bouton langue : se ferme au clic à l'extérieur.
+  const lp = document.querySelector<HTMLDetailsElement>(".nav .lang-pick");
+  if (lp) document.addEventListener("click", (e) => { if (lp.open && !lp.contains(e.target as Node)) lp.open = false; });
   // Menu avatar : se ferme au clic à l'extérieur ou avec Échap.
   const m = document.querySelector<HTMLDetailsElement>(".me-menu");
   if (m) {

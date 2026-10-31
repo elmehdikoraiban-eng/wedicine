@@ -5,7 +5,6 @@ import { currentUser } from "@/lib/auth";
 import { avatarOf } from "@/lib/db";
 import { SITE_URL, CONTENT_REVIEWED } from "@/lib/site";
 import Nav from "@/components/Nav.astro";
-import { Icon } from "@/components/Icon";
 
 interface Props {
   lang: Lang;
@@ -56,12 +55,6 @@ const robots = noindex || !CONTENT_REVIEWED ? "noindex, follow" : "index, follow
     <div class="mini-foot" role="contentinfo">
       <div class="wrap chat-legal">
         <span>{t(lang, "emergencyLine")} {t(lang, "notDoctor")} · {t(lang, "footerLegal")}</span>
-        <nav>
-          <details class="lang-pick">
-            <summary aria-label={t(lang, "accLanguage")}><Icon name="Globe" size={14} />{LANG_NAMES[lang]}<Icon name="ChevronDown" size={14} /></summary>
-            <div class="lang-pop">{LANGS.filter(isLang).map((l) => <a href={`/${l}`} lang={l} aria-current={l === lang ? "true" : undefined}>{LANG_NAMES[l]}</a>)}</div>
-          </details>
-        </nav>
       </div>
     </div>
     )}
