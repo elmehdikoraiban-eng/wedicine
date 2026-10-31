@@ -304,3 +304,4 @@
 10:26:44 [200] /fr 15ms
 10:26:46 [200] POST /api/questions 2ms
 10:26:46 [200] /en 14ms
+10:27:21 [watch] /src/styles/global.css

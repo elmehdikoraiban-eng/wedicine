@@ -773,7 +773,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .chat-legal a { color: var(--muted-2); }
 .chat-legal a:hover { color: var(--brand); text-decoration: none; }
 .chat-legal a[aria-current="true"] { color: var(--ink); }
-.chat.conv .chat-legal { justify-content: center; text-align: center; }
+.chat.conv .chat-legal, .space .chat-legal { justify-content: center; text-align: center; }
 .urgent-msg .u-title { font-weight: 700; color: var(--red); }
 .urgent-msg .calls { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .chat .btn-danger { min-height: 40px; font-size: 14px; padding: 0 16px; }
