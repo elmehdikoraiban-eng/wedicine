@@ -163,7 +163,7 @@ main > .page { padding-block: 48px 96px; }
 .section-head { max-width: 760px; margin-bottom: clamp(32px, 5vw, 56px); }
 .section-head.center { margin-inline: auto; text-align: center; }
 
-.list-links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.list-links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
 .list-links a { display: flex; align-items: center; gap: 14px; background: var(--canvas); border: 1px solid var(--line-2); border-radius: var(--r-card); padding: 18px 22px; color: var(--ink); font-weight: 500; transition: box-shadow .25s, transform .25s var(--ease), border-color .25s; }
 .list-links a:hover { box-shadow: var(--shadow-hover); border-color: transparent; text-decoration: none; transform: translateY(-3px); }
 .list-links svg { color: var(--link); flex: none; }
@@ -670,6 +670,9 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 
 /* Page publique courte */
 .brief-calls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+/* Sur petit écran, le texte et les boutons d'appel passent à la ligne au lieu d'élargir la page. */
+.brief li > span:not(.brief-ico) { min-width: 0; }
+.brief-calls .btn { white-space: normal; text-align: start; max-width: 100%; }
 .doctor-line { display: flex; gap: 14px; align-items: center; padding: 16px 20px; border-radius: var(--r-card); background: #f1efff; }
 .doctor-line p { margin: 0; }
 .doctor-line .ico { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--canvas); color: var(--purple); }
@@ -716,7 +719,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .tabbar::-webkit-scrollbar { display: none; }
 .tabbar-tab { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--r-pill); color: var(--muted); font-weight: 600; font-size: var(--fs-small); white-space: nowrap; transition: background var(--t), color var(--t); }
 .tabbar-tab:hover { background: var(--neutral); color: var(--ink); text-decoration: none; }
-.tabbar-tab[aria-selected="true"] { background: var(--brand); color: #fff; }
+.tabbar-tab[aria-selected="true"] { background: var(--btn); color: var(--btn-text); }
 .tabpanel { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px; align-items: start; padding: 32px 0 8px; animation: rise .25s var(--ease); }
 .tabpanel[hidden] { display: none !important; }
 .tabpanel-art svg { width: 100%; height: auto; }
@@ -1140,7 +1143,7 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
 .contact-consent { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 16px; font-size: 13px; line-height: 1.45; color: var(--muted); cursor: pointer; }
 .contact-consent input { margin-top: 2px; accent-color: var(--brand); }
 .contact .set-err { margin-bottom: 10px; }
-.contact-done { display: flex; align-items: center; gap: 8px; margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--green-bg); color: var(--green); font-size: 14px; font-weight: 600; }
+.contact-done { display: flex; align-items: center; gap: 8px; margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--green-bg); color: #006644; font-size: 14px; font-weight: 600; }
 .chat-legal a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 /* Admin : messages */
 .adm-msgs { display: grid; gap: 10px; }
@@ -1198,6 +1201,18 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
   --shadow-hover: 0 12px 32px rgba(0, 0, 0, .4); --shadow-card: 0 2px 12px rgba(0, 0, 0, .35); --shadow-float: 0 24px 64px rgba(0, 0, 0, .5);
 }
 :root[data-theme="dark"] body { background: var(--canvas); color: var(--ink); }
+/* Thème sombre : surfaces qui avaient une couleur claire écrite en dur (pages publiques, réglages). */
+:root[data-theme="dark"] .brief .lv-home { --c: #4bce97; --bg: #15291f; }
+:root[data-theme="dark"] .brief .lv-soon { --c: #f5a54a; --bg: #2e2112; }
+:root[data-theme="dark"] .brief .lv-urgent { --c: #ff8a7a; --bg: #331a1a; }
+:root[data-theme="dark"] .panel-red, :root[data-theme="dark"] .sec-danger { background: #2a1717; }
+:root[data-theme="dark"] .doctor-line { background: #221f38; }
+:root[data-theme="dark"] .set-confirm { background: #2a1717; color: #ffb3a8; }
+:root[data-theme="dark"] .qrow:hover { background: var(--hover); }
+:root[data-theme="dark"] .contact-done { color: #4bce97; }
+:root[data-theme="dark"] .authx-badge { background: #15291f; color: #4bce97; }
+:root[data-theme="dark"] .topic-art { background: radial-gradient(circle at 50% 45%, #1f2f4a 0%, #18233a 70%); }
+:root[data-theme="dark"] .btn-on-dark { background: var(--ink); color: var(--canvas); }
 /* Logos : version claire sur fond sombre. */
 :root:not([data-theme="dark"]) .logo-dark, :root[data-theme="dark"] .logo-light { display: none !important; }
 /* Bouton de thème : soleil / lune, comme les réglages de Claude. */
@@ -1208,3 +1223,22 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
 .side-theme { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; font-size: 13px; color: var(--muted-2); }
 .me-theme { padding: 8px 12px; }
 .nav-links .theme-pick { margin-inline-end: 4px; }
+
+/* En-tête sur téléphone (langue + thème + Connexion + Inscription) : symbole seul et un seul bouton de thème
+   (celui qui bascule), pour que tout tienne sans glisser sur le côté. */
+@media (max-width: 520px) {
+  .logo .logo-full { display: none !important; }
+  .logo .logo-mark { display: block; }
+  :root[data-theme="dark"] .logo .logo-mark.logo-light, :root:not([data-theme="dark"]) .logo .logo-mark.logo-dark { display: none !important; }
+  .nav .theme-pick { border: 0; padding: 0; margin-inline-end: 0; }
+  .nav .theme-pick button[aria-pressed="true"] { display: none; }
+  .nav .theme-pick button { width: 34px; height: 34px; }
+  .nav .lang-pick summary { padding: 6px; }
+  .nav-links { gap: 2px; }
+}
+/* Très petits téléphones (320 px) : boutons de l'en-tête plus serrés. */
+@media (max-width: 380px) {
+  .nav-links > a.plain { padding: 8px 6px; }
+  .nav .btn, .nav .btn-sm { padding: 0 11px; }
+  .nav .wrap { gap: 4px; }
+}

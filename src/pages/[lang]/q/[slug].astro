@@ -85,10 +85,9 @@ const faqLd = {
         )}
         <p class="muted small" style="margin:12px 0 0">{t(lang, "anonCountLine")}</p>
       </section>
-      <section class="card sec" id={anchor(lang, "othersAsked")} style="margin-top:16px">
+      {askers.length > 0 && <section class="card sec" id={anchor(lang, "othersAsked")} style="margin-top:16px">
         <h2><Icon name="Users" size={22} />{t(lang, "othersAsked")}</h2>
-        {askers.length === 0 ? <p class="muted">—</p> : (
-          <div class="askers">
+        <div class="askers">
             {askers.map((p) => (
               <span class="asker">
                 <b>{p.anonymous ? who(p) : publicName(p.first_name, p.last_name)}</b>
@@ -97,9 +96,8 @@ const faqLd = {
                 <span class="muted"> · {formatDate(p.created_at, lang)}</span>
               </span>
             ))}
-          </div>
-        )}
-      </section>
+        </div>
+      </section>}
       </>}
     </Answer>
     <section class="helpful" id={anchor(lang, "feedback")} data-page={`${th.id}/${sy.id}/${intent}`}>
