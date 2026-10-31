@@ -21,7 +21,7 @@ const next = sp.get("next");
 const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : undefined;
 
 const user = await currentUser(Astro.cookies);
-if (user) return Astro.redirect(hasQ ? `/${lang}/compte/q/${qid}` : safeNext ?? `/${lang}/compte`, 302);
+if (user) return Astro.redirect(hasQ ? `/${lang}/compte/q/${qid}` : safeNext ?? `/${lang}`, 302);
 
 // La question doit exister et ne pas être déjà rattachée à un compte ; sinon simple connexion.
 let q = hasQ ? await questionById(qid).catch(() => undefined) : undefined;

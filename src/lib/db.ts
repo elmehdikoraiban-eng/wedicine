@@ -342,3 +342,19 @@ export async function deleteQuestion(id: number, userId: number) {
   const r = await d.query("DELETE FROM wedicine.questions WHERE id = $1 AND user_id = $2 RETURNING id", [id, userId]);
   return r.rows.length > 0;
 }
+
+// Droit d'accès (loi 09-08) : tout ce que Wedicine garde sur le patient, sans le mot de passe.
+export async function exportUser(userId: number) {
+  const d = await db();
+  const u = await d.query("SELECT id, first_name, last_name, contact, lang, sex, avatar, created_at, consent_info_at, consent_terms_at FROM wedicine.users WHERE id = $1", [userId]);
+  const q = await d.query("SELECT * FROM wedicine.questions WHERE user_id = $1 ORDER BY id", [userId]);
+  return { account: u.rows[0] ?? null, questions: q.rows.map(({ user_id, ...x }) => x) };
+}
+
+// Droit à l'effacement : le compte, ses sessions et toutes ses questions (publiées comprises).
+export async function deleteUser(userId: number) {
+  const d = await db();
+  await d.query("DELETE FROM wedicine.sessions WHERE user_id = $1", [userId]);
+  await d.query("DELETE FROM wedicine.questions WHERE user_id = $1", [userId]);
+  await d.query("DELETE FROM wedicine.users WHERE id = $1", [userId]);
+}

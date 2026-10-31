@@ -32,13 +32,13 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
       </div>
       <nav class="side-menu">
         <a href={`/${lang}`} class="side-new" aria-current={active === "new" ? "page" : undefined}><Icon name="Plus" size={18} strokeWidth={2.2} /><span>{t(lang, "newQuestion")}</span></a>
-        <a href={`/${lang}/compte/questions`} aria-current={active === "questions" ? "page" : undefined}><Icon name="MessageCircle" size={18} /><span>{t(lang, "myQuestions")}</span></a>
         {recent.length > 0 && (
           <>
             <p class="side-label">{t(lang, "recentLabel")}</p>
             {recent.map((r) => (
               <a href={`/${lang}/compte/q/${r.id}`} class="side-recent" aria-current={r.id === currentId ? "page" : undefined}><span>{r.title}</span></a>
             ))}
+            <a href={`/${lang}/compte/questions`} class="side-all" aria-current={active === "questions" ? "page" : undefined}><span>{t(lang, "seeAll")}</span></a>
           </>
         )}
       </nav>
@@ -49,7 +49,7 @@ const rest = Astro.url.pathname.replace(/^\/(fr|ar|en)(?=\/|$)/, "");
           <Icon name="ChevronDown" size={16} />
         </summary>
         <div class="side-pop">
-          {ACCOUNT_PAGES.filter((p) => p.id !== "questions").map((p) => (
+          {ACCOUNT_PAGES.map((p) => (
             <a href={`/${lang}/compte${p.id ? `/${p.id}` : ""}`} aria-current={p.id === active ? "page" : undefined}>
               <Icon name={p.icon} size={18} /><span>{t(lang, (p.id ? p.key : "myAccount") as UIKey)}</span>
             </a>

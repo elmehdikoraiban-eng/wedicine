@@ -29,5 +29,5 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     await matchAvatarToSex(userId);
     return json({ url: `/${lang}/compte/q/${qid}` });
   }
-  return json({ url: safePath(b.redirectTo, `/${lang}/compte`) });
+  return json({ url: safePath(b.redirectTo, `/${lang}`) });
 };

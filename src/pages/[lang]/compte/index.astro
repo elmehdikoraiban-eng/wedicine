@@ -1,48 +1,179 @@
 ---
+// Mon compte : une fenêtre de réglages par-dessus l'espace patient, façon Claude. Les rubriques à gauche
+// (mes informations, mon profil santé, confidentialité, mes données), une rubrique à la fois à droite,
+// en lignes « libellé, valeur, action », sans cartes ni couleurs.
 import Account from "@/layouts/Account.astro";
-import { t } from "@/lib/i18n";
+import { t, LANG_NAMES, LANGS } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
-import { loadAccount, ACCOUNT_PAGES } from "@/lib/account";
-import { pageTitle } from "@/lib/content/themes";
+import { loadAccount } from "@/lib/account";
 import { formatDate } from "@/lib/site";
+import { AVATAR_COUNT, avatarSex } from "@/lib/db";
 import { Icon } from "@/components/Icon";
-import QuestionRow from "@/components/QuestionRow.astro";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const a = await loadAccount(Astro, lang);
 if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
-const tiles = ACCOUNT_PAGES.filter((p) => p.id);
-const DESC = { questions: "accQuestionsDesc", infos: "accIdentityDesc", sante: "accHealthDesc", confidentialite: "accPrivacyDesc" } as const;
+const { acc } = a;
+const ok = Astro.url.searchParams.get("ok");
+const current = Number(a.avatar);
+// Les avatars du sexe du patient d'abord, puis les autres.
+const sex = acc.sex ?? avatarSex(current);
+const all = Array.from({ length: AVATAR_COUNT }, (_, i) => i + 1);
+const order = [...all.filter((n) => avatarSex(n) === sex), ...all.filter((n) => avatarSex(n) !== sex)];
+const fullName = [acc.first_name, acc.last_name].filter(Boolean).join(" ");
+const TABS = [
+  { id: "infos", icon: "UserRound", key: "accIdentity" },
+  { id: "sante", icon: "HeartPulse", key: "accHealth" },
+  { id: "confidentialite", icon: "ShieldCheck", key: "accPrivacyTitle" },
+  { id: "donnees", icon: "Download", key: "myData" },
+] as const;
+const sub = [`${t(lang, "memberSince")} ${formatDate(acc.created_at, lang)}`, a.nPub ? t(lang, "helpedLine").replace("{n}", `<b>${a.helped}</b>`) : null].filter(Boolean).join(" · ");
 ---
-<Account lang={lang} active="" title={`${t(lang, "hello")} ${a.acc.first_name}`} name={a.shortName} avatar={a.avatar} recent={a.recent}>
-  <p class="muted acc-lead">{t(lang, "memberSince")} {formatDate(a.acc.created_at, lang)}</p>
-  <a href={`/${lang}/compte/questions`} class={`helped${a.nPub ? "" : " helped-empty"}`}>
-    <span class="ico"><Icon name="HeartHandshake" size={28} /></span>
-    {a.nPub
-      ? <span><span class="muted small">{t(lang, "helpedTitle")}</span><b>{a.helped} {t(lang, "helpedPeople")}</b></span>
-      : <span>{t(lang, "helpedNone")}</span>}
-  </a>
-  <div class="acc-stats">
-    {a.stats.map((s) => <a href={`/${lang}/compte/${s.href}`}><b>{s.n}</b><span>{s.k}</span></a>)}
-  </div>
-  <div class="acc-shortcuts">
-    {tiles.map((p) => (
-      <a href={`/${lang}/compte/${p.id}`} class="acc-shortcut">
-        <span class="ico"><Icon name={p.icon} size={24} /></span>
-        <span><b>{t(lang, p.key)}</b><span class="muted small">{t(lang, DESC[p.id as keyof typeof DESC])}</span></span>
-        <Icon name={lang === "ar" ? "ArrowLeft" : "ArrowRight"} size={18} />
-      </a>
-    ))}
-  </div>
-  {a.qs.length > 0 && (
-    <section class="acc-section">
-      <div class="acc-section-head">
-        <h2>{t(lang, "accLatest")}</h2>
-        <a href={`/${lang}/compte/questions`} class="link-ul">{t(lang, "accSeeAll")}</a>
+<Account lang={lang} active="" title={t(lang, "myAccount")} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+  <a href={`/${lang}`} class="set-back" aria-label={t(lang, "close")} tabindex="-1"></a>
+  <div class="set-modal" role="dialog" aria-modal="true" aria-labelledby="set-title">
+   <header class="set-modal-head">
+     <h1 id="set-title">{t(lang, "myAccount")}</h1>
+     <a href={`/${lang}`} class="set-x" aria-label={t(lang, "close")}><Icon name="X" size={20} /></a>
+   </header>
+   <div class="set-modal-body">
+    <nav class="set-nav" aria-label={t(lang, "myAccount")}>
+      {TABS.map((tb) => <a href={`#${tb.id}`} data-tab={tb.id}><Icon name={tb.icon} size={18} /><span>{t(lang, tb.key)}</span></a>)}
+      <a href={`/${lang}/compte/questions`}><Icon name="MessageCircle" size={18} /><span>{t(lang, "myQuestions")}</span></a>
+      <a href={`/api/logout?lang=${lang}`} rel="nofollow" class="set-nav-out"><Icon name="LogOut" size={18} /><span>{t(lang, "logout")}</span></a>
+    </nav>
+  <div class="set">
+    {ok && <p class="set-ok" role="status"><Icon name="Check" size={16} /> {t(lang, ok === "1" ? "accAvatarSaved" : "accSaved")}</p>}
+
+    <section id="infos">
+      <h2>{t(lang, "accIdentity")}</h2>
+      <header class="set-head">
+        <img src={`/avatars/${a.avatar}.svg`} alt="" width="48" height="48" />
+        <div><p class="set-name">{fullName}</p><p set:html={sub} /></div>
+      </header>
+      <div id="info-view">
+        <div class="set-row"><span class="k">{t(lang, "nameLabel")}</span><span class="v">{fullName}</span><button type="button" class="act" data-edit>{t(lang, "edit")}</button></div>
+        <div class="set-row"><span class="k">{t(lang, "contact")}</span><span class="v" dir="ltr">{acc.contact}</span><button type="button" class="act" data-edit>{t(lang, "edit")}</button></div>
+        <div class="set-row"><span class="k">{t(lang, "accLanguage")}</span><span class="v">{LANG_NAMES[acc.lang as keyof typeof LANG_NAMES] ?? acc.lang}</span><button type="button" class="act" data-edit>{t(lang, "edit")}</button></div>
       </div>
-      <div class="qlist">{a.qs.slice(0, 3).map((x) => <QuestionRow lang={lang} {...x} />)}</div>
+      <form id="info-edit" class="set-form" hidden>
+        <div class="cf"><label for="f-first">{t(lang, "firstName")}</label><input id="f-first" name="firstName" value={acc.first_name} maxlength="40" required autocomplete="given-name" /></div>
+        <div class="cf"><label for="f-last">{t(lang, "lastName")}</label><input id="f-last" name="lastName" value={acc.last_name} maxlength="40" required autocomplete="family-name" /></div>
+        <div class="cf"><label for="f-contact">{t(lang, "contact")}</label><input id="f-contact" name="contact" value={acc.contact} maxlength="80" required dir="ltr" autocomplete="email" /></div>
+        <div class="cf"><label for="f-lang">{t(lang, "accLanguage")}</label>
+          <select id="f-lang" name="lang">{LANGS.map((l) => <option value={l} selected={l === acc.lang}>{LANG_NAMES[l]}</option>)}</select>
+        </div>
+        <p class="set-err" id="edit-error" hidden></p>
+        <div class="set-actions">
+          <button type="submit" class="btn btn-primary btn-xs">{t(lang, "save")}</button>
+          <button type="button" class="ghost" id="edit-cancel">{t(lang, "cancel")}</button>
+        </div>
+      </form>
+      <div class="set-row"><span class="k">{t(lang, "sex")}</span>
+        <span class="v sex-pick" role="group" aria-label={t(lang, "sex")}>
+          <button type="button" class="seg" data-set="sex" data-value="f" aria-pressed={acc.sex === "f" ? "true" : "false"}>{t(lang, "female")}</button>
+          <button type="button" class="seg" data-set="sex" data-value="m" aria-pressed={acc.sex === "m" ? "true" : "false"}>{t(lang, "male")}</button>
+        </span>
+      </div>
+      <details class="set-row avatar-pick">
+        <summary><span class="k">{t(lang, "avatarLabel")}</span><span class="v"><img src={`/avatars/${a.avatar}.svg`} alt="" width="28" height="28" /></span><span class="act">{t(lang, "change")}</span></summary>
+        <div class="avatar-grid">
+          {order.map((n) => {
+            const id = String(n).padStart(2, "0");
+            return <button type="button" data-set="avatar" data-value={n} aria-pressed={n === current ? "true" : "false"} aria-label={`Avatar ${n}`}><img src={`/avatars/${id}.svg`} alt="" width="48" height="48" loading="lazy" /></button>;
+          })}
+        </div>
+      </details>
     </section>
-  )}
-  <p><a href={`/${lang}`} class="btn btn-primary">{t(lang, "newQuestion")}</a></p>
+
+    <section id="sante">
+      <h2>{t(lang, "accHealth")}</h2>
+      {a.health.length
+        ? <>
+            <p class="set-note">{t(lang, "accHealthHint")}</p>
+            {a.health.filter((h) => h.icon !== "UserRound").map((h) => <div class="set-row"><span class="k">{h.k}</span><span class="v">{h.v}</span></div>)}
+          </>
+        : <p class="set-note">{t(lang, "accHealthEmpty")}</p>}
+      {a.topics.length > 0 && <div class="set-row"><span class="k">{t(lang, "accTopics")}</span><span class="v">{a.topics.map((th) => th.label[lang]).join(", ")}</span></div>}
+    </section>
+
+    <section id="confidentialite">
+      <h2>{t(lang, "accPrivacyTitle")}</h2>
+      <div class="set-row"><span class="k">{t(lang, "consentHealth")}</span><span class="v">{t(lang, "consentGiven").replace("{d}", formatDate(acc.consent_terms_at, lang))}</span></div>
+      <div class="set-row"><span class="k">{t(lang, "questionsPublished")}</span><span class="v">{t(lang, "publishedOf").replace("{n}", String(a.nPub)).replace("{total}", String(a.qs.length))}</span><a class="act" href={`/${lang}/compte/questions`}>{t(lang, "manage")}</a></div>
+      <p class="set-note">{t(lang, "accPrivacy")}</p>
+    </section>
+
+    <section id="donnees">
+      <h2>{t(lang, "myData")}</h2>
+      <div class="set-row"><span class="k">{t(lang, "exportData")}</span><span class="v"></span><a class="act" href="/api/export" download>JSON</a></div>
+      <div class="set-row"><span class="k">{t(lang, "deleteAccount")}</span><span class="v"></span><button type="button" class="act danger" id="del-open">{t(lang, "deleteAccount")}</button></div>
+      <div class="set-confirm" id="del-box" hidden>
+        <p>{t(lang, "deleteAccountConfirm")}</p>
+        <div class="set-actions">
+          <button type="button" class="btn btn-danger btn-xs" id="del-yes" data-lang={lang}>{t(lang, "deleteAccountYes")}</button>
+          <button type="button" class="ghost" id="del-no">{t(lang, "cancel")}</button>
+        </div>
+      </div>
+    </section>
+  </div>
+   </div>
+  </div>
 </Account>
+
+<script define:vars={{ msgTaken: t(lang, "contactTaken"), msgError: t(lang, "error"), home: `/${lang}` }}>
+  // Une rubrique à la fois, choisie à gauche (et gardée dans l'adresse : #sante, #donnees…).
+  const tabs = ["infos", "sante", "confidentialite", "donnees"];
+  const show = () => {
+    const cur = tabs.includes(location.hash.slice(1)) ? location.hash.slice(1) : "infos";
+    tabs.forEach((id) => { document.getElementById(id).hidden = id !== cur; });
+    document.querySelectorAll(".set-nav [data-tab]").forEach((a) => a.setAttribute("aria-current", a.dataset.tab === cur ? "page" : "false"));
+    document.querySelector(".set-modal .set").scrollTop = 0;
+  };
+  show(); addEventListener("hashchange", show);
+  document.querySelector(".set-nav").addEventListener("click", (e) => {
+    const a = e.target.closest("[data-tab]"); if (!a) return;
+    e.preventDefault(); history.replaceState(null, "", "#" + a.dataset.tab); show();
+  });
+  // Échap ferme la fenêtre, comme le bouton ×.
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.querySelector(".side-user[open]")) location.href = home; });
+  // Modifier : la fiche laisse place au formulaire, puis enregistre en JSON.
+  const view = document.getElementById("info-view"), form = document.getElementById("info-edit");
+  const err = document.getElementById("edit-error");
+  const toggle = (editing) => { view.hidden = editing; form.hidden = !editing; if (editing) form.querySelector("input").focus(); };
+  document.querySelectorAll("[data-edit]").forEach((b) => b.addEventListener("click", () => toggle(true)));
+  document.getElementById("edit-cancel").addEventListener("click", () => { form.reset(); err.hidden = true; toggle(false); });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('[type="submit"]'); btn.disabled = true; err.hidden = true;
+    const res = await fetch("/api/profile", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ identity: Object.fromEntries(new FormData(form)) }) }).catch(() => null);
+    if (res && res.ok) { location.replace(location.pathname + "?ok=infos#infos"); return; }
+    const data = res ? await res.json().catch(() => ({})) : {};
+    err.textContent = data.error === "taken" ? msgTaken : msgError; err.hidden = false; btn.disabled = false;
+  });
+  // Supprimer le compte : confirmation dans la page, puis retour à l'accueil.
+  const box = document.getElementById("del-box");
+  document.getElementById("del-open").addEventListener("click", () => { box.hidden = false; });
+  document.getElementById("del-no").addEventListener("click", () => { box.hidden = true; });
+  document.getElementById("del-yes").addEventListener("click", async (e) => {
+    const b = e.currentTarget; b.disabled = true;
+    const r = await fetch("/api/account-delete", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirm: true }) }).catch(() => null);
+    if (r && r.ok) location.replace(`/${b.dataset.lang}`); else b.disabled = false;
+  });
+</script>
+<script>
+  // Sexe et avatar : enregistrés tout de suite, puis la page se recharge pour montrer le nouvel avatar.
+  document.querySelectorAll<HTMLButtonElement>("[data-set]").forEach((b) => {
+    b.addEventListener("click", async () => {
+      b.disabled = true;
+      const res = await fetch("/api/profile", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ [b.dataset.set!]: b.dataset.value }),
+      }).catch(() => null);
+      if (res?.ok) location.replace(location.pathname + "?ok=1" + location.hash);
+      else b.disabled = false;
+    });
+  });
+</script>

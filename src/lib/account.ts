@@ -7,20 +7,20 @@ import { symptom, theme, type Theme } from "@/lib/content/themes";
 import { AGES, CITIES, DURATIONS, WHO } from "@/lib/content/options";
 
 // Rubriques de l'espace patient (ordre du menu). L'id sert aussi de chemin : /compte/<id>.
+// Infos, profil santé et confidentialité sont réunis sur /compte (une seule page de réglages, façon Claude).
 export const ACCOUNT_PAGES = [
-  { id: "", icon: "House", key: "accHome" },
+  { id: "", icon: "UserRound", key: "myAccount" },
   { id: "questions", icon: "MessageCircleQuestion", key: "myQuestions" },
-  { id: "infos", icon: "IdCard", key: "accIdentity" },
-  { id: "sante", icon: "HeartPulse", key: "accHealth" },
-  { id: "confidentialite", icon: "ShieldCheck", key: "accPrivacyTitle" },
 ] as const;
 export type AccountPage = (typeof ACCOUNT_PAGES)[number]["id"];
 
 // Titre court d'une question, pour la barre latérale : « Fièvre, 1 à 3 jours », « Maux de tête, mon enfant ».
+// Le symptôme précis (et non le sujet) pour que deux questions voisines restent distinctes.
 export function shortTitle(lang: Lang, q: QuestionRow, th: Theme) {
   const low = (x: string) => (lang === "ar" ? x : x.toLowerCase());
+  const name = symptom(th, q.symptom)?.label[lang] ?? th.label[lang];
   const extra = q.who !== "moi" ? WHO.find((w) => w.id === q.who)?.label[lang] : DURATIONS.find((d) => d.id === q.duration)?.label[lang];
-  return extra ? `${th.label[lang]}, ${low(extra)}` : th.label[lang];
+  return extra ? `${name}, ${low(extra)}` : name;
 }
 
 export async function loadAccount(Astro: AstroGlobal, lang: Lang) {

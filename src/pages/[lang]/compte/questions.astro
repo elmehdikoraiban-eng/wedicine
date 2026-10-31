@@ -1,39 +1,47 @@
 ---
+// Mes questions : une liste simple, comme les discussions de Claude. Filtres par personne (lien ?pour=, sans JavaScript).
 import Account from "@/layouts/Account.astro";
 import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { loadAccount } from "@/lib/account";
-import QuestionRow from "@/components/QuestionRow.astro";
+import { pageTitle } from "@/lib/content/themes";
+import { WHO } from "@/lib/content/options";
+import { dayLabel } from "@/lib/site";
 import { Icon } from "@/components/Icon";
 
 const lang = langParam(Astro.params);
 if (!lang) return Astro.redirect("/fr", 302);
 const a = await loadAccount(Astro, lang);
 if (!a) return Astro.redirect(`/${lang}/connexion`, 302);
-// Trois onglets (pour moi, un enfant, un proche ; lien ?tab=, sans JavaScript) + un quatrième qui ouvre le questionnaire.
-const TABS = [
-  { id: "moi", icon: "UserRound", key: "accForMe" },
-  { id: "enfant", icon: "Baby", key: "accForChild" },
-  { id: "proche", icon: "Users", key: "accForRelative" },
-] as const;
-const by = (id: string) => a.qs.filter(({ q }) => q.who === id);
-const asked = Astro.url.searchParams.get("tab");
-const tab = TABS.find((x) => x.id === asked)?.id ?? TABS.find((x) => by(x.id).length)?.id ?? "moi";
-const list = by(tab);
+const asked = Astro.url.searchParams.get("pour");
+const who = WHO.find((w) => w.id === asked)?.id ?? null;
+const list = who ? a.qs.filter(({ q }) => q.who === who) : a.qs;
+const filters = [{ id: null, label: t(lang, "filterAll"), n: a.qs.length }, ...WHO.map((w) => ({ id: w.id, label: w.label[lang], n: a.qs.filter(({ q }) => q.who === w.id).length }))];
 ---
-<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={a.shortName} avatar={a.avatar} recent={a.recent}>
-  {Astro.url.searchParams.get("deleted") === "1" && <p class="notice notice-ok" role="status"><Icon name="Check" size={18} /> {t(lang, "delQDone")}</p>}
-  <nav class="acc-tabs" role="tablist" aria-label={t(lang, "myQuestions")}>
-    {TABS.map((x) => (
-      <a role="tab" href={`?tab=${x.id}`} aria-selected={x.id === tab ? "true" : "false"} class="tab">
-        <Icon name={x.icon} size={18} />{t(lang, x.key)}<span class="tab-count">{by(x.id).length}</span>
-      </a>
-    ))}
-    <a href={`/${lang}`} class="tab tab-new"><Icon name="Plus" size={18} />{t(lang, "newQuestionTab")}</a>
-  </nav>
-  <div role="tabpanel">
+<Account lang={lang} active="questions" title={t(lang, "myQuestions")} name={a.shortName} avatar={a.avatar} recent={a.recent} plain>
+  <div class="set">
+    <div class="set-title">
+      <h1>{t(lang, "myQuestions")}</h1>
+      <nav class="filters" aria-label={t(lang, "myQuestions")}>
+        {filters.map((f) => <a href={f.id ? `?pour=${f.id}` : "?"} class="filter" aria-current={f.id === who ? "true" : undefined}>{f.label}<span>{f.n}</span></a>)}
+      </nav>
+    </div>
+    {Astro.url.searchParams.get("deleted") === "1" && <p class="set-ok" role="status"><Icon name="Check" size={16} /> {t(lang, "delQDone")}</p>}
     {list.length === 0
-      ? <p class="tab-empty muted">{t(lang, "accTabEmpty")}</p>
-      : <div class="qlist">{list.map((x) => <QuestionRow lang={lang} {...x} />)}</div>}
+      ? <p class="set-note">{t(lang, "accTabEmpty")}</p>
+      : <div class="qrows">
+          {list.map(({ q, th, sy }) => (
+            <a href={`/${lang}/compte/q/${q.id}`} class="qrow">
+              <span class="t">{pageTitle(lang, th, sy, q.intent)}</span>
+              <span class="d">{WHO.find((w) => w.id === q.who)?.label[lang]} · {dayLabel(q.created_at, lang, t(lang, "today"), t(lang, "yesterday"))}</span>
+              {q.urgent
+                ? <span class="tag urg">{t(lang, "urgentTag")}</span>
+                : q.is_public
+                  ? <span class="tag pub"><Icon name="Globe" size={13} />{q.anonymous ? t(lang, "pubAnonBadge") : t(lang, "published")}</span>
+                  : <span class="tag"><Icon name="Lock" size={13} />{t(lang, "private")}</span>}
+            </a>
+          ))}
+        </div>}
+    <p class="set-note">{t(lang, "listNote")}</p>
   </div>
 </Account>

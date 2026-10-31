@@ -48,3 +48,13 @@ export function isEvening(now = new Date()) {
   const h = Number(new Intl.DateTimeFormat("en", { timeZone: TZ, hour: "numeric", hour12: false }).format(now));
   return h >= 18 || h < 5;
 }
+
+// « Aujourd'hui », « Hier » ou « 29 octobre », à l'heure du Maroc (liste des questions).
+export function dayLabel(d: string | Date, l: Lang, today: string, yesterday: string, now = new Date()) {
+  const day = (x: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(x);
+  const date = new Date(d);
+  if (day(date) === day(now)) return today;
+  if (day(date) === day(new Date(now.getTime() - 86400000))) return yesterday;
+  const sameYear = date.getFullYear() === now.getFullYear();
+  return new Intl.DateTimeFormat(LOCALE[l], { timeZone: TZ, day: "numeric", month: "long", ...(sameYear ? {} : { year: "numeric" }) }).format(date);
+}
