@@ -1,0 +1,49 @@
+---
+import Admin from "@/layouts/Admin.astro";
+import { adminUser, notAdminUrl, adminUsers, allFiches, reviewedKeys, logAction } from "@/lib/admin";
+import { publicName } from "@/lib/auth";
+import { avatarOf } from "@/lib/db";
+
+// Utilisateurs : les comptes, du plus récent au plus ancien. Le contact sert à répondre ; jamais le mot de passe.
+const user = await adminUser(Astro.cookies);
+if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/utilisateurs"), 302);
+const q = (Astro.url.searchParams.get("q") ?? "").slice(0, 80);
+const rows = await adminUsers(q);
+const toReview = allFiches().length - (await reviewedKeys()).size;
+if (q) await logAction(user, "A cherché un utilisateur", `« ${q} »`);
+const day = (x: string | Date) => new Date(x).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Africa/Casablanca" });
+const ago = (x: string | Date | null) => {
+  if (!x) return "—";
+  const h = (Date.now() - new Date(x).getTime()) / 36e5;
+  return h < 1 ? "Il y a moins d'1 h" : h < 24 ? `Il y a ${Math.floor(h)} h` : h < 48 ? "Hier" : `Il y a ${Math.floor(h / 24)} j`;
+};
+const LANG: Record<string, string> = { fr: "FR", ar: "AR", en: "EN" };
+---
+<Admin user={user} active="users" title="Utilisateurs" counts={{ toReview }}>
+  <div class="adm-top"><h1>Utilisateurs</h1><span class="adm-note">{rows.length} compte{rows.length > 1 ? "s" : ""}{q && ` pour « ${q} »`}. Le contact sert seulement à répondre au patient.</span></div>
+  <form class="adm-search" method="get" role="search">
+    <input class="input" name="q" value={q} placeholder="Chercher un prénom, un nom, un e-mail ou un téléphone" aria-label="Chercher un utilisateur" />
+    {q && <a href="/admin/utilisateurs" class="adm-link">Effacer</a>}
+  </form>
+  <div class="adm-table">
+    <table>
+      <thead><tr><th>Utilisateur</th><th>Contact</th><th>Inscrit le</th><th>Langue</th><th>Questions</th><th>Publiées</th><th>Dernière visite</th><th></th></tr></thead>
+      <tbody>
+        {rows.map((u) => (
+          <tr>
+            <td><span class="adm-user"><img src={`/avatars/${String(avatarOf(u)).padStart(2, "0")}.svg`} alt="" width="28" height="28" loading="lazy" />{publicName(u.first_name, u.last_name)}</span></td>
+            <td class="adm-contact" dir="ltr">{u.contact}</td>
+            <td class="adm-nowrap">{day(u.created_at)}</td>
+            <td>{LANG[u.lang] ?? u.lang}</td>
+            <td>{u.nq}</td>
+            <td>{u.npub}</td>
+            <td class="adm-nowrap">{ago(u.last_seen)}</td>
+            <td>{u.nq > 0 && <a class="act" href={`/admin/questions?u=${u.id}`}>Ses questions</a>}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {rows.length === 0 && <p class="adm-empty">Aucun utilisateur{q && " pour cette recherche"}.</p>}
+  </div>
+  {rows.length === 300 && <p class="adm-note">Les 300 plus récents sont affichés : utilise la recherche.</p>}
+</Admin>

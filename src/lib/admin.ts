@@ -105,7 +105,7 @@ export type AdminQ = {
   who: string; age: string | null; sex: string | null; city: string | null; intent: string; urgent: boolean;
   is_public: boolean; anonymous: boolean; hidden: boolean; lang: string;
 };
-export async function adminQuestions(f: { filter?: string; theme?: string; city?: string }) {
+export async function adminQuestions(f: { filter?: string; theme?: string; city?: string; user?: number }) {
   const d = await db();
   const where: string[] = [];
   const p: unknown[] = [];
@@ -114,6 +114,7 @@ export async function adminQuestions(f: { filter?: string; theme?: string; city?
   if (f.filter === "hidden") where.push("hidden");
   if (f.theme) { p.push(f.theme); where.push(`theme = $${p.length}`); }
   if (f.city) { p.push(f.city); where.push(`city = $${p.length}`); }
+  if (f.user) { p.push(f.user); where.push(`user_id = $${p.length}`); }
   const r = await d.query(
     `SELECT id, created_at, user_id, theme, symptom, duration, who, age, sex, city, intent, urgent, is_public, anonymous, hidden, lang
      FROM wedicine.questions ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY id DESC LIMIT 150`, p);
@@ -190,4 +191,24 @@ export async function analytics(days: number) {
     abandoned: n(flow.abandoned), ongoing: n(flow.ongoing),
     series, sources, since: first,
   };
+}
+
+// ---- Utilisateurs (comptes) : jamais le mot de passe ; le contact sert à répondre au patient. ----
+export type AdminUserRow = { id: number; created_at: string | Date; first_name: string; last_name: string; contact: string; lang: string; avatar: number | null; nq: number; npub: number; last_seen: string | Date | null };
+export async function adminUsers(search = "") {
+  const d = await db();
+  const s = search.trim().toLowerCase().slice(0, 80);
+  const r = await d.query(
+    `SELECT u.id, u.created_at, u.first_name, u.last_name, u.contact, u.lang, u.avatar,
+       (SELECT count(*)::int FROM wedicine.questions q WHERE q.user_id = u.id) AS nq,
+       (SELECT count(*)::int FROM wedicine.questions q WHERE q.user_id = u.id AND q.is_public AND NOT q.hidden) AS npub,
+       GREATEST((SELECT max(v.last_at) FROM wedicine.visits v WHERE v.user_id = u.id), (SELECT max(s.created_at) FROM wedicine.sessions s WHERE s.user_id = u.id)) AS last_seen
+     FROM wedicine.users u
+     ${s ? "WHERE lower(u.first_name || ' ' || u.last_name) LIKE $1 OR lower(u.contact) LIKE $1" : ""}
+     ORDER BY u.id DESC LIMIT 300`, s ? [`%${s}%`] : []);
+  return r.rows as AdminUserRow[];
+}
+export async function countUsers() {
+  const d = await db();
+  return Number((await d.query("SELECT count(*)::int AS n FROM wedicine.users")).rows[0].n);
 }

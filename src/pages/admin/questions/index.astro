@@ -9,7 +9,8 @@ import { dayLabel } from "@/lib/site";
 const user = await adminUser(Astro.cookies);
 if (!user) return Astro.redirect(await notAdminUrl(Astro.cookies, "/admin/questions"), 302);
 const sp = Astro.url.searchParams;
-const f = { filter: sp.get("f") ?? "", theme: sp.get("theme") ?? "", city: sp.get("ville") ?? "" };
+const uid = Number(sp.get("u")) || undefined;
+const f = { filter: sp.get("f") ?? "", theme: sp.get("theme") ?? "", city: sp.get("ville") ?? "", user: uid };
 const rows = await adminQuestions(f);
 const all = await adminQuestions({});
 const toReview = allFiches().length - (await reviewedKeys()).size;
@@ -27,7 +28,7 @@ const usedThemes = THEMES.filter((t) => all.some((q) => q.theme === t.id));
 const usedCities = CITIES.filter((c) => all.some((q) => q.city === c.id));
 ---
 <Admin user={user} active="questions" title="Questions" counts={{ questions: all.length, toReview }}>
-  <div class="adm-top"><h1>Questions</h1><span class="adm-note">Sans nom : on voit le profil, jamais l'identité.</span></div>
+  <div class="adm-top"><h1>Questions{uid && <> <a href="/admin/questions" class="adm-back">· compte n° {uid} ×</a></>}</h1><span class="adm-note">Sans nom : on voit le profil, jamais l'identité.</span></div>
   <div class="adm-filters">
     {[["", "Toutes"], ["urgent", "Urgences"], ["named", "Publiées avec prénom"], ["hidden", `Retirées (${hidden})`]].map(([id, l]) => <a class="filter" href={link({ f: id })} aria-current={f.filter === id ? "true" : undefined}>{l}</a>)}
     <form class="adm-selects" method="get">

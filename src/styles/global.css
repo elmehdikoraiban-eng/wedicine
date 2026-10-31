@@ -1176,6 +1176,12 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
 .adm-hbars b { font-weight: 500; font-size: 13px; }
 @media (max-width: 600px) { .adm-hbars > div { grid-template-columns: 100px 1fr; } }
 
+/* Admin : utilisateurs */
+.adm-search { display: flex; align-items: center; gap: 12px; max-width: 520px; }
+.adm-user { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; font-weight: 600; }
+.adm-user img { border-radius: 50%; flex: none; }
+.adm-table td.adm-contact { color: var(--muted-2); }
+
 /* Thème sombre (bouton soleil / lune ; choix gardé dans le navigateur). Seuls les jetons changent. */
 :root[data-theme="dark"] {
   color-scheme: dark;
