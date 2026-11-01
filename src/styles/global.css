@@ -6,45 +6,52 @@
      choisie par El Mehdi le 2026-10-31 à la place de Ramis). Fichiers dans public/fonts. */
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
+@font-face { font-family: "Newsreader"; src: url("/fonts/newsreader.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }  /* salutation façon Claude, OFL */
 @font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 @font-face { font-family: "Tajawal"; src: url("/fonts/tajawal-700.woff2") format("woff2"); font-weight: 600 900; font-style: normal; font-display: swap; }
 :root {
   --brand: #0065ff;        /* bande bleue, accents, sélection */
-  --brand-hover: #0747a6;
+  --brand-hover: #0052cc;
   --link: #0052cc;
-  --ink: #091e42;          /* texte principal */
-  --ink-2: #172b4d;
-  --muted: #44546f;
-  --muted-2: #626f86;
+  /* Système Claude (2026-11-01) : gris neutres, aucune teinte ; le bleu remplace l'orange de Claude. */
+  --ink: #1f1f1f;          /* texte principal */
+  --ink-2: #2e2e2e;
+  --muted: #5e5e5e;        /* secondaire */
+  --muted-2: #737373;      /* aide, légendes */
+  --muted-3: #8a8a8a;      /* dates */
   --canvas: #ffffff;
-  --neutral: #f4f5f7;
-  --soft: #f7f9fc;         /* fond de section très léger */
-  --tint: #deebff;
-  --tint-2: #eef4ff;       /* panneau pastel bleu */
-  --line: #dfe1e6;
-  --line-2: #ebecf0;       /* filet presque invisible */
+  --neutral: #f4f4f4;
+  --soft: #f7f7f7;         /* fond de section très léger */
+  --tint: #ececec;
+  --tint-2: #f4f4f4;       /* panneau neutre */
+  --line: #e3e3e3;
+  --line-2: #ececec;       /* filet presque invisible */
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --field: #f4f4f4; --field-line: #e3e3e3; --chip-line: #d9d9d9; --on-field: #ebebeb;
+  --card: #ffffff; --card-line: #e6e6e6; --well: #ececec; --frame: #e3e3e3;
+  --seg: #ececec; --seg-on: #ffffff;
   --purple: #6554c0; --purple-bg: #eae6ff;
   --teal: #00a3bf; --teal-bg: #e6fcff;
   --green: #36b37e; --green-bg: #e3fcef;
   --yellow: #ffab00; --yellow-bg: #fffae6;
   --red: #de354c; --red-bg: #ffebe6;
   /* Boutons et champs (asana.com) */
-  --btn: #0065ff; --btn-hover: #0747a6; --btn-text: #ffffff;
-  --btn-2: #ffffff; --btn-2-hover: #f4f5f7; --btn-2-border: #c1c7d0;
-  --field-border: #eceef2; --field-bg: #f4f5f7; --field-hover: #eceef2; --field-focus: #0065ff; --ring: #4075cf;
+  --btn: #0065ff; --btn-hover: #0052cc; --btn-text: #ffffff;
+  --btn-2: #ffffff; --btn-2-hover: #f4f4f4; --btn-2-border: #d6d6d6;
+  --field-border: #e6e6e6; --field-bg: #f4f4f4; --field-hover: #ececec; --field-focus: #0065ff; --ring: #4075cf;
   /* Arrondis asana : panneaux 24, cartes 16, éléments 12, champs 6 */
   --r-pill: 10px; --r-field: 10px; --r-chip: 100px; --r-card: 16px; --r-panel: 24px; --r-sm: 12px;
-  --shadow-hover: 0 12px 32px rgba(9, 30, 66, .10);
-  --shadow-card: 0 2px 12px rgba(9, 30, 66, .06);
-  --shadow-float: 0 24px 64px rgba(9, 30, 66, .12);
+  --shadow-hover: none;    /* Claude : pas d'ombre, la profondeur vient du gris */
+  --shadow-card: none;
+  --shadow-float: 0 8px 28px rgba(0, 0, 0, .12);
   --focus: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ring);
   --max: 1200px;
   --nav-h: 64px;
   --font: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   /* Neutres de l'interface (filets, survols, bulles) : redéfinis en thème sombre. */
-  --l1: #eef0f4; --l2: #e6e9ef; --l3: #d9dee7; --l4: #c1c7d0;
-  --hover: #eef1f5; --active: #e9edf3; --side: #f7f8fa; --bubble: #eef3fb; --hover-brand: #f4f8ff; --tl-soft: #b3d4ff;
+  --l1: #f0f0f0; --l2: #e6e6e6; --l3: #dcdcdc; --l4: #c8c8c8;
+  --hover: #ececec; --active: #e3e3e3; --side: #f7f7f7; --bubble: #f0f0f0; --hover-brand: #f4f4f4; --tl-soft: #b3d4ff;
   color-scheme: light;
   --font-ar: "Tajawal", "Nunito Sans", system-ui, sans-serif;
   --ease: cubic-bezier(.2, .7, .2, 1);
@@ -103,7 +110,7 @@ main > .page { padding-block: 48px 96px; }
 
 /* Navigation : 64 px (60 sur mobile), blanche, sans filet (ombre légère au défilement). */
 .nav { background: color-mix(in srgb, var(--canvas) 92%, transparent); backdrop-filter: saturate(1.4) blur(10px); position: sticky; top: 0; z-index: 10; transition: box-shadow .25s; }
-.nav.scrolled { box-shadow: 0 1px 0 var(--line-2), 0 8px 24px rgba(9, 30, 66, .06); }
+.nav.scrolled { box-shadow: 0 1px 0 var(--line-2), 0 8px 24px rgba(0, 0, 0, .06); }
 .nav .wrap { display: flex; align-items: center; gap: 8px; height: var(--nav-h); max-width: none; padding-inline: clamp(16px, 3vw, 40px); }
 /* Logo : la bulle qui écoute (stéthoscope en forme de و) + mot « wedicine » (public/brand). Sur très petit écran, le symbole seul. */
 .logo { display: flex; align-items: center; flex: none; }
@@ -446,7 +453,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .faces { display: flex; gap: 8px; align-items: flex-end; }
 .face { flex: 1; display: grid; gap: 8px; justify-items: center; text-align: center; }
 .face .ico { width: 44px; height: 44px; border-radius: 50%; background: var(--line-2); color: var(--muted-2); display: grid; place-items: center; transition: transform .25s var(--ease); }
-.face.on .ico { width: 64px; height: 64px; background: var(--c); color: #fff; box-shadow: 0 8px 20px rgba(9, 30, 66, .15); animation: pop .3s var(--ease); }
+.face.on .ico { width: 64px; height: 64px; background: var(--c); color: #fff; box-shadow: 0 8px 20px rgba(0, 0, 0, .15); animation: pop .3s var(--ease); }
 .face .lbl { font-size: .8125rem; color: var(--muted); }
 .face.on .lbl { color: var(--ink); font-weight: 600; }
 @media (max-width: 600px) {
@@ -774,7 +781,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .lang-pick summary { list-style: none; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: var(--muted-2); }
 .lang-pick summary::-webkit-details-marker { display: none; }
 .lang-pick summary:hover { color: var(--brand); }
-.lang-pop { position: absolute; bottom: calc(100% + 6px); inset-inline-end: 0; min-width: 130px; display: flex; flex-direction: column; padding: 4px; background: var(--canvas); border: 1px solid var(--l2); border-radius: 10px; box-shadow: 0 8px 24px rgba(9, 30, 66, .12); z-index: 20; }
+.lang-pop { position: absolute; bottom: calc(100% + 6px); inset-inline-end: 0; min-width: 130px; display: flex; flex-direction: column; padding: 4px; background: var(--canvas); border: 1px solid var(--l2); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .12); z-index: 20; }
 .nav .lang-pick summary { font-size: 14px; color: var(--ink); padding: 6px 8px; border-radius: 8px; }
 .nav .lang-pick summary:hover { background: var(--hover); color: var(--ink); }
 .lang-pick.down .lang-pop { bottom: auto; top: calc(100% + 6px); }
@@ -835,7 +842,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .side-user summary > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .side-user summary svg { flex: none; color: var(--muted-2); transition: transform var(--t); }
 .side-user[open] summary svg { transform: rotate(180deg); }
-.side-pop { position: absolute; inset-inline: 0; bottom: calc(100% - 4px); background: var(--canvas); border: 1px solid var(--l2); border-radius: 12px; box-shadow: 0 12px 32px rgba(9, 30, 66, .10); padding: 6px; display: grid; gap: 2px; z-index: 5; animation: rise .18s var(--ease); }
+.side-pop { position: absolute; inset-inline: 0; bottom: calc(100% - 4px); background: var(--canvas); border: 1px solid var(--l2); border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, .10); padding: 6px; display: grid; gap: 2px; z-index: 5; animation: rise .18s var(--ease); }
 .side-pop a.logout { border-top: 1px solid var(--l2); border-radius: 0 0 8px 8px; margin-top: 4px; }
 .side-lang { display: flex; gap: 2px; padding: 6px 2px 4px; border-top: 1px solid var(--l2); margin-top: 4px; }
 .side-lang a { flex: 1; justify-content: center; padding: 6px 4px; font-size: 13px; color: var(--muted-2); }
@@ -851,12 +858,12 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 @media (max-width: 860px) {
   .side { position: fixed; inset: 0 auto 0 0; z-index: 30; width: min(300px, 86vw); transform: translateX(-100%); transition: transform .25s var(--ease); }
   [dir="rtl"] .side { inset: 0 0 0 auto; transform: translateX(100%); }
-  .side-toggle:checked ~ .side { transform: none; box-shadow: 0 24px 64px rgba(9, 30, 66, .18); }
-  .side-backdrop { display: block; position: fixed; inset: 0; z-index: 29; background: rgba(9, 30, 66, .35); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .side-toggle:checked ~ .side { transform: none; box-shadow: 0 24px 64px rgba(0, 0, 0, .18); }
+  .side-backdrop { display: block; position: fixed; inset: 0; z-index: 29; background: rgba(0, 0, 0, .35); opacity: 0; pointer-events: none; transition: opacity .25s; }
   .side-toggle:checked ~ .side-backdrop { opacity: 1; pointer-events: auto; }
   .side-close, .side-burger, .space-plus { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 8px; color: var(--ink); cursor: pointer; flex: none; }
   .side-close:hover, .side-burger:hover, .space-plus:hover { background: var(--hover); }
-  .space-plus { color: var(--brand); }
+  .space-plus { color: var(--ink); }
   .space-top { padding: 8px 12px; }
   .space-meta { display: none; }
 }
@@ -986,8 +993,8 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 }
 
 /* Mon compte : fenêtre de réglages par-dessus l'espace patient, façon Claude */
-.set-back { position: fixed; inset: 0; z-index: 60; background: rgba(9, 30, 66, .32); }
-.set-modal { position: fixed; z-index: 61; inset: 0; margin: auto; width: min(960px, calc(100vw - 48px)); height: min(680px, calc(100dvh - 48px)); display: flex; flex-direction: column; background: var(--canvas); border-radius: 16px; box-shadow: 0 24px 64px rgba(9, 30, 66, .22); overflow: hidden; }
+.set-back { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .32); }
+.set-modal { position: fixed; z-index: 61; inset: 0; margin: auto; width: min(960px, calc(100vw - 48px)); height: min(680px, calc(100dvh - 48px)); display: flex; flex-direction: column; background: var(--canvas); border-radius: 16px; box-shadow: 0 24px 64px rgba(0, 0, 0, .22); overflow: hidden; }
 .set-modal-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 14px 20px; border-bottom: 1px solid var(--l1); }
 .set-modal-head h1 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
 .set-x { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; color: var(--muted-2); }
@@ -1055,7 +1062,7 @@ footer { padding: 64px 0 32px; color: rgba(255,255,255,.72); font-size: var(--fs
 .adm-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--neutral); border-radius: 10px; }
 .adm-seg a { padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted-2); }
 .adm-seg a:hover { color: var(--ink); text-decoration: none; }
-.adm-seg a[aria-current="true"] { background: var(--canvas); color: var(--ink); box-shadow: 0 1px 2px rgba(9, 30, 66, .12); }
+.adm-seg a[aria-current="true"] { background: var(--canvas); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
 .adm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .adm-kpi, .adm-card { border: 1px solid var(--l2); border-radius: 14px; padding: 16px 18px; background: var(--canvas); min-width: 0; }
 .adm-kpi { display: grid; gap: 4px; }
@@ -1189,16 +1196,20 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
 :root[data-theme="dark"] {
   color-scheme: dark;
   --brand: #4c9aff; --brand-hover: #85b8ff; --link: #85b8ff;
-  --ink: #e6e9ef; --ink-2: #cfd5de; --muted: #a9b4c4; --muted-2: #8c98aa;
-  --canvas: #15181e; --neutral: #1f232b; --soft: #191c22; --tint: #1c2b45; --tint-2: #1a2333;
-  --line: #2e333d; --line-2: #262a33;
+  /* Mesuré sur claude.ai (2026-11-01) : neuf gris neutres empilés, texte #efefef, pas d'ombre. */
+  --ink: #efefef; --ink-2: #e3e3e3; --muted: #9e9e9e; --muted-2: #878787; --muted-3: #797979;
+  --canvas: #191919; --neutral: #303030; --soft: #1f1f1f; --tint: #2a2a2a; --tint-2: #1f1f1f;
+  --line: #303030; --line-2: #282828;
+  --field: #303030; --field-line: #404040; --chip-line: #4a4a4a; --on-field: #3a3a3a;
+  --card: #1f1f1f; --card-line: #282828; --well: #0b0b0b; --frame: #171717;
+  --seg: #2a2a2a; --seg-on: #404040;
   --purple-bg: #2a2545; --teal-bg: #12303a; --green-bg: #163327; --yellow-bg: #3a2f12; --red-bg: #3d1b1f;
   --btn: #0065ff; --btn-hover: #2f80ff; --btn-text: #ffffff;
-  --btn-2: #1f232b; --btn-2-hover: #262a33; --btn-2-border: #3a404b;
-  --field-border: #2a2f38; --field-bg: #1f232b; --field-hover: #262a33; --field-focus: #4c9aff;
-  --l1: #23272f; --l2: #2a2f38; --l3: #353b46; --l4: #4a5160;
-  --hover: #22262e; --active: #2a2f38; --side: #111318; --bubble: #1f2a3d; --hover-brand: #1a2538; --tl-soft: #24406b;
-  --shadow-hover: 0 12px 32px rgba(0, 0, 0, .4); --shadow-card: 0 2px 12px rgba(0, 0, 0, .35); --shadow-float: 0 24px 64px rgba(0, 0, 0, .5);
+  --btn-2: #2a2a2a; --btn-2-hover: #303030; --btn-2-border: #404040;
+  --field-border: #404040; --field-bg: #303030; --field-hover: #363636; --field-focus: #4c9aff;
+  --l1: #2a2a2a; --l2: #303030; --l3: #3a3a3a; --l4: #404040;
+  --hover: #2a2a2a; --active: #404040; --side: #1f1f1f; --bubble: #303030; --hover-brand: #2a2a2a; --tl-soft: #24406b;
+  --shadow-hover: none; --shadow-card: none; --shadow-float: 0 8px 28px rgba(0, 0, 0, .5);
 }
 :root[data-theme="dark"] body { background: var(--canvas); color: var(--ink); }
 /* Thème sombre : surfaces qui avaient une couleur claire écrite en dur (pages publiques, réglages). */
@@ -1242,3 +1253,125 @@ select.input.select { appearance: none; -webkit-appearance: none; padding-inline
   .nav .btn, .nav .btn-sm { padding: 0 11px; }
   .nav .wrap { gap: 4px; }
 }
+
+/* =====================================================================================================
+   Système Claude (2026-11-01). Demande d'El Mehdi : « même chose à 100 %, seulement l'orange #d97757 en bleu ».
+   Mesures de l'accueil claude.ai (capture à 125 %, ramenées en px CSS) : barre latérale 288, lignes de 32
+   (pas de 34), arrondi 10, champ 656 × 103 arrondi 13, salutation en serif 36, interface en 14, aucune ombre,
+   aucun gras ; une seule couleur (ici le bleu) pour le symbole, la pastille et l'action principale.
+   Analyse complète : https://claude.ai/artifact/C5Jx7jVzrZ3wNNMqXrHs9p
+   ===================================================================================================== */
+:root { --pop: #ffffff; }
+:root[data-theme="dark"] { --pop: #262626; }
+
+/* Barre latérale */
+.side { width: 288px; padding: 8px; gap: 0; background: var(--side); border-inline-end: 1px solid var(--l2); }
+.side-head { height: 36px; padding: 0 0 0 10px; margin-bottom: 5px; gap: 8px; justify-content: flex-start; }
+[dir="rtl"] .side-head { padding: 0 10px 0 0; }
+.side-fold, .side-unfold { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; margin-inline-start: -4px; padding: 0; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; transition: background var(--t), color var(--t); }
+.side-fold:hover, .side-unfold:hover { background: var(--hover); color: var(--ink); }
+.side-unfold { display: none; margin: 0; width: 32px; height: 32px; border-radius: 8px; }
+.side-logo { display: flex; }
+.side-logo img { height: 22px; }
+.side-head .theme-pick { margin-inline-start: auto; }
+.side-menu { gap: 2px; }
+.side-menu a, .side-user summary, .side-pop a { min-height: 32px; padding: 0 10px; gap: 10px; border-radius: 10px; font-size: 14px; font-weight: 450; line-height: 1.3; }
+.side-menu a svg, .side-pop a svg { color: var(--ink); }
+.side-menu a[aria-current="page"], .side-pop a[aria-current="page"] { background: var(--active); font-weight: 450; }
+.side-new, .side-menu .side-new { font-weight: 450; }
+.side-menu .side-new svg { color: var(--ink); }
+.side-group { display: flex; flex-direction: column; gap: 2px; }
+.side-group > summary { list-style: none; }
+.side-group > summary::-webkit-details-marker { display: none; }
+.side-label { display: flex; align-items: center; gap: 6px; width: max-content; margin: 0; padding: 22px 10px 6px; font-size: 12.5px; font-weight: 450; letter-spacing: 0; text-transform: none; color: var(--muted); cursor: pointer; }
+.side-label:hover { color: var(--ink); }
+.side-label svg { transition: transform var(--t); }
+.side-group:not([open]) .side-label svg { transform: rotate(-90deg); }
+[dir="rtl"] .side-group:not([open]) .side-label svg { transform: rotate(90deg); }
+/* Titre trop long : fondu sur la fin, pas de « … » (comme Claude). */
+.side-recent span, .rc-title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: clip; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+[dir="rtl"] .side-recent span, [dir="rtl"] .rc-title { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }
+.side-menu a.side-all { color: var(--muted); font-size: 14px; }
+.side-menu a.side-all:hover { color: var(--ink); }
+.side-user { margin: auto -8px -8px; padding: 8px; border-top: 1px solid var(--l3); }
+.side-user summary { min-height: 32px; padding: 0 8px; gap: 10px; }
+.side-user summary img { width: 20px; height: 20px; }
+.side-user summary > span { flex: 0 1 auto; }
+.side-user summary svg { color: var(--muted); }
+.side-pop { inset-inline: 8px; bottom: calc(100% + 4px); padding: 4px; border: 1px solid var(--l3); border-radius: 12px; background: var(--pop); box-shadow: var(--shadow-float); }
+
+/* Zone principale */
+.space-main { background: var(--canvas); }
+.space-top { min-height: 48px; padding: 8px 12px 8px 16px; font-size: 14px; color: var(--ink); }
+.space-meta { font-size: 13px; color: var(--muted); }
+.space-lock { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; color: var(--muted); }
+@media (min-width: 861px) {
+  .side-off .side { display: none; }
+  .side-off .side-unfold { display: inline-grid; }
+}
+@media (max-width: 860px) {
+  .side { width: min(288px, 86vw); }
+  .side-fold, .side-unfold { display: none !important; }
+}
+
+/* Accueil : symbole + salutation en serif sur une ligne, au tiers haut, puis le champ. */
+.chat { max-width: 704px; }
+.chat.intro .chat-main { justify-content: flex-start; gap: 0; padding: clamp(32px, 16vh, 220px) 0 32px; }
+.chat-hero { flex-direction: row; justify-content: center; align-items: center; gap: 10px; margin-bottom: 32px; text-align: start; }
+.chat-hero img { flex: none; width: 32px; height: 32px; }
+.chat-hero h1 { margin: 0; font-family: var(--serif); font-size: 36px; font-weight: 400; line-height: 1.15; letter-spacing: -.01em; color: var(--ink); text-wrap: balance; }
+html[lang="ar"] .chat-hero h1 { font-family: var(--font-ar); font-size: 32px; letter-spacing: 0; }
+@media (max-width: 600px) { .chat-hero h1 { font-size: 28px; } .chat-hero img { width: 26px; height: 26px; } }
+
+/* Champ de saisie : gris un peu plus clair que le fond, bord 1 px, arrondi 13, marge intérieure 16. */
+.composer { min-height: 103px; gap: 12px; padding: 14px 16px; border: 1px solid var(--field-line); border-radius: 13px; background: var(--field); }
+.composer-q { padding: 0; font-size: 16px; line-height: 1.4; color: var(--muted-2); }
+.opt, .answer-chat .opt { min-height: 32px; padding: 0 10px; gap: 6px; border: 1px solid var(--chip-line); border-radius: 8px; background: transparent; color: var(--ink); font-size: 14px; font-weight: 450; }
+.opt svg { color: var(--muted); }
+.opt:hover { border-color: var(--chip-line); background: var(--on-field); color: var(--ink); }
+.opt:hover svg { color: var(--ink); }
+.opt[aria-pressed="true"] { border-color: var(--btn); background: var(--btn); color: #fff; }
+.composer-foot { font-size: 13px; color: var(--muted-2); }
+.chat .link:hover { color: var(--ink); }
+
+/* Questions récentes en cartes (comme « Artéfacts récents ») : 70 px sous le champ, 3 colonnes, écart 12. */
+.rc-sec { display: flex; flex-direction: column; gap: 18px; margin-top: 70px; }
+.rc-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 0 16px; font-size: 14px; color: var(--muted); }
+.rc-head a { color: var(--muted); }
+.rc-head a:hover { color: var(--ink); text-decoration: none; }
+.rc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0 8px; }
+.rc { display: flex; flex-direction: column; min-width: 0; padding: 4px 4px 8px; border: 1px solid var(--card-line); border-radius: 10px; background: var(--card); color: var(--ink); transition: border-color var(--t); }
+.rc:hover { border-color: var(--l4); text-decoration: none; }
+.rc-well { display: block; height: 104px; padding: 14px 16px 0; border-radius: 7px; background: var(--well); box-shadow: inset 0 0 0 1px var(--frame); overflow: hidden; }
+.rc-page { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 10px 12px; border-radius: 6px 6px 0 0; background: #ffffff; }
+.rc-page b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 2px; font-size: 9px; line-height: 1.3; font-weight: 700; color: #1f1f1f; }
+.rc-page i { display: block; height: 4px; border-radius: 2px; background: #e6e6e6; }
+.rc-page i:nth-of-type(1) { width: 92%; }
+.rc-page i:nth-of-type(2) { width: 78%; }
+.rc-page i:nth-of-type(3) { width: 56%; }
+.rc-title { display: block; padding: 8px 6px 0; font-size: 14px; }
+.rc-time { padding: 1px 6px 0; font-size: 12.5px; color: var(--muted-3); }
+@media (max-width: 640px) { .rc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rc:nth-child(3) { display: none; } }
+
+/* Sujets sous le champ (visiteur) : petites touches grises, comme les suggestions de Claude. */
+.topics { gap: 8px; margin-top: 16px; padding: 0 8px; }
+.topic { height: 32px; padding: 0 10px; gap: 6px; border: 1px solid var(--l2); border-radius: 8px; color: var(--muted); font-size: 14px; font-weight: 450; }
+.topic svg { color: var(--muted); }
+.topic:hover { background: var(--hover); color: var(--ink); }
+.topic:hover svg { color: var(--ink); }
+
+/* En-tête : boutons de 32 px arrondis à 8, sélecteur de thème en contrôle segmenté (28 px, onglet 24). */
+.nav .btn-sm { min-height: 32px; padding: 0 12px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+.nav-links > a.plain { padding: 6px 10px; border-radius: 8px; font-weight: 450; }
+.nav-links > a.plain:hover { background: var(--hover); }
+.theme-pick { align-items: center; gap: 0; height: 28px; padding: 2px; border: 0; border-radius: 7px; background: var(--seg); }
+.theme-pick button { width: 33px; height: 24px; border-radius: 5px; color: var(--muted); }
+.theme-pick button[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); }
+@media (max-width: 520px) { .nav .theme-pick { height: auto; background: none; } }
+@media (max-width: 380px) { .nav .btn-sm { padding: 0 10px; } .nav-links > a.plain { padding: 6px; } }
+/* Boutons secondaires neutres : le bleu reste réservé à l'action principale (comme l'orange chez Claude). */
+.btn-ghost { color: var(--ink); }
+/* Fenêtre « Mon compte » : même règle, icône active neutre, pas de gras. */
+.set-nav a[aria-current="page"] { font-weight: 450; }
+.set-nav a[aria-current="page"] svg { color: var(--ink); }
+.set-back { background: rgba(0, 0, 0, .5); }

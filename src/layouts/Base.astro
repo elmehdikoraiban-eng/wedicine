@@ -45,6 +45,8 @@ import { isAdmin } from "@/lib/admin";
     <script is:inline>
       // Thème avant l'affichage (pas de flash) : choix gardé, sinon réglage du système.
       try { var th = localStorage.getItem("wd-theme"); if (!th) th = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; document.documentElement.dataset.theme = th; } catch (e) {}
+      // Menu latéral replié (espace patient, ordinateur) : appliqué avant l'affichage.
+      try { if (localStorage.getItem("wd-side") === "off") document.documentElement.classList.add("side-off"); } catch (e) {}
     </script>
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

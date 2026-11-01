@@ -50,7 +50,7 @@ function cleared(a: Answers, step: Step, themeFirst: boolean): Answers {
   return out;
 }
 
-export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; initialTheme?: string; greeting?: string; recent?: { href: string; title: string }[] }) {
+export function Chat({ lang, initialTheme, greeting, recent, allHref }: { lang: Lang; initialTheme?: string; greeting?: string; recent?: { href: string; title: string; ago?: string }[]; allHref?: string }) {
   const start = getTheme(initialTheme ?? "") ? initialTheme! : "";
   const [themeFirst, setThemeFirst] = useState(!!start);
   const [a, setA] = useState<Answers>({ ...EMPTY, theme: start });
@@ -199,7 +199,7 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
 
   const composer = (
     <div className="composer">
-      {intro && !greeting && <p className="composer-q">{question(step)}</p>}
+      {intro && <p className="composer-q">{question(step)}</p>}
       <div className="opts">
         {choices().map((c) => (
           <button key={c.id} type="button" className={`opt${c.alert ? " alert" : ""}`} disabled={busy}
@@ -254,15 +254,26 @@ export function Chat({ lang, initialTheme, greeting, recent }: { lang: Lang; ini
     return (
       <div className="chat intro">
         <div className="chat-main">
+          {/* Comme l'accueil de Claude : symbole et salutation sur une ligne, le champ, puis les questions récentes en cartes. */}
           <div className="chat-hero">
-            <><img src="/brand/symbole.svg" alt="" width={44} height={44} className="logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width={44} height={44} className="logo-dark" /></>
+            <><img src="/brand/symbole.svg" alt="" width={32} height={32} className="logo-light" /><img src="/brand/symbole-sombre.svg" alt="" width={32} height={32} className="logo-dark" /></>
             <h1>{greeting ?? t(lang, "chatTitle")}</h1>
-            {greeting && <p>{question(step)}</p>}
           </div>
           {composer}
           {greeting
             ? recent && recent.length > 0 && (
-              <p className="resume"><span>{t(lang, "orResume")}</span>{recent.map((r) => <a key={r.href} href={r.href}>{r.title}</a>)}</p>
+              <section className="rc-sec" aria-label={t(lang, "recentQuestions")}>
+                <div className="rc-head"><span>{t(lang, "recentQuestions")}</span>{allHref && <a href={allHref}>{t(lang, "seeAll")}</a>}</div>
+                <div className="rc-grid">
+                  {recent.map((r) => (
+                    <a key={r.href} className="rc" href={r.href}>
+                      <span className="rc-well" aria-hidden="true"><span className="rc-page"><b>{r.title}</b><i /><i /><i /></span></span>
+                      <span className="rc-title">{r.title}</span>
+                      {r.ago && <span className="rc-time">{r.ago}</span>}
+                    </a>
+                  ))}
+                </div>
+              </section>
             )
             : <nav className="topics" aria-label={t(lang, "themesTitle")}>
               {THEMES.map((x) => <a key={x.id} className="topic" href={`/${lang}?theme=${x.id}`} onClick={(e) => { e.preventDefault(); startWith(x.id); }}><Icon name={x.icon} size={16} />{x.label[lang]}</a>)}

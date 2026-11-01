@@ -44,6 +44,11 @@ export function whenLabel(d: string | Date, l: Lang, today: string, now = new Da
 }
 
 // Soir à partir de 18 h (pour « Bonsoir »).
+// Jour de la semaine à l'heure du Maroc, pour « Bon dimanche, El Mehdi » (accueil de l'espace patient).
+export function weekday(l: Lang, now = new Date()) {
+  return new Intl.DateTimeFormat(l === "en" ? "en" : "fr", { timeZone: TZ, weekday: "long" }).format(now);
+}
+
 export function isEvening(now = new Date()) {
   const h = Number(new Intl.DateTimeFormat("en", { timeZone: TZ, hour: "numeric", hour12: false }).format(now));
   return h >= 18 || h < 5;

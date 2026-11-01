@@ -5,7 +5,7 @@ import { t } from "@/lib/i18n";
 import { langParam } from "@/lib/lang";
 import { theme } from "@/lib/content/themes";
 import { loadAccount } from "@/lib/account";
-import { isEvening, SITE_URL } from "@/lib/site";
+import { isEvening, SITE_URL, timeAgo, weekday } from "@/lib/site";
 import { Chat } from "@/components/Chat";
 
 const lang = langParam(Astro.params);
@@ -17,11 +17,11 @@ const initialTheme = theme(th) ? th : undefined;
 const alternates = { fr: `${SITE_URL}/fr`, ar: `${SITE_URL}/ar`, en: `${SITE_URL}/en`, "x-default": `${SITE_URL}/fr` };
 // Connecté : la même conversation, dans l'espace patient, avec un bonjour et les questions récentes.
 const a = await loadAccount(Astro, lang);
-const greeting = a ? t(lang, isEvening() ? "greetEvening" : "greetDay").replace("{name}", a.acc.first_name) : undefined;
+const greeting = a ? t(lang, isEvening() ? "greetEvening" : "greetDay").replace("{day}", weekday(lang)).replace("{name}", a.acc.first_name) : undefined;
 ---
 {a ? (
   <Account lang={lang} active="new" title={t(lang, "newQuestion")} meta={t(lang, "privateAnswers")} name={a.shortName} avatar={a.avatar} recent={a.recent} acc={a} plain>
-    <Chat client:load lang={lang} initialTheme={initialTheme} greeting={greeting} recent={a.recent.slice(0, 3).map((r) => ({ href: `/${lang}/compte/q/${r.id}`, title: r.title }))} />
+    <Chat client:load lang={lang} initialTheme={initialTheme} greeting={greeting} recent={a.recent.slice(0, 3).map((r) => ({ href: `/${lang}/compte/q/${r.id}`, title: r.title, ago: timeAgo(r.at, lang) }))} allHref={`/${lang}/compte/questions`} />
   </Account>
 ) : (
   <Base lang={lang} canonical={`/${lang}`} alternates={alternates} wrap={false} footer={false}>

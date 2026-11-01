@@ -32,26 +32,28 @@ import ThemePick from "@/components/ThemePick.astro";
     <label for="side-toggle" class="side-backdrop" aria-hidden="true"></label>
     <aside class="side" aria-label={t(lang, "myAccount")}>
       <div class="side-head">
-        <a href={`/${lang}`} class="side-logo" aria-label="Wedicine"><img src="/brand/logo.svg" alt="" width="147" height="26" class="logo-light" /><img src="/brand/logo-sombre.svg" alt="" width="147" height="26" class="logo-dark" /></a>
+        <button type="button" class="side-fold" data-side-fold aria-label={t(lang, "sideFold")} title={t(lang, "sideFold")}><Icon name="PanelLeft" size={16} /></button>
+        <a href={`/${lang}`} class="side-logo" aria-label="Wedicine"><img src="/brand/logo.svg" alt="" width="124" height="22" class="logo-light" /><img src="/brand/logo-sombre.svg" alt="" width="124" height="22" class="logo-dark" /></a>
+        <ThemePick lang={lang} />
         <label for="side-toggle" class="side-close" aria-label={t(lang, "close")}><Icon name="X" size={18} /></label>
       </div>
       <nav class="side-menu">
-        <a href={`/${lang}`} class="side-new" aria-current={active === "new" ? "page" : undefined}><Icon name="Plus" size={18} strokeWidth={2.2} /><span>{t(lang, "newQuestion")}</span></a>
+        <a href={`/${lang}`} class="side-new" aria-current={active === "new" ? "page" : undefined}><Icon name="Plus" size={16} /><span>{t(lang, "newQuestion")}</span></a>
         {recent.length > 0 && (
-          <>
-            <p class="side-label">{t(lang, "recentLabel")}</p>
+          <details class="side-group" open>
+            <summary class="side-label">{t(lang, "recentLabel")}<svg width="8" height="8" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3h8L5 8z" fill="currentColor" /></svg></summary>
             {recent.map((r) => (
               <a href={`/${lang}/compte/q/${r.id}`} class="side-recent" aria-current={r.id === currentId ? "page" : undefined}><span>{r.title}</span></a>
             ))}
-            <a href={`/${lang}/compte/questions`} class="side-all" aria-current={active === "questions" ? "page" : undefined}><span>{t(lang, "seeAll")}</span></a>
-          </>
+            <a href={`/${lang}/compte/questions`} class="side-all"><span>{t(lang, "seeAll")}</span></a>
+          </details>
         )}
       </nav>
       <details class="side-user">
         <summary aria-label={t(lang, "myAccount")}>
-          <img src={`/avatars/${avatar}.svg`} alt="" width="28" height="28" />
-          <span>{name}</span>
-          <Icon name="ChevronDown" size={16} />
+          <img src={`/avatars/${avatar}.svg`} alt="" width="20" height="20" />
+          <span dir="auto">{name}</span>
+          <Icon name="ChevronDown" size={12} />
         </summary>
         <div class="side-pop">
           {ACCOUNT_PAGES.map((p) => (
@@ -63,7 +65,6 @@ import ThemePick from "@/components/ThemePick.astro";
           <div class="side-lang" aria-label={t(lang, "accLanguage")}>
             {LANGS.map((l) => <a href={`/${l}${rest}`} aria-current={l === lang ? "true" : undefined} lang={l}>{LANG_NAMES[l]}</a>)}
           </div>
-          <div class="side-theme"><span>{t(lang, "theme")}</span><ThemePick lang={lang} /></div>
           <a href={`/api/logout?lang=${lang}`} class="logout" rel="nofollow"><Icon name="LogOut" size={18} /><span>{t(lang, "logout")}</span></a>
         </div>
       </details>
@@ -71,8 +72,13 @@ import ThemePick from "@/components/ThemePick.astro";
     <div class="space-main">
       <div class="space-top">
         <label for="side-toggle" class="side-burger" aria-label={t(lang, "menu")}><Icon name="Menu" size={20} /></label>
-        <span class="space-title">{plain ? title : t(lang, "myAccount")}</span>
-        {meta && <span class="space-meta">{meta}</span>}
+        <button type="button" class="side-unfold" data-side-fold aria-label={t(lang, "sideUnfold")} title={t(lang, "sideUnfold")}><Icon name="PanelLeft" size={16} /></button>
+        {active === "new"
+          ? <span class="space-title" aria-hidden="true"></span>
+          : <span class="space-title">{plain ? title : t(lang, "myAccount")}</span>}
+        {active === "new"
+          ? meta && <span class="space-lock" title={meta} aria-label={meta}><Icon name="Lock" size={16} /></span>
+          : meta && <span class="space-meta">{meta}</span>}
         <a href={`/${lang}`} class="space-plus" aria-label={t(lang, "newQuestion")}><Icon name="Plus" size={20} strokeWidth={2.2} /></a>
       </div>
       {plain ? <slot /> : <div class="acc-main"><h1 class="acc-title">{title}</h1><slot /></div>}
@@ -85,6 +91,11 @@ import ThemePick from "@/components/ThemePick.astro";
   // Le menu du patient se ferme au clic à l'extérieur ou avec Échap ; le tiroir mobile se ferme avec Échap.
   const m = document.querySelector<HTMLDetailsElement>(".side-user");
   const toggle = document.querySelector<HTMLInputElement>("#side-toggle");
+  // Ordinateur : l'icône en haut de la barre la replie (comme Claude) ; le choix est gardé dans le navigateur.
+  document.querySelectorAll("[data-side-fold]").forEach((b) => b.addEventListener("click", () => {
+    const off = document.documentElement.classList.toggle("side-off");
+    try { localStorage.setItem("wd-side", off ? "off" : "on"); } catch {}
+  }));
   document.addEventListener("click", (e) => { if (m?.open && !m.contains(e.target as Node)) m.open = false; });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;

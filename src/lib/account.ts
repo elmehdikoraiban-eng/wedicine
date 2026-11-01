@@ -52,6 +52,6 @@ export async function loadAccount(Astro: AstroGlobal, lang: Lang) {
     { n: qs.filter(({ q }) => q.who !== "moi").length, k: t(lang, "accStatRelatives"), href: "questions" },
   ];
   const helped = nPub ? await helpedCount(user.id).catch(() => 0) : 0;
-  const recent = qs.slice(0, 5).map(({ q, th }) => ({ id: q.id, title: shortTitle(lang, q, th) }));
+  const recent = qs.slice(0, 5).map(({ q, th }) => ({ id: q.id, title: shortTitle(lang, q, th), at: q.created_at }));
   return { helped, acc, avatar: String(avatarOf(acc)).padStart(2, "0"), qs, health, topics, stats, nPub, recent, shortName: publicName(acc.first_name, acc.last_name) };
 }
